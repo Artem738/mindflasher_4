@@ -1,0 +1,31 @@
+# Ignore all files by default
+*
+.idea/
+ios/
+macos/
+windows/
+web/
+
+
+# Except for the 'lib' directory and its contents
+!lib/
+!lib/**
+!lib/env_config_example.dart
+
+# Explicitly ignore env_config.dart files
+lib/env_config.dart
+
+
+# Except for the 'AndroidManifest.xml' file
+!android/
+!android/app/
+!android/app/src/
+!android/app/src/main/
+!android/app/src/main/AndroidManifest.xml
+
+# Except for .gitignore, pubspec.yaml, README.md, LICENSE in the root directory
+!.gitignore
+!pubspec.yaml
+!README.md
+!LICENSE
+

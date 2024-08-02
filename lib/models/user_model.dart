@@ -1,15 +1,22 @@
 class UserModel {
-  final String id;
-  final String? firstName;
-  final String? lastName;
+  final int? apiId;
+  final int? tgId;  // Telegram ID
   final String? username;
+  final String? firstname;
+  final String? lastname;
+  final String? languageCode;
   final String? email;
+  final String? token;
+
 
   UserModel({
-    required this.id,
-    this.firstName,
-    this.lastName,
-    this.username,
+    this.apiId,
+    this.tgId,
+    required this.username,
+    this.firstname,
+    this.lastname,
+    this.languageCode,
     this.email,
+    this.token,
   });
 }

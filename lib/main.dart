@@ -1,4 +1,7 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:mindflasher_4/env_config.dart';
 import 'package:mindflasher_4/models/user_model.dart';
 import 'package:mindflasher_4/services/api_logger.dart';
 import 'package:provider/provider.dart';
@@ -9,7 +12,7 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AppStartupNotifier()),
+        ChangeNotifierProvider(create: (_) => ProviderUserLogin()),
       ],
       child: AppStartupWidget(),
     ),
@@ -19,7 +22,7 @@ void main() {
 class AppStartupWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final notifier = Provider.of<AppStartupNotifier>(context);
+    final notifier = Provider.of<ProviderUserLogin>(context);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -34,8 +37,8 @@ class AppStartupWidget extends StatelessWidget {
   }
 }
 
-class AppStartupNotifier extends ChangeNotifier {
-  AppStartupNotifier() {
+class ProviderUserLogin extends ChangeNotifier {
+  ProviderUserLogin() {
     initialize();
   }
 
@@ -81,18 +84,14 @@ class AppStartupNotifier extends ChangeNotifier {
         _telegramUser = TelegramWebApp.instance.initData?.user;
         Future.delayed(const Duration(seconds: 1), TelegramWebApp.instance.expand);
         if (_telegramUser != null) {
-          // ApiLogger.apiPrint('User tgId: ${_telegramUser?.id}');
-          // ApiLogger.apiPrint('User username: ${_telegramUser?.username}');
-          // ApiLogger.apiPrint('User firstname: ${_telegramUser?.firstname}');
-          // ApiLogger.apiPrint('User lastname: ${_telegramUser?.lastname}');
-          // ApiLogger.apiPrint('User languageCode: ${_telegramUser?.languageCode}');
-
           _userModel = UserModel(
             tgId: _telegramUser?.id,
             username: _telegramUser?.username,
             firstname: _telegramUser?.firstname,
             lastname: _telegramUser?.lastname,
             languageCode: _telegramUser?.languageCode,
+            authDate: TelegramWebApp.instance.initData?.authDate,
+            hash: TelegramWebApp.instance.initData?.hash,
           );
 
           await _loginWithTelegram();
@@ -107,10 +106,31 @@ class AppStartupNotifier extends ChangeNotifier {
     }
   }
 
-  Future<void> _loginWithTelegram() async {
-    // Здесь будет логика для взаимодействия с сервером
-    ApiLogger.apiPrint('Telegram User: ${_userModel?.tgId}, ${_userModel?.username}, ${_userModel?.firstname}, ${_userModel?.languageCode}');
 
+  Future<void> _loginWithTelegram() async {
+    const url = '${EnvConfig.mainApiUrl}/telegram/auth';
+    final headers = {'Content-Type': 'application/json'};
+    final body = jsonEncode(_userModel?.toJson());
+
+    try {
+      final response = await http.post(Uri.parse(url), headers: headers, body: body);
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        // Обработка успешного ответа, например, сохранение токена
+        _userModel = _userModel?.copyWith(token: responseData['token']);
+        notifyListeners();
+      } else {
+        // Обработка ошибки
+        _hasError = true;
+        _errorMessage = 'Ошибка авторизации: ${response.statusCode}';
+        notifyListeners();
+      }
+    } catch (e) {
+      // Обработка ошибки сети
+      _hasError = true;
+      _errorMessage = 'Ошибка сети: $e';
+      notifyListeners();
+    }
   }
 
   Future<void> _loginWithoutTelegram() async {
@@ -130,10 +150,10 @@ class AppStartupNotifier extends ChangeNotifier {
 class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final notifier = context.watch<AppStartupNotifier>();
+    final notifier = context.watch<ProviderUserLogin>();
     // notifier.initialize();
     final sharedPreferences = notifier.sharedPreferences;
-    final user = context.read<AppStartupNotifier>()._userModel;
+    final user = context.read<ProviderUserLogin>()._userModel;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(

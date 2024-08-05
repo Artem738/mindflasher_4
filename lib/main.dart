@@ -1,12 +1,15 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/env_config.dart';
+import 'package:mindflasher_4/main_app.dart';
 import 'package:mindflasher_4/models/user_model.dart';
+import 'package:mindflasher_4/screens/util/snackbar_extension.dart';
 import 'package:mindflasher_4/services/api_logger.dart';
+import 'package:mindflasher_4/telegram/telegram_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:telegram_web_app/telegram_web_app.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(
@@ -28,11 +31,13 @@ class AppStartupWidget extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: notifier.isLoading
           ? Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
-            )
-          : MainApp(),
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      )
+          : ScaffoldMessenger(
+        child: MainApp(), // Убедимся, что класс MainApp объявлен корректно
+      ),
     );
   }
 }
@@ -58,6 +63,7 @@ class ProviderUserLogin extends ChangeNotifier {
   SharedPreferences? get sharedPreferences => _sharedPreferences;
 
   TelegramUser? get telegramUser => _telegramUser;
+
   UserModel? get userModel => _userModel;
 
   Future<void> initialize() async {
@@ -93,7 +99,8 @@ class ProviderUserLogin extends ChangeNotifier {
             authDate: TelegramWebApp.instance.initData?.authDate,
             hash: TelegramWebApp.instance.initData?.hash,
           );
-
+          // Логируем отправляемые данные
+          print('Отправляемые данные: ${_userModel!.toJson()}');
           await _loginWithTelegram();
         }
       }
@@ -106,29 +113,39 @@ class ProviderUserLogin extends ChangeNotifier {
     }
   }
 
-
   Future<void> _loginWithTelegram() async {
-    const url = '${EnvConfig.mainApiUrl}/telegram/auth';
+    const url = '${EnvConfig.mainApiUrl}/api/telegram/auth';
     final headers = {'Content-Type': 'application/json'};
-    final body = jsonEncode(_userModel?.toJson());
+
+    final initData = TelegramWebApp.instance.initData?.raw;
+
+    ApiLogger.apiPrint("login vs TG $url");
+    print("Отправляем запрос: $initData");
 
     try {
-      final response = await http.post(Uri.parse(url), headers: headers, body: body);
+      final response = await http.post(
+        Uri.parse(url),
+        headers: headers,
+        body: jsonEncode({'initData': initData}),
+      );
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         // Обработка успешного ответа, например, сохранение токена
         _userModel = _userModel?.copyWith(token: responseData['token']);
+        ApiLogger.apiPrint(_userModel!.toJson().toString());
         notifyListeners();
       } else {
         // Обработка ошибки
         _hasError = true;
         _errorMessage = 'Ошибка авторизации: ${response.statusCode}';
+        ApiLogger.apiPrint(_errorMessage);
         notifyListeners();
       }
     } catch (e) {
       // Обработка ошибки сети
       _hasError = true;
       _errorMessage = 'Ошибка сети: $e';
+      ApiLogger.apiPrint(_errorMessage);
       notifyListeners();
     }
   }
@@ -144,43 +161,5 @@ class ProviderUserLogin extends ChangeNotifier {
     _errorMessage = '';
     initialize();
     notifyListeners();
-  }
-}
-
-class MainApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final notifier = context.watch<ProviderUserLogin>();
-    // notifier.initialize();
-    final sharedPreferences = notifier.sharedPreferences;
-    final user = context.read<ProviderUserLogin>()._userModel;
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Main App 2'),
-        ),
-        body: Center(
-          child: Container(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (user != null) ...[
-                  Text('Logged in via Telegram'),
-                  Text('User ID: ${user.tgId}'),
-                  Text('First Name: ${user.firstname}'),
-                  if (user.lastname != null) Text('Last Name: ${user.lastname}'),
-                  if (user.username != null) Text('Username: ${user.username}'),
-                  if (user.languageCode != null) Text('Language Code: ${user.languageCode}'),
-                ] else
-                  Text('Simple login'),
-                Text('SharedPreferences is ready: ${sharedPreferences != null}'),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }

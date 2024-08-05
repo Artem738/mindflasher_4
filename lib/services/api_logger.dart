@@ -5,6 +5,7 @@ import 'package:mindflasher_4/env_config.dart';
 
 
 /// ApiLogger.apiPrint('Some error: $e');
+/// СПЕЦИАЛЬНЫЙ КЛАСС ДЛЯ ПРОСТОГО ЛОГИРОВАНИЯ НА СЕРВЕРЕ, ПОЛЕЗНО...
 class ApiLogger {
   static Future<void> apiPrint(String message) async {
     final url = Uri.parse("${EnvConfig.mainApiUrl}/api/log");

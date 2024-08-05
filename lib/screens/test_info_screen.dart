@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mindflasher_4/providers/provider_user_login.dart';
 import 'package:mindflasher_4/screens/util/snackbar_extension.dart';
 import 'package:mindflasher_4/telegram/telegram_utils.dart';
 import 'package:provider/provider.dart';
@@ -6,7 +7,7 @@ import 'package:telegram_web_app/telegram_web_app.dart';
 
 import 'package:mindflasher_4/main.dart'; // Импортируем файл с классом ProviderUserLogin
 
-class MainApp extends StatelessWidget {
+class TestInfoScreen extends StatelessWidget {
   final TelegramWebApp telegram = TelegramWebApp.instance;
 
   @override

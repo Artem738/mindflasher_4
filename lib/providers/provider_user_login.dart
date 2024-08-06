@@ -66,16 +66,12 @@ class ProviderUserLogin extends ChangeNotifier {
             hash: TelegramWebApp.instance.initData?.hash,
           );
           // Логируем отправляемые данные
-          print('Отправляемые данные: ${_userModel!.toJson()}');
+          ApiLogger.apiPrint('Отправляемые данные: ${_userModel!.toJson().toString()}');
           await _loginWithTelegram();
         }
       }
     } catch (e) {
       // Игнорируем ошибку, так как это нормальное поведение
-    }
-
-    if (_telegramUser == null) {
-      await _loginWithoutTelegram();
     }
   }
 
@@ -85,8 +81,8 @@ class ProviderUserLogin extends ChangeNotifier {
 
     final initData = TelegramWebApp.instance.initData?.raw;
 
-    ApiLogger.apiPrint("login vs TG $url");
-    print("Отправляем запрос: $initData");
+    ApiLogger.apiPrint("login vs Telegram $url");
+    ApiLogger.apiPrint("Send initData: ${initData.toString()}");
 
     try {
       final response = await http.post(
@@ -98,7 +94,7 @@ class ProviderUserLogin extends ChangeNotifier {
         final responseData = jsonDecode(response.body);
         // Обработка успешного ответа, например, сохранение токена
         _userModel = _userModel?.copyWith(token: responseData['token']);
-        ApiLogger.apiPrint(responseData['token']);
+        ApiLogger.apiPrint('Ошибка авторизации: ${responseData['token']}');
         notifyListeners();
       } else {
         // Обработка ошибки
@@ -116,10 +112,6 @@ class ProviderUserLogin extends ChangeNotifier {
     }
   }
 
-  Future<void> _loginWithoutTelegram() async {
-    ApiLogger.apiPrint('Logged in without Telegram');
-  }
-
   Future<void> loginWithEmail(String email, String password) async {
     const url = '${EnvConfig.mainApiUrl}/api/login';
     final headers = {'Content-Type': 'application/json'};
@@ -129,11 +121,14 @@ class ProviderUserLogin extends ChangeNotifier {
       final response = await http.post(Uri.parse(url), headers: headers, body: body);
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        _userModel = UserModel(token: responseData['access_token']);
+        _userModel = UserModel(
+          token: responseData['access_token'],
+          email: email,
+        );
         notifyListeners();
       } else {
         _hasError = true;
-        _errorMessage = 'Login failed: ${response.statusCode}';
+        _errorMessage = 'Login failed!'; //  ${response.statusCode}
         notifyListeners();
       }
     } catch (e) {

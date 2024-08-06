@@ -15,4 +15,16 @@ class ProviderUserControl with ChangeNotifier {
     _userModel = null;
     notifyListeners();
   }
+
+  void initializeUser(UserModel user) {
+    _userModel = user;
+    notifyListeners();
+  }
+
+  void incrementApiId() {
+    if (_userModel != null) {
+      _userModel = _userModel!.copyWith(apiId: (_userModel!.apiId ?? 0) + 1);
+      notifyListeners();
+    }
+  }
 }

@@ -41,9 +41,9 @@ class LoginScreen extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => DeckListScreen()),
                   );
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Login failed')),
-                  );
+                  // ScaffoldMessenger.of(context).showSnackBar(
+                  //   SnackBar(content: Text('Login failed')),
+                  // );
                 }
               },
               child: Text('Login'),

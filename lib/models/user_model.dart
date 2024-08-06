@@ -13,7 +13,7 @@ class UserModel {
   UserModel({
     this.apiId,
     this.tgId,
-    required this.username,
+    this.username,
     this.firstname,
     this.lastname,
     this.languageCode,

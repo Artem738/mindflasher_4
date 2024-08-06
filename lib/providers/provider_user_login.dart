@@ -117,8 +117,58 @@ class ProviderUserLogin extends ChangeNotifier {
   }
 
   Future<void> _loginWithoutTelegram() async {
-    // Здесь будет логика для взаимодействия с сервером
     ApiLogger.apiPrint('Logged in without Telegram');
+  }
+
+  Future<void> loginWithEmail(String email, String password) async {
+    const url = '${EnvConfig.mainApiUrl}/api/login';
+    final headers = {'Content-Type': 'application/json'};
+    final body = jsonEncode({'email': email, 'password': password});
+
+    try {
+      final response = await http.post(Uri.parse(url), headers: headers, body: body);
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        _userModel = UserModel(token: responseData['access_token']);
+        notifyListeners();
+      } else {
+        _hasError = true;
+        _errorMessage = 'Login failed: ${response.statusCode}';
+        notifyListeners();
+      }
+    } catch (e) {
+      _hasError = true;
+      _errorMessage = 'Network error: $e';
+      notifyListeners();
+    }
+  }
+
+  Future<void> registerWithEmail(String name, String email, String password, String passwordConfirmation) async {
+    const url = '${EnvConfig.mainApiUrl}/api/register';
+    final headers = {'Content-Type': 'application/json'};
+    final body = jsonEncode({
+      'name': name,
+      'email': email,
+      'password': password,
+      'password_confirmation': passwordConfirmation,
+    });
+
+    try {
+      final response = await http.post(Uri.parse(url), headers: headers, body: body);
+      if (response.statusCode == 201) {
+        final responseData = jsonDecode(response.body);
+        _userModel = UserModel(token: responseData['access_token']);
+        notifyListeners();
+      } else {
+        _hasError = true;
+        _errorMessage = 'Registration failed: ${response.statusCode}';
+        notifyListeners();
+      }
+    } catch (e) {
+      _hasError = true;
+      _errorMessage = 'Network error: $e';
+      notifyListeners();
+    }
   }
 
   void retry() {

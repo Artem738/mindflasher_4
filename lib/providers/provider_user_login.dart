@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb; // Импортирует переменную kIsWeb которая используется для определения Web
-import 'telegram_web_app_stub.dart' // Импортируется заглушка для Классов
+import 'devise_special_load/telegram_web_app_stub.dart' // Импортируется заглушка для Классов
     if (dart.library.html) 'telegram_web_app_web.dart'; // Если библиотека dart.library.html доступна (приложение выполняется в веб-браузере),// то импортируется реальная реализация для веб-платформ
 
 class ProviderUserLogin extends ChangeNotifier {

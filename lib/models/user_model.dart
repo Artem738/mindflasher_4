@@ -1,14 +1,16 @@
-class UserModel {
-  final int? apiId;
-  final int? tgId;  // Telegram ID
-  final String? username;
-  final String? firstname;
-  final String? lastname;
-  final String? languageCode;
-  final String? email;
-  final String? token;
-  final int? authDate;
-  final String? hash;
+import 'package:flutter/material.dart';
+
+class UserModel extends ChangeNotifier {
+  int? apiId;
+  int? tgId;
+  String? username;
+  String? firstname;
+  String? lastname;
+  String? languageCode;
+  String? email;
+  String? token;
+  int? authDate;
+  String? hash;
 
   UserModel({
     this.apiId,
@@ -23,19 +25,7 @@ class UserModel {
     this.hash,
   });
 
-  Map<String, dynamic> toJson() {
-    return {
-      'tgId': tgId,
-      'username': username,
-      'firstname': firstname,
-      'lastname': lastname,
-      'languageCode': languageCode,
-      'authDate': authDate,
-      'hash': hash,
-    };
-  }
-
-  UserModel copyWith({
+  void update({
     int? apiId,
     int? tgId,
     String? username,
@@ -47,17 +37,25 @@ class UserModel {
     int? authDate,
     String? hash,
   }) {
-    return UserModel(
-      apiId: apiId ?? this.apiId,
-      tgId: tgId ?? this.tgId,
-      username: username ?? this.username,
-      firstname: firstname ?? this.firstname,
-      lastname: lastname ?? this.lastname,
-      languageCode: languageCode ?? this.languageCode,
-      email: email ?? this.email,
-      token: token ?? this.token,
-      authDate: authDate ?? this.authDate,
-      hash: hash ?? this.hash,
-    );
+    this.apiId = apiId ?? this.apiId;
+    this.tgId = tgId ?? this.tgId;
+    this.username = username ?? this.username;
+    this.firstname = firstname ?? this.firstname;
+    this.lastname = lastname ?? this.lastname;
+    this.languageCode = languageCode ?? this.languageCode;
+    this.email = email ?? this.email;
+    this.token = token ?? this.token;
+    this.authDate = authDate ?? this.authDate;
+    this.hash = hash ?? this.hash;
+    notifyListeners();
+  }
+
+  void incrementApiId() {
+    apiId = (apiId ?? 0) + 1;
+    notifyListeners();
+  }
+
+  String log() {
+    return 'UserModel - apiId: $apiId, tgId: $tgId, username: $username, firstname: $firstname, lastname: $lastname, languageCode: $languageCode, email: $email, token: $token, authDate: $authDate, hash: $hash';
   }
 }

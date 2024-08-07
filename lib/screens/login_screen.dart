@@ -18,6 +18,8 @@ class LoginScreen extends StatelessWidget {
         padding: EdgeInsets.all(16.0),
         child: Column(
           children: [
+            SelectableText("222@222.222"),
+            SelectableText("12345678"),
             TextField(
               controller: _emailController,
               decoration: InputDecoration(labelText: 'Email'),
@@ -35,15 +37,15 @@ class LoginScreen extends StatelessWidget {
                   _emailController.text,
                   _passwordController.text,
                 );
-                if (provider.userModel != null) {
+                if (provider.userModel.token != null) {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => DeckListScreen()),
                   );
                 } else {
-                  // ScaffoldMessenger.of(context).showSnackBar(
-                  //   SnackBar(content: Text('Login failed')),
-                  // );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Login failed')),
+                  );
                 }
               },
               child: Text('Login'),

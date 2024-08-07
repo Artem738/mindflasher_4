@@ -47,7 +47,7 @@ class RegistrationScreen extends StatelessWidget {
                   _passwordController.text,
                   _confirmPasswordController.text,
                 );
-                if (provider.userModel != null) {
+                if (provider.userModel.token != null) {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => DeckListScreen()),

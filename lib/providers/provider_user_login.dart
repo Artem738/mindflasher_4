@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/env_config.dart';
 import 'package:mindflasher_4/models/user_model.dart';
@@ -9,7 +8,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:telegram_web_app/telegram_web_app.dart';
 
 class ProviderUserLogin extends ChangeNotifier {
-  ProviderUserLogin() {
+  final UserModel _userModel;
+
+  ProviderUserLogin(this._userModel) {
     initialize();
   }
 
@@ -18,7 +19,6 @@ class ProviderUserLogin extends ChangeNotifier {
   String _errorMessage = '';
   SharedPreferences? _sharedPreferences;
   TelegramUser? _telegramUser;
-  UserModel? _userModel;
 
   bool get isLoading => _isLoading;
 
@@ -30,12 +30,11 @@ class ProviderUserLogin extends ChangeNotifier {
 
   TelegramUser? get telegramUser => _telegramUser;
 
-  UserModel? get userModel => _userModel;
+  UserModel get userModel => _userModel;
 
   Future<void> initialize() async {
     await _initializeSharedPreferences();
     await _initializeTelegram();
-
     _isLoading = false;
     notifyListeners();
   }
@@ -44,8 +43,10 @@ class ProviderUserLogin extends ChangeNotifier {
     try {
       _sharedPreferences = await SharedPreferences.getInstance();
     } catch (e) {
-      _hasError = true; // Устанавливаем флаг ошибки
-      _errorMessage = e.toString(); // Сохраняем сообщение об ошибке
+      _hasError = true;
+      _errorMessage = e.toString();
+    } finally {
+      notifyListeners();
     }
   }
 
@@ -56,7 +57,7 @@ class ProviderUserLogin extends ChangeNotifier {
         _telegramUser = TelegramWebApp.instance.initData?.user;
         Future.delayed(const Duration(seconds: 1), TelegramWebApp.instance.expand);
         if (_telegramUser != null) {
-          _userModel = UserModel(
+          _userModel.update(
             tgId: _telegramUser?.id,
             username: _telegramUser?.username,
             firstname: _telegramUser?.firstname,
@@ -65,13 +66,15 @@ class ProviderUserLogin extends ChangeNotifier {
             authDate: TelegramWebApp.instance.initData?.authDate,
             hash: TelegramWebApp.instance.initData?.hash,
           );
-          // Логируем отправляемые данные
-          ApiLogger.apiPrint('Отправляемые данные: ${_userModel!.toJson().toString()}');
           await _loginWithTelegram();
         }
       }
     } catch (e) {
-      // Игнорируем ошибку, так как это нормальное поведение
+      //
+      // Заглушка: Здесь намеренно игнорируем ошибку. Тут нет ошибки. Оставляем этот комментарий.
+      //
+    } finally {
+      notifyListeners();
     }
   }
 
@@ -81,9 +84,6 @@ class ProviderUserLogin extends ChangeNotifier {
 
     final initData = TelegramWebApp.instance.initData?.raw;
 
-    ApiLogger.apiPrint("login vs Telegram $url");
-    ApiLogger.apiPrint("Send initData: ${initData.toString()}");
-
     try {
       final response = await http.post(
         Uri.parse(url),
@@ -92,23 +92,17 @@ class ProviderUserLogin extends ChangeNotifier {
       );
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        // Обработка успешного ответа, например, сохранение токена
-        _userModel = _userModel?.copyWith(token: responseData['token']);
-        ApiLogger.apiPrint('Ошибка авторизации: ${responseData['token']}');
-        notifyListeners();
+        _userModel.update(token: responseData['token']);
+        ApiLogger.apiPrint("Login with TG Success: ${_userModel.log()}");
       } else {
-        // Обработка ошибки
         _hasError = true;
         _errorMessage = 'Ошибка авторизации: ${response.statusCode}';
-        ApiLogger.apiPrint(_errorMessage);
-        notifyListeners();
       }
     } catch (e) {
-      // Обработка ошибки сети
       _hasError = true;
-      _errorMessage = 'Ошибка сети: $e';
-      ApiLogger.apiPrint(_errorMessage);
-      notifyListeners();
+      _errorMessage = 'Error TG login: $e';
+      ApiLogger.apiPrint("Error TG login: $e ${_userModel.log()}");
+
     }
   }
 
@@ -121,20 +115,16 @@ class ProviderUserLogin extends ChangeNotifier {
       final response = await http.post(Uri.parse(url), headers: headers, body: body);
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        _userModel = UserModel(
-          token: responseData['access_token'],
-          email: email,
-        );
+        _userModel.update(token: responseData['access_token'], email: email);
+        ApiLogger.apiPrint("Login email done: ${_userModel.log()}");
         notifyListeners();
       } else {
-        _hasError = true;
-        _errorMessage = 'Login failed!'; //  ${response.statusCode}
-        notifyListeners();
+        // Login failed: Nothing to do yet...
       }
     } catch (e) {
       _hasError = true;
       _errorMessage = 'Network error: $e';
-      notifyListeners();
+      ApiLogger.apiPrint(_errorMessage);
     }
   }
 
@@ -152,16 +142,18 @@ class ProviderUserLogin extends ChangeNotifier {
       final response = await http.post(Uri.parse(url), headers: headers, body: body);
       if (response.statusCode == 201) {
         final responseData = jsonDecode(response.body);
-        _userModel = UserModel(token: responseData['access_token']);
-        notifyListeners();
+        _userModel.update(token: responseData['access_token']);
+        ApiLogger.apiPrint("Register with email success: ${_userModel.log()}");
       } else {
         _hasError = true;
         _errorMessage = 'Registration failed: ${response.statusCode}';
-        notifyListeners();
+        ApiLogger.apiPrint(_errorMessage);
       }
     } catch (e) {
       _hasError = true;
       _errorMessage = 'Network error: $e';
+      ApiLogger.apiPrint(_errorMessage);
+    } finally {
       notifyListeners();
     }
   }

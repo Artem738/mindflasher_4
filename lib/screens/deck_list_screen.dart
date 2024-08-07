@@ -16,18 +16,17 @@ class DeckListScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Welcome, - ${userModel?.firstname}, ${userModel?.username}, ${userModel?.email} \n token - ${userModel?.token}',
+              'Welcome, - ${userModel.firstname}, ${userModel.username}, ${userModel.email} \n token - ${userModel.token}',
               textAlign: TextAlign.center,
             ),
-            Text('apiId ${userModel?.apiId.toString()}'),
+            Text('apiId ${userModel.apiId.toString()}'),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 final userControlProvider = context.read<ProviderUserControl>();
                 userControlProvider.incrementApiId();
-                print(userControlProvider.userModel?.apiId);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('apiId updated to ${userControlProvider.userModel?.apiId}')),
+                  SnackBar(content: Text('apiId updated to ${userControlProvider.userModel.apiId}')),
                 );
               },
               child: Text('Update apiId'),

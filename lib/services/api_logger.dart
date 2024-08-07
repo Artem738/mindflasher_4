@@ -20,10 +20,10 @@ class ApiLogger {
     );
 
     if (response.statusCode != 200) {
-      print('ApiLogger - Failed to send message');
+      print('ApiLogger => Failed to send message');
       throw Exception('Failed to send message');
     } else {
-      print("ApiLogger - $message");
+      print("ApiLogger => $message");
     }
 
   }

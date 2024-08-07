@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/providers/provider_user_login.dart';
 import 'package:mindflasher_4/screens/deck_list_screen.dart';
 import 'package:mindflasher_4/screens/registration_screen.dart'; // Импортируем экран регистрации
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatelessWidget {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  late TextEditingController _emailController = TextEditingController();
+  late TextEditingController _passwordController = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
+
+    //final providerUserLogin = context.watch<ProviderUserLogin>().userModel;
+    _emailController = TextEditingController(text: context.watch<ProviderUserLogin>().userModel.email);
+    _passwordController = TextEditingController(text: context.watch<ProviderUserLogin>().lastPass);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Login'),
@@ -18,8 +25,6 @@ class LoginScreen extends StatelessWidget {
         padding: EdgeInsets.all(16.0),
         child: Column(
           children: [
-            SelectableText("222@222.222"),
-            SelectableText("12345678"),
             TextField(
               controller: _emailController,
               decoration: InputDecoration(labelText: 'Email'),

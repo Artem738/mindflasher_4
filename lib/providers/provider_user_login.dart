@@ -5,7 +5,11 @@ import 'package:mindflasher_4/env_config.dart';
 import 'package:mindflasher_4/models/user_model.dart';
 import 'package:mindflasher_4/services/api_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:telegram_web_app/telegram_web_app.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+import 'package:flutter/foundation.dart' show kIsWeb; // Импортирует переменную kIsWeb которая используется для определения Web
+import 'telegram_web_app_stub.dart' // Импортируется заглушка для Классов
+    if (dart.library.html) 'telegram_web_app_web.dart'; // Если библиотека dart.library.html доступна (приложение выполняется в веб-браузере),// то импортируется реальная реализация для веб-платформ
 
 class ProviderUserLogin extends ChangeNotifier {
   final UserModel _userModel;
@@ -18,7 +22,6 @@ class ProviderUserLogin extends ChangeNotifier {
   bool _hasError = false;
   String _errorMessage = '';
   SharedPreferences? _sharedPreferences;
-  TelegramUser? _telegramUser;
 
   bool get isLoading => _isLoading;
 
@@ -28,20 +31,55 @@ class ProviderUserLogin extends ChangeNotifier {
 
   SharedPreferences? get sharedPreferences => _sharedPreferences;
 
+  UserModel get userModel => _userModel;
+
+  TelegramUser? _telegramUser;
+
   TelegramUser? get telegramUser => _telegramUser;
 
-  UserModel get userModel => _userModel;
+  FlutterSecureStorage? _secureStorage;
 
   Future<void> initialize() async {
     await _initializeSharedPreferences();
-    await _initializeTelegram();
+    if (kIsWeb) {
+      await _initializeTelegram();
+    } else {
+      await _initializeSecureStorage();
+    }
     _isLoading = false;
     notifyListeners();
+  }
+
+  String _lastPass = '';
+  String get lastPass => _lastPass;
+
+  Future<void> _initializeSecureStorage() async {
+    if (!kIsWeb) {
+      _secureStorage = const FlutterSecureStorage();
+
+      // Чтение данных из secure storage с проверкой на null
+      String? lastPass = await _secureStorage?.read(key: 'lastPass');
+
+      // Если значение отсутствует, lastPass будет равно null
+      if (lastPass != null) {
+        _lastPass = lastPass;
+        print(_lastPass);
+      } else {
+        _lastPass = "";
+      }
+    }
   }
 
   Future<void> _initializeSharedPreferences() async {
     try {
       _sharedPreferences = await SharedPreferences.getInstance();
+
+      String? lastEmail = sharedPreferences?.getString('lastEmail');
+      if (lastEmail != null) {
+        _userModel.update(
+          email: lastEmail,
+        );
+      }
     } catch (e) {
       _hasError = true;
       _errorMessage = e.toString();
@@ -51,37 +89,38 @@ class ProviderUserLogin extends ChangeNotifier {
   }
 
   Future<void> _initializeTelegram() async {
-    try {
-      if (TelegramWebApp.instance.isSupported) {
-        await TelegramWebApp.instance.ready();
-        _telegramUser = TelegramWebApp.instance.initData?.user;
-        Future.delayed(const Duration(seconds: 1), TelegramWebApp.instance.expand);
-        if (_telegramUser != null) {
-          _userModel.update(
-            tgId: _telegramUser?.id,
-            username: _telegramUser?.username,
-            firstname: _telegramUser?.firstname,
-            lastname: _telegramUser?.lastname,
-            languageCode: _telegramUser?.languageCode,
-            authDate: TelegramWebApp.instance.initData?.authDate,
-            hash: TelegramWebApp.instance.initData?.hash,
-          );
-          await _loginWithTelegram();
+    if (kIsWeb) {
+      try {
+        if (TelegramWebApp.instance.isSupported) {
+          await TelegramWebApp.instance.ready();
+          _telegramUser = TelegramWebApp.instance.initData?.user;
+          Future.delayed(const Duration(seconds: 1), TelegramWebApp.instance.expand);
+          if (_telegramUser != null) {
+            _userModel.update(
+              tgId: _telegramUser?.id,
+              username: _telegramUser?.username,
+              firstname: _telegramUser?.firstname,
+              lastname: _telegramUser?.lastname,
+              languageCode: _telegramUser?.languageCode,
+              authDate: TelegramWebApp.instance.initData?.authDate,
+              hash: TelegramWebApp.instance.initData?.hash,
+            );
+            await _loginWithTelegram();
+          }
         }
+      } catch (e) {
+        //
+        // Заглушка: Здесь намеренно игнорируем ошибку. Тут нет ошибки. Оставляем этот комментарий.
+        //
+      } finally {
+        notifyListeners();
       }
-    } catch (e) {
-      //
-      // Заглушка: Здесь намеренно игнорируем ошибку. Тут нет ошибки. Оставляем этот комментарий.
-      //
-    } finally {
-      notifyListeners();
     }
   }
 
   Future<void> _loginWithTelegram() async {
     const url = '${EnvConfig.mainApiUrl}/api/telegram/auth';
     final headers = {'Content-Type': 'application/json'};
-
     final initData = TelegramWebApp.instance.initData?.raw;
 
     try {
@@ -102,7 +141,6 @@ class ProviderUserLogin extends ChangeNotifier {
       _hasError = true;
       _errorMessage = 'Error TG login: $e';
       ApiLogger.apiPrint("Error TG login: $e ${_userModel.log()}");
-
     }
   }
 
@@ -110,7 +148,8 @@ class ProviderUserLogin extends ChangeNotifier {
     const url = '${EnvConfig.mainApiUrl}/api/login';
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({'email': email, 'password': password});
-
+    await _sharedPreferences!.setString('lastEmail', email);
+    await _secureStorage?.write(key: 'lastPass', value: password);
     try {
       final response = await http.post(Uri.parse(url), headers: headers, body: body);
       if (response.statusCode == 200) {
@@ -141,9 +180,10 @@ class ProviderUserLogin extends ChangeNotifier {
     try {
       final response = await http.post(Uri.parse(url), headers: headers, body: body);
       if (response.statusCode == 201) {
-        final responseData = jsonDecode(response.body);
-        _userModel.update(token: responseData['access_token']);
-        ApiLogger.apiPrint("Register with email success: ${_userModel.log()}");
+        await loginWithEmail(email, password);
+        if (_userModel.token != null) {
+          ApiLogger.apiPrint("Register with email success: ${_userModel.log()}");
+        }
       } else {
         _hasError = true;
         _errorMessage = 'Registration failed: ${response.statusCode}';

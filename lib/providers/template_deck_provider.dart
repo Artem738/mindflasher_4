@@ -4,12 +4,12 @@ import 'package:http/http.dart' as http;
 import 'package:mindflasher_4/env_config.dart';
 import 'package:mindflasher_4/models/template_deck_model.dart';
 
-class DeckProvider extends ChangeNotifier {
+class TemplateDeckProvider extends ChangeNotifier {
   List<TemplateDeckModel> _decks = [];
 
   List<TemplateDeckModel> get decks => _decks;
 
-  Future<void> fetchDeck(String token) async {
+  Future<void> fetchDecks(String token) async {
     String apiUrl = '${EnvConfig.mainApiUrl}/api/template-decks';
     final response = await http.get(
       Uri.parse(apiUrl),

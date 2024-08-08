@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:mindflasher_4/providers/deck_provider.dart';
+import 'package:mindflasher_4/providers/template_deck_provider.dart';
 import 'package:mindflasher_4/providers/provider_user_control.dart';
+import 'package:mindflasher_4/screens/template_flashcard_index_screen.dart';
 import 'package:provider/provider.dart';
 
-class DeckIndexScreen extends StatelessWidget {
-  const DeckIndexScreen({Key? key}) : super(key: key);
+class TemplateDeckIndexScreen extends StatelessWidget {
+  const TemplateDeckIndexScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -12,23 +13,17 @@ class DeckIndexScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Deck'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () {}, // Provider.of<UserProvider>(navigatorKey.currentContext!, listen: false).logout,
-          ),
-        ],
+        title: Text('Template Deck'),
       ),
       body: FutureBuilder(
-        future: context.read<DeckProvider>().fetchDeck(token!),
+        future: context.read<TemplateDeckProvider>().fetchDecks(token!),
         builder: (ctx, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('An error occurred: ${snapshot.error}'));
           } else {
-            return Consumer<DeckProvider>(
+            return Consumer<TemplateDeckProvider>(
               builder: (ctx, deckProvider, child) => ListView.builder(
                 itemCount: deckProvider.decks.length,
                 itemBuilder: (ctx, i) => ListTile(
@@ -37,7 +32,7 @@ class DeckIndexScreen extends StatelessWidget {
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => FlashcardIndexScreen(deck: deckProvider.decks[i]),
+                        builder: (context) => TemplateFlashcardIndexScreen(deck: deckProvider.decks[i]),
                       ),
                     );
                   },

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mindflasher_4/providers/template_deck_provider.dart';
+import 'package:mindflasher_4/providers/template_flashcard_provider.dart';
+import 'package:mindflasher_4/screens/template_deck_index_screen.dart';
 import 'package:mindflasher_4/services/api_logger.dart';
 import 'package:provider/provider.dart';
 import 'providers/provider_user_control.dart';
@@ -22,6 +25,8 @@ void main() {
           create: (context) => ProviderUserControl(userModel),
           update: (context, userModel, providerUserControl) => providerUserControl!,
         ),
+        ChangeNotifierProvider(create: (_) => TemplateDeckProvider()),
+        ChangeNotifierProvider(create: (_) => TemplateFlashcardProvider()),
       ],
       child: MyApp(),
     ),
@@ -59,7 +64,8 @@ class IndexScreen extends StatelessWidget {
     if (userModel.token == null && userLogin.isLoading == false) {
       return LoginScreen();
     } else {
-      return DeckListScreen();
+      //return DeckListScreen();
+      return TemplateDeckIndexScreen();
     }
   }
 }

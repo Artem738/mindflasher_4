@@ -1,4 +1,4 @@
-class Flashcard {
+class FlashcardModel  {
   final int id;
   final String question;
   final String answer;
@@ -6,7 +6,7 @@ class Flashcard {
   final int? deckId;
   final String? lastReviewedAt;
 
-  Flashcard({
+  FlashcardModel ({
     required this.id,
     required this.question,
     required this.answer,
@@ -15,7 +15,7 @@ class Flashcard {
     this.lastReviewedAt,
   });
 
-  Flashcard copyWith({
+  FlashcardModel  copyWith({
     int? id,
     String? question,
     String? answer,
@@ -23,7 +23,7 @@ class Flashcard {
     int? deckId,
     String? lastReviewedAt,
   }) {
-    return Flashcard(
+    return FlashcardModel (
       id: id ?? this.id,
       question: question ?? this.question,
       answer: answer ?? this.answer,

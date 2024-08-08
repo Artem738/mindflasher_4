@@ -1,0 +1,69 @@
+import 'package:flutter/material.dart';
+import 'package:mindflasher_4/models/deck_model.dart';
+import 'package:mindflasher_4/models/flashcard_model.dart';
+import 'package:mindflasher_4/models/user_model.dart';
+
+import 'package:mindflasher_4/providers/flashcard_provider.dart';
+import 'package:provider/provider.dart';
+
+import 'swipeable_card.dart';
+
+class FlashcardIndexScreen extends StatelessWidget {
+  final DeckModel deck;
+
+  FlashcardIndexScreen({required this.deck});
+
+  Widget _buildCardItem(BuildContext context, FlashcardModel card, Animation<double> animation) {
+    return SizeTransition(
+      sizeFactor: animation,
+      child: SwipeableCard(
+        flashcard: card,
+        // onRemove: () {
+        //  // context.read<FlashcardProvider>().updateCardWeight(card.id, 1);
+        // },
+        // onSwipe: (increment) {
+        //  // context.read<FlashcardProvider>().updateCardWeight(card.id, increment);
+        // },
+        // onIncrease: (increment) {
+        //   context.read<FlashcardProvider>().updateCardWeight(card.id, increment);
+        // },
+      ),
+    );
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+
+    final String? token = context.read<UserModel>().token;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(deck.name),
+      ),
+      body: FutureBuilder(
+        future: Provider.of<FlashcardProvider>(context, listen: false).fetchAndPopulateFlashcards(token!, deck.id),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('An error occurred: ${snapshot.error}'));
+          } else {
+            return Consumer<FlashcardProvider>(
+              builder: (context, flashcardProvider, child) {
+                return AnimatedList(
+                  key: flashcardProvider.listKey,
+                  initialItemCount: flashcardProvider.flashcards.length,
+                  itemBuilder: (context, index, animation) {
+                    final flashcard = flashcardProvider.flashcards[index];
+                    return _buildCardItem(context, flashcard, animation);
+                  },
+                );
+              },
+            );
+          }
+        },
+      ),
+    );
+  }
+}

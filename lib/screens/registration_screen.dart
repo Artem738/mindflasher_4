@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/providers/provider_user_login.dart';
+import 'package:mindflasher_4/screens/deck_index_screen.dart';
 import 'package:mindflasher_4/screens/template_deck_index_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -50,7 +51,8 @@ class RegistrationScreen extends StatelessWidget {
                 if (provider.userModel.token != null) {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => TemplateDeckIndexScreen()),
+                   // MaterialPageRoute(builder: (context) => TemplateDeckIndexScreen()),
+                    MaterialPageRoute(builder: (context) => DeckIndexScreen()),
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(

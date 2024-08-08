@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:mindflasher_4/providers/deck_provider.dart';
+import 'package:mindflasher_4/providers/flashcard_provider.dart';
 import 'package:mindflasher_4/providers/template_deck_provider.dart';
 import 'package:mindflasher_4/providers/template_flashcard_provider.dart';
+import 'package:mindflasher_4/screens/deck_index_screen.dart';
 import 'package:mindflasher_4/screens/template_deck_index_screen.dart';
 import 'package:mindflasher_4/services/api_logger.dart';
 import 'package:provider/provider.dart';
 import 'providers/provider_user_control.dart';
 import 'providers/provider_user_login.dart';
-import 'screens/deck_list_screen.dart';
+import 'screens/user_settings_screen.dart';
 import 'screens/login_screen.dart';
 import 'models/user_model.dart';
 
@@ -27,6 +30,8 @@ void main() {
         ),
         ChangeNotifierProvider(create: (_) => TemplateDeckProvider()),
         ChangeNotifierProvider(create: (_) => TemplateFlashcardProvider()),
+        ChangeNotifierProvider(create: (_) => DeckProvider()),
+        ChangeNotifierProvider(create: (_) => FlashcardProvider()),
       ],
       child: MyApp(),
     ),
@@ -65,6 +70,7 @@ class IndexScreen extends StatelessWidget {
       return LoginScreen();
     } else {
       //return DeckListScreen();
+      return DeckIndexScreen();
       return TemplateDeckIndexScreen();
     }
   }

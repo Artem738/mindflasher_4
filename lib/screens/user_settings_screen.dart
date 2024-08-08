@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/provider_user_control.dart';
 
-class DeckListScreen extends StatelessWidget {
+class UserSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userModel = context.watch<ProviderUserControl>().userModel;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/models/user_model.dart';
 import 'package:mindflasher_4/screens/list/flashcard_index_screen.dart';
+import 'package:mindflasher_4/screens/template_deck_index_screen.dart';
 
 import 'package:provider/provider.dart';
 
@@ -43,6 +44,17 @@ class DeckIndexScreen extends StatelessWidget {
             );
           }
         },
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => TemplateDeckIndexScreen(),
+            ),
+          );
+        },
+        label: Text('Add Deck'),
+        icon: Icon(Icons.add),
       ),
     );
   }

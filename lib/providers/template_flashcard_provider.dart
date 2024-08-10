@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mindflasher_4/env_config.dart';
 import 'package:mindflasher_4/models/flashcard_model.dart';
+import 'package:mindflasher_4/providers/deck_provider.dart';
+import 'package:provider/provider.dart';
 
 class TemplateFlashcardProvider extends ChangeNotifier {
   List<FlashcardModel> _flashcards = [];
@@ -39,4 +41,30 @@ class TemplateFlashcardProvider extends ChangeNotifier {
       throw Exception('Failed to load flashcards');
     }
   }
+
+  Future<bool> addTemplateBaseToUser(BuildContext context, int templateDeckId, String token) async {
+    String apiUrl = '${EnvConfig.mainApiUrl}/api/add-template-to-user';
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'template_deck_id': templateDeckId,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      await Provider.of<DeckProvider>(context, listen: false).fetchDecks(token);
+      print('Template base added to user');
+      notifyListeners();
+      return true; // Успешное выполнение
+    } else {
+      print(response.body);
+      return false; // Неудача
+    }
+  }
+
 }

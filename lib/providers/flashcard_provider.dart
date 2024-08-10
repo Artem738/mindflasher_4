@@ -90,7 +90,7 @@ class FlashcardProvider with ChangeNotifier {
     if (token == null) {
       throw Exception('User not authenticated');
     }
- ///flashcards/{flashcardId}/progress/weight'
+    ///flashcards/{flashcardId}/progress/weight'
     final url = Uri.parse('${EnvConfig.mainApiUrl}/api/flashcards/$id/progress/weight');
     final response = await http.post(
       url,
@@ -100,8 +100,8 @@ class FlashcardProvider with ChangeNotifier {
       },
       body: json.encode({'weight': weight}),
     );
-print(response.statusCode);
-print(response.body);
+    print(response.statusCode);
+    print(response.body);
     if (response.statusCode != 200) {
       throw Exception('Failed to update weight on server');
     }

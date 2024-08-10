@@ -11,6 +11,7 @@ class UserModel extends ChangeNotifier {
   String? token;
   int? authDate;
   String? hash;
+  int? user_lvl;
 
   UserModel({
     this.apiId,
@@ -23,6 +24,7 @@ class UserModel extends ChangeNotifier {
     this.token,
     this.authDate,
     this.hash,
+    this.user_lvl,
   });
 
   void update({
@@ -36,6 +38,7 @@ class UserModel extends ChangeNotifier {
     String? token,
     int? authDate,
     String? hash,
+    int? user_lvl,
   }) {
     this.apiId = apiId ?? this.apiId;
     this.tgId = tgId ?? this.tgId;
@@ -47,6 +50,7 @@ class UserModel extends ChangeNotifier {
     this.token = token ?? this.token;
     this.authDate = authDate ?? this.authDate;
     this.hash = hash ?? this.hash;
+    this.user_lvl = user_lvl ?? this.user_lvl;
     notifyListeners();
   }
 
@@ -56,6 +60,6 @@ class UserModel extends ChangeNotifier {
   }
 
   String log() {
-    return 'UserModel - apiId: $apiId, tgId: $tgId, username: $username, firstname: $firstname, lastname: $lastname, languageCode: $languageCode, email: $email, token: $token, authDate: $authDate, hash: $hash';
+    return 'UserModel - apiId: $apiId, tgId: $tgId, username: $username, firstname: $firstname, lastname: $lastname, languageCode: $languageCode, email: $email, token: $token, authDate: $authDate, hash: $hash, user_lvl: $user_lvl';
   }
 }

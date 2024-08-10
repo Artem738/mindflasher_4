@@ -7,9 +7,9 @@ import 'package:mindflasher_4/providers/deck_provider.dart';
 import 'package:provider/provider.dart';
 
 class TemplateFlashcardProvider extends ChangeNotifier {
-  List<FlashcardModel> _flashcards = [];
+  List<FlashcardModel> _templateFlashcards = [];
 
-  List<FlashcardModel> get flashcards => _flashcards;
+  List<FlashcardModel> get templateFlashcards => _templateFlashcards;
 
 
   Future<void> fetchFlashcards(int deckId, String token) async {
@@ -25,10 +25,10 @@ class TemplateFlashcardProvider extends ChangeNotifier {
 
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
-      _flashcards.clear();
+      _templateFlashcards.clear();
 
       for (var item in data) {
-        _flashcards.add(FlashcardModel(
+        _templateFlashcards.add(FlashcardModel(
           id: item['id'],
           deckId: item['deck_id'],
           question: item['question'],

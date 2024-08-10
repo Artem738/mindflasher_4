@@ -5,9 +5,9 @@ import 'package:mindflasher_4/env_config.dart';
 import 'package:mindflasher_4/models/template_deck_model.dart';
 
 class TemplateDeckProvider extends ChangeNotifier {
-  List<TemplateDeckModel> _decks = [];
+  List<TemplateDeckModel> _templateDecks = [];
 
-  List<TemplateDeckModel> get decks => _decks;
+  List<TemplateDeckModel> get decks => _templateDecks;
 
   Future<void> fetchDecks(String token) async {
     String apiUrl = '${EnvConfig.mainApiUrl}/api/template-decks';
@@ -21,13 +21,16 @@ class TemplateDeckProvider extends ChangeNotifier {
     );
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
-      _decks.clear();
+      _templateDecks.clear();
 
       for (var item in data) {
-        _decks.add(TemplateDeckModel(
+        _templateDecks.add(TemplateDeckModel(
           id: item['id'],
           name: item['name'],
           description: item['description'],
+          deck_lang: item['deck_lang'],
+          question_lang: item['question_lang'],
+          answer_lang: item['answer_lang'],
         ));
       }
       notifyListeners();

@@ -13,7 +13,7 @@ class TemplateDeckIndexScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Template Deck'),
+        title: Text('Template Decks'),
       ),
       body: FutureBuilder(
         future: context.read<TemplateDeckProvider>().fetchDecks(token!),

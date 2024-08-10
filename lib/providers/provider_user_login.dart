@@ -115,7 +115,7 @@ class ProviderUserLogin extends ChangeNotifier {
     final initData = TelegramWebApp.instance.initData?.raw;
 
     try {
-      // Отправляем на наш API данные с полями, которые дал Telegram (initData)
+      // Отправляем как-бы не не наши API данные с полями, которые дал Telegram (initData)
       final response = await http.post(
         Uri.parse(url),
         headers: headers,

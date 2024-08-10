@@ -16,7 +16,7 @@ class TemplateFlashcardIndexScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('${deck.name}'),
+        title: Text('${deck.name} ${deck.deck_lang}'),
       ),
       body: FutureBuilder(
         future: context.read<TemplateFlashcardProvider>().fetchFlashcards(deck.id, token!),
@@ -30,11 +30,11 @@ class TemplateFlashcardIndexScreen extends StatelessWidget {
             return Padding(
               padding: const EdgeInsets.only(left: 25), // Здесь вы можете настроить паддинг
               child: ListView.builder(
-                itemCount: flashcardProvider.flashcards.length,
+                itemCount: flashcardProvider.templateFlashcards.length,
                 itemBuilder: (ctx, i) {
                   return ListTile(
-                    title: Text(flashcardProvider.flashcards[i].question),
-                    subtitle: Text(flashcardProvider.flashcards[i].answer),
+                    title: Text(flashcardProvider.templateFlashcards[i].question),
+                    subtitle: Text(flashcardProvider.templateFlashcards[i].answer),
                   );
                 },
               ),

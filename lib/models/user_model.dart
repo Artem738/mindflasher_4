@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class UserModel extends ChangeNotifier {
   int? apiId;
-  int? tgId;
-  String? username;
+  int? telegram_id;
+  String? tg_username;
   String? firstname;
-  String? lastname;
+  String? tg_last_name;
   String? languageCode;
   String? email;
   String? token;
@@ -15,10 +15,10 @@ class UserModel extends ChangeNotifier {
 
   UserModel({
     this.apiId,
-    this.tgId,
-    this.username,
+    this.telegram_id,
+    this.tg_username,
     this.firstname,
-    this.lastname,
+    this.tg_last_name,
     this.languageCode,
     this.email,
     this.token,
@@ -29,10 +29,10 @@ class UserModel extends ChangeNotifier {
 
   void update({
     int? apiId,
-    int? tgId,
-    String? username,
+    int? telegram_id,
+    String? tg_username,
     String? firstname,
-    String? lastname,
+    String? tg_last_name,
     String? languageCode,
     String? email,
     String? token,
@@ -41,10 +41,10 @@ class UserModel extends ChangeNotifier {
     int? user_lvl,
   }) {
     this.apiId = apiId ?? this.apiId;
-    this.tgId = tgId ?? this.tgId;
-    this.username = username ?? this.username;
+    this.telegram_id = telegram_id ?? this.telegram_id;
+    this.tg_username = tg_username ?? this.tg_username;
     this.firstname = firstname ?? this.firstname;
-    this.lastname = lastname ?? this.lastname;
+    this.tg_last_name = tg_last_name ?? this.tg_last_name;
     this.languageCode = languageCode ?? this.languageCode;
     this.email = email ?? this.email;
     this.token = token ?? this.token;
@@ -60,6 +60,6 @@ class UserModel extends ChangeNotifier {
   }
 
   String log() {
-    return 'UserModel - apiId: $apiId, tgId: $tgId, username: $username, firstname: $firstname, lastname: $lastname, languageCode: $languageCode, email: $email, token: $token, authDate: $authDate, hash: $hash, user_lvl: $user_lvl';
+    return 'UserModel - apiId: $apiId, telegram_id: $telegram_id, tg_username: $tg_username, firstname: $firstname, tg_last_name: $tg_last_name, languageCode: $languageCode, email: $email, token: $token, authDate: $authDate, hash: $hash, user_lvl: $user_lvl';
   }
 }

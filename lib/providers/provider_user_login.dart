@@ -15,6 +15,7 @@ class ProviderUserLogin extends ChangeNotifier {
   final UserModel _userModel;
 
   ProviderUserLogin(this._userModel) {
+    // Класс инициализируется сразу.
     initialize();
   }
 
@@ -51,16 +52,15 @@ class ProviderUserLogin extends ChangeNotifier {
   }
 
   String _lastPass = '';
+
   String get lastPass => _lastPass;
 
   Future<void> _initializeSecureStorage() async {
     if (!kIsWeb) {
       _secureStorage = const FlutterSecureStorage();
 
-      // Чтение данных из secure storage с проверкой на null
       String? lastPass = await _secureStorage?.read(key: 'lastPass');
 
-      // Если значение отсутствует, lastPass будет равно null
       if (lastPass != null) {
         _lastPass = lastPass;
         print(_lastPass);
@@ -96,15 +96,6 @@ class ProviderUserLogin extends ChangeNotifier {
           _telegramUser = TelegramWebApp.instance.initData?.user;
           Future.delayed(const Duration(seconds: 1), TelegramWebApp.instance.expand);
           if (_telegramUser != null) {
-            _userModel.update(
-              tgId: _telegramUser?.id,
-              username: _telegramUser?.username,
-              firstname: _telegramUser?.firstname,
-              lastname: _telegramUser?.lastname,
-              languageCode: _telegramUser?.languageCode,
-              authDate: TelegramWebApp.instance.initData?.authDate,
-              hash: TelegramWebApp.instance.initData?.hash,
-            );
             await _loginWithTelegram();
           }
         }
@@ -124,14 +115,38 @@ class ProviderUserLogin extends ChangeNotifier {
     final initData = TelegramWebApp.instance.initData?.raw;
 
     try {
+      // Отправляем на наш API данные с полями, которые дал Telegram (initData)
       final response = await http.post(
         Uri.parse(url),
         headers: headers,
         body: jsonEncode({'initData': initData}),
       );
+
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        _userModel.update(token: responseData['token']);
+        ApiLogger.apiPrint("Tg login responseData: $responseData");
+
+        final userData = responseData['user'];
+
+        // Обновляем модель пользователя данными из ответа сервера
+        _userModel.update(
+          apiId: userData['id'],
+          telegram_id: userData['telegram_id'],
+          email: userData['email'],
+          tg_username: userData['tg_username'],
+          firstname: userData['tg_first_name'],
+          tg_last_name: userData['tg_last_name'],
+          languageCode: userData['language_code'],
+          token: responseData['token'],
+          authDate: userData['auth_date'],
+          user_lvl: userData['user_lvl'],
+        );
+        // Необходимое удаление email если был логин с email, но не зарегистрированный.
+        if (userData['email'] != null) {
+          await _sharedPreferences!.setString('lastEmail', userData['email']);
+        } else {
+          await _sharedPreferences!.remove('lastEmail');
+        }
         ApiLogger.apiPrint("Login with TG Success: ${_userModel.log()}");
       } else {
         _hasError = true;
@@ -143,6 +158,7 @@ class ProviderUserLogin extends ChangeNotifier {
       ApiLogger.apiPrint("Error TG login: $e ${_userModel.log()}");
     }
   }
+
 
   Future<void> loginWithEmail(String email, String password) async {
     const url = '${EnvConfig.mainApiUrl}/api/login';

@@ -7,16 +7,33 @@ import 'package:mindflasher_4/screens/user_settings_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/deck_provider.dart';
+import '../translates/deck_index_screen_translate.dart';
 
-class DeckIndexScreen extends StatelessWidget {
+class DeckIndexScreen extends StatefulWidget {
   const DeckIndexScreen({Key? key}) : super(key: key);
 
   @override
+  _DeckIndexScreenState createState() => _DeckIndexScreenState();
+}
+
+class _DeckIndexScreenState extends State<DeckIndexScreen> {
+  late final DeckIndexScreenTranslate txt;
+
+  @override
+  void initState() {
+    super.initState();
+    final deckProvider = context.read<DeckProvider>();
+    deckProvider.fetchDecks(context.read<UserModel>().token!);
+    txt = DeckIndexScreenTranslate(context.read<UserModel>().languageCode ?? 'en');
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final String? token = context.read<UserModel>().token;
+    final deckProvider = context.watch<DeckProvider>();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Deck'),
+        title: Text(txt.tt('title')),
         actions: [
           IconButton(
             icon: Icon(Icons.person),
@@ -26,38 +43,38 @@ class DeckIndexScreen extends StatelessWidget {
                   builder: (context) => UserSettingsScreen(),
                 ),
               );
-
             },
           ),
         ],
-
       ),
-      body: FutureBuilder(
-        future: Provider.of<DeckProvider>(context, listen: false).fetchDecks(token!),
-        builder: (ctx, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('An error occurred: ${snapshot.error}'));
-          } else {
-            return Consumer<DeckProvider>(
-              builder: (ctx, deckProvider, child) => ListView.builder(
-                itemCount: deckProvider.decks.length,
-                itemBuilder: (ctx, i) => ListTile(
-                  title: Text(deckProvider.decks[i].name),
-                  subtitle: Text(deckProvider.decks[i].description),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => FlashcardIndexScreen(deck: deckProvider.decks[i]),
-                      ),
-                    );
-                  },
-                ),
+      body: deckProvider.decks.isEmpty
+          ? Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 150),
+            Text(
+              txt.tt('no_decks'),
+              style: const TextStyle(fontSize: 20),
+            ),
+            const SizedBox(height: 10),
+            Text(txt.tt('add_deck_prompt')),
+          ],
+        ),
+      )
+          : ListView.builder(
+        itemCount: deckProvider.decks.length,
+        itemBuilder: (ctx, i) => ListTile(
+          title: Text(deckProvider.decks[i].name),
+          subtitle: Text(deckProvider.decks[i].description),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => FlashcardIndexScreen(deck: deckProvider.decks[i]),
               ),
             );
-          }
-        },
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -67,8 +84,8 @@ class DeckIndexScreen extends StatelessWidget {
             ),
           );
         },
-        label: Text('Add Deck'),
-        icon: Icon(Icons.add),
+        label: Text(txt.tt('add_deck')),
+        icon: const Icon(Icons.add),
       ),
     );
   }

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:mindflasher_4/models/user_model.dart';
 import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/providers/provider_user_login.dart';
 import 'package:mindflasher_4/screens/deck_index_screen.dart';
 import 'package:mindflasher_4/screens/template_deck_index_screen.dart';
 import 'package:mindflasher_4/screens/user_settings_screen.dart';
 import 'package:mindflasher_4/screens/registration_screen.dart'; // Импортируем экран регистрации
+import 'package:mindflasher_4/translates/login_screen_translate.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -18,10 +20,11 @@ class LoginScreen extends StatelessWidget {
     //final providerUserLogin = context.watch<ProviderUserLogin>().userModel;
     _emailController = TextEditingController(text: context.watch<ProviderUserLogin>().userModel.email);
     _passwordController = TextEditingController(text: context.watch<ProviderUserLogin>().lastPass);
-
+    var txt = LoginScreenTranslate(context.read<UserModel>().languageCode ?? 'uk');
+// Text(txt.tr('add_deck_prompt')),
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: Text(txt.tt('title')),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -33,7 +36,7 @@ class LoginScreen extends StatelessWidget {
             ),
             TextField(
               controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
+              decoration: InputDecoration(labelText: txt.tt('password')),
               obscureText: true,
             ),
             SizedBox(height: 20),
@@ -52,11 +55,11 @@ class LoginScreen extends StatelessWidget {
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Login failed')),
+                    SnackBar(content: Text(txt.tt('login_failed'))),
                   );
                 }
               },
-              child: Text('Login'),
+              child: Text(txt.tt('login')),
             ),
             SizedBox(height: 20),
             TextButton(
@@ -66,7 +69,7 @@ class LoginScreen extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => RegistrationScreen()),
                 );
               },
-              child: Text('Don\'t have an account? Register'),
+              child: Text(txt.tt('register')),
             ),
           ],
         ),

@@ -22,8 +22,7 @@ class FirstEnterScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
 
-                context.read<ProviderUserLogin>().setFirstEnterSharedPreferences();
-                // Здесь можно добавить логику для перехода на другой экран или другое действие
+                context.read<ProviderUserLogin>().setIsFirstEnter(false);
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => IndexScreen()),

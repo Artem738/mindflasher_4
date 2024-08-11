@@ -62,7 +62,8 @@ class ProviderUserLogin extends ChangeNotifier {
     _isLoading = false;
   }
 
-  final String _firstEnterSpName = "firstEnterB451";
+  final String _firstEnterSpName = "firstEnterB4512";
+  bool _isSharedPreferencesLoaded = false;
 
   Future<void> _initializeSharedPreferences() async {
     try {
@@ -70,48 +71,39 @@ class ProviderUserLogin extends ChangeNotifier {
 
       if (_sharedPreferences != null) {
         String? lastEmail = _sharedPreferences!.getString('lastEmail');
-        ApiLogger.apiPrint("Last email loaded: $lastEmail");
-
         if (lastEmail != null) {
           _userModel.update(email: lastEmail);
-        } else {
-          ApiLogger.apiPrint("No email found in SharedPreferences.");
         }
 
         bool? firstEnter = await _sharedPreferences!.getBool(_firstEnterSpName);
-        ApiLogger.apiPrint("First enter flag loaded: $firstEnter");
-
         if (firstEnter == null) {
-          _userModel.update(firstEnter: true);
+          _userModel.update(isFirstEnter: true);
           await _sharedPreferences!.setBool(_firstEnterSpName, true);
-          ApiLogger.apiPrint("First enter flag set to true.");
         } else {
-          _userModel.update(firstEnter: false);
+          _userModel.update(isFirstEnter: false);
           await _sharedPreferences!.setBool(_firstEnterSpName, false);
-          ApiLogger.apiPrint("First enter flag set to false.");
         }
-
-        ApiLogger.apiPrint("UserModel updated: ${_userModel.log()}");
-      } else {
-        _hasError = true;
-        _errorMessage = 'SharedPreferences is null';
-        ApiLogger.apiPrint("Error: SharedPreferences is null");
+        _isSharedPreferencesLoaded = true;
       }
     } catch (e) {
-      _hasError = true;
-      _errorMessage = 'Error initializing SharedPreferences: $e';
-      ApiLogger.apiPrint("Error initializing SharedPreferences: $e");
+      _isSharedPreferencesLoaded = false;
+
+      /// ТАК и должно быть потому, что в телеграмме это не работает
+      // _hasError = true;
+      // _errorMessage = 'Error initializing SharedPreferences: $e';
+      // ApiLogger.apiPrint("Error initializing SharedPreferences: $e");
     } finally {
       notifyListeners();
     }
   }
 
-  Future<void> setFirstEnterSharedPreferences() async {
+  Future<void> setIsFirstEnter(bool setVal) async {
     _userModel.update(
-      firstEnter: false,
+      isFirstEnter: setVal,
     );
-    await _sharedPreferences!.setBool(_firstEnterSpName, false);
-
+    if (_isSharedPreferencesLoaded) {
+      await _sharedPreferences!.setBool(_firstEnterSpName, setVal);
+    }
     notifyListeners();
   }
 
@@ -184,7 +176,7 @@ class ProviderUserLogin extends ChangeNotifier {
           tg_username: userData['tg_username'],
           firstname: userData['tg_first_name'],
           tg_last_name: userData['tg_last_name'],
-          languageCode: userData['language_code'],
+          tg_language_code: userData['language_code'],
           token: responseData['token'],
           authDate: userData['auth_date'],
           user_lvl: userData['user_lvl'],
@@ -227,17 +219,19 @@ class ProviderUserLogin extends ChangeNotifier {
         final responseData = jsonDecode(response.body);
         _userModel.update(token: responseData['access_token'], email: email);
         ApiLogger.apiPrint("Login email done: ${_userModel.log()}");
-        await _sharedPreferences!.setString('lastEmail', email);
+        if (_isSharedPreferencesLoaded) {
+          await _sharedPreferences!.setString('lastEmail', email);
+        }
         if (!kIsWeb) {
           await _secureStorage?.write(key: 'lastPass', value: password);
         }
         notifyListeners();
       } else {
-        // Login failed: Nothing to do yet...
+        ApiLogger.apiPrint("loginWithEmail failed: $email $password");
       }
     } catch (e) {
       _hasError = true;
-      _errorMessage = 'Network error: $e';
+      _errorMessage = 'loginWithEmail Network error: $e';
       ApiLogger.apiPrint(_errorMessage);
     }
   }
@@ -266,7 +260,7 @@ class ProviderUserLogin extends ChangeNotifier {
       }
     } catch (e) {
       _hasError = true;
-      _errorMessage = 'Network error: $e';
+      _errorMessage = 'registerWithEmail Network error: $e';
       ApiLogger.apiPrint(_errorMessage);
     } finally {
       notifyListeners();

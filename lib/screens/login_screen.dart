@@ -22,7 +22,7 @@ class LoginScreen extends StatelessWidget {
     //final providerUserLogin = context.watch<ProviderUserLogin>().userModel;
     _emailController = TextEditingController(text: context.watch<ProviderUserLogin>().userModel.email);
     _passwordController = TextEditingController(text: context.watch<ProviderUserLogin>().lastPass);
-    var txt = LoginScreenTranslate(context.read<UserModel>().languageCode ?? 'uk');
+    var txt = LoginScreenTranslate(context.read<UserModel>().tg_language_code ?? 'uk');
 // Text(txt.tr('add_deck_prompt')),
     return Scaffold(
       appBar: AppBar(

@@ -62,7 +62,7 @@ class LanguageSelectionScreen extends StatelessWidget {
 
   void _setLanguage(BuildContext context, Language language) {
     final userModel = Provider.of<UserModel>(context, listen: false);
-    userModel.languageCode = language.code;
+    userModel.tg_language_code = language.code;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (context) => IndexScreen()),
     );

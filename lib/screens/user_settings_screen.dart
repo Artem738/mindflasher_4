@@ -107,7 +107,7 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
                 Text('API ID: ${userModel.apiId ?? ''}'),
                 Text('Telegram ID: ${userModel.telegram_id ?? ''}'),
                 Text('Фамилия: ${userModel.tg_last_name ?? ''}'),
-                Text('Язык: ${userModel.languageCode ?? ''}'),
+                Text('Язык: ${userModel.tg_language_code ?? ''}'),
                 Text('Уровень пользователя: ${userModel.user_lvl ?? ''}'),
                 Text(
                   'Current Input: ${_inputSequence.join(' ')}',

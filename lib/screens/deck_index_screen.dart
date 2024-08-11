@@ -23,7 +23,7 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
   @override
   void initState() {
     super.initState();
-    txt = DeckIndexScreenTranslate(context.read<UserModel>().languageCode ?? 'en');
+    txt = DeckIndexScreenTranslate(context.read<UserModel>().tg_language_code ?? 'en');
     _fetchDecksFuture = context.read<DeckProvider>().fetchDecks(context.read<UserModel>().token!);
   }
 

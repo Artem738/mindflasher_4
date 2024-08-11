@@ -39,7 +39,7 @@ class CentralTopCard extends StatelessWidget {
                       padding: EdgeInsets.zero, // Убираем внутренние отступы
                     ),
                     child: Center(
-                      child: Icon(Icons.check),
+                      child: Icon(Icons.more_time_rounded),
                     ),
                   ),
                 ),

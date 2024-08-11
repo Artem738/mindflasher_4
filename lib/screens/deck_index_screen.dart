@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/models/user_model.dart';
+import 'package:mindflasher_4/providers/provider_user_login.dart';
+import 'package:mindflasher_4/screens/first_enter_screen.dart';
 import 'package:mindflasher_4/screens/list/flashcard_index_screen.dart';
 import 'package:mindflasher_4/screens/template_deck_index_screen.dart';
 import 'package:mindflasher_4/screens/user_settings_screen.dart';
@@ -28,7 +30,8 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
 
   @override
   Widget build(BuildContext context) {
-   var  txt = DeckIndexScreenTranslate(context.read<UserModel>().language_code ?? 'en');
+    context.read<ProviderUserLogin>().expandTelegram();
+    var txt = DeckIndexScreenTranslate(context.read<UserModel>().language_code ?? 'en');
     final deckProvider = context.watch<DeckProvider>();
 
     return Scaffold(
@@ -36,12 +39,27 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
         title: Text(txt.tt('title')),
         actions: [
           IconButton(
-            icon: Icon(Icons.person),
+            icon: Icon(Icons.info_outline),
+            onPressed: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => FirstEnterScreen()),
+                    (Route<dynamic> route) => false,
+              );
+              // Navigator.of(context).push(
+              //   MaterialPageRoute(
+              //     builder: (context) => FirstEnterScreen(),
+              //   ),
+              // );
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.person_outline_outlined),
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => UserSettingsScreen(),
                 ),
+
               );
             },
           ),
@@ -57,33 +75,33 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
           } else {
             return deckProvider.decks.isEmpty
                 ? Center(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 150),
-                  Text(
-                    txt.tt('no_decks'),
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(txt.tt('add_deck_prompt')),
-                ],
-              ),
-            )
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 150),
+                        Text(
+                          txt.tt('no_decks'),
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(txt.tt('add_deck_prompt')),
+                      ],
+                    ),
+                  )
                 : ListView.builder(
-              itemCount: deckProvider.decks.length,
-              itemBuilder: (ctx, i) => ListTile(
-                title: Text(deckProvider.decks[i].name),
-                subtitle: Text(deckProvider.decks[i].description),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => FlashcardIndexScreen(deck: deckProvider.decks[i]),
+                    itemCount: deckProvider.decks.length,
+                    itemBuilder: (ctx, i) => ListTile(
+                      title: Text(deckProvider.decks[i].name),
+                      subtitle: Text(deckProvider.decks[i].description),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => FlashcardIndexScreen(deck: deckProvider.decks[i]),
+                          ),
+                        );
+                      },
                     ),
                   );
-                },
-              ),
-            );
           }
         },
       ),

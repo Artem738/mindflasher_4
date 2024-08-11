@@ -62,7 +62,7 @@ class ProviderUserLogin extends ChangeNotifier {
     _isLoading = false;
   }
 
-  final String _firstEnterSpName = "firstEnterVarName";
+  final String _firstEnterSpName = "firstEnterVarName1";
   bool isSharedPreferencesLoaded = false;
 
   Future<void> _initializeSharedPreferences() async {
@@ -126,24 +126,37 @@ class ProviderUserLogin extends ChangeNotifier {
     }
   }
 
+  bool isTelegramFeatureWorks = false;
+
   Future<void> _initializeTelegram() async {
     if (kIsWeb) {
       try {
         if (TelegramWebApp.instance.isSupported) {
           await TelegramWebApp.instance.ready();
           _telegramUser = TelegramWebApp.instance.initData?.user;
-          Future.delayed(const Duration(seconds: 1), TelegramWebApp.instance.expand);
+          expandTelegram();
+          Future.delayed(const Duration(milliseconds: 10), TelegramWebApp.instance.expand);
           if (_telegramUser != null) {
             await _loginWithTelegram();
           }
+          isTelegramFeatureWorks = true;
         }
       } catch (e) {
+        bool isTelegramFeatureWorks = false;
         //
         // Заглушка: Здесь намеренно игнорируем ошибку. Тут нет ошибки. Оставляем этот комментарий.
         //
       } finally {
         notifyListeners();
       }
+    } else {
+      isTelegramFeatureWorks = false;
+    }
+  }
+
+  Future<void> expandTelegram() async {
+    if (isTelegramFeatureWorks) {
+      Future.delayed(const Duration(milliseconds: 10), TelegramWebApp.instance.expand);
     }
   }
 
@@ -164,7 +177,6 @@ class ProviderUserLogin extends ChangeNotifier {
         Uri.parse(url),
         headers: headers,
         body: jsonEncode({'initData': initData, 'language_code': userModel.language_code}),
-
       );
 
       if (response.statusCode == 200) {
@@ -178,9 +190,10 @@ class ProviderUserLogin extends ChangeNotifier {
         _userModel?.update(
           apiId: userData['id'],
           telegram_id: userData['telegram_id'],
+          name: userData['name'],
           email: userData['email'],
           tg_username: userData['tg_username'],
-          firstname: userData['tg_first_name'],
+          tg_first_name: userData['tg_first_name'],
           tg_last_name: userData['tg_last_name'],
           tg_language_code: userData['tg_language_code'],
           language_code: userData['language_code'],
@@ -224,12 +237,23 @@ class ProviderUserLogin extends ChangeNotifier {
       final response = await http.post(Uri.parse(url), headers: headers, body: body);
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        ApiLogger.apiPrint("responseData TO ADD: ${response.body}");
+        ApiLogger.apiPrint("user TO ADD: ${responseData['user']}");
+        final userData = responseData['user'];
         _userModel.update(
+          apiId: userData['id'],
           email: email,
+          name: userData['name'],
           token: responseData['access_token'],
-         // token: responseData['access_token'],
+          language_code: userData['language_code'],
+          user_lvl: userData['user_lvl'],
+          telegram_id: userData['telegram_id'],
+          tg_username: userData['tg_username'],
+           tg_first_name: userData['tg_first_name'],
+           tg_last_name: userData['tg_last_name'],
+          tg_language_code: userData['tg_language_code'],
         );
+       // final userData = responseData['user'];
+
         ApiLogger.apiPrint("Login email done: ${_userModel.log()}");
         if (isSharedPreferencesLoaded) {
           await _sharedPreferences!.setString('lastEmail', email);

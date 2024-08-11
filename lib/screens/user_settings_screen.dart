@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/screens/language_selection_screen.dart';
 import 'package:mindflasher_4/screens/test_info_screen.dart';
+import 'package:mindflasher_4/screens/tg_test_info_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/provider_user_control.dart';
 
 class UserSettingsScreen extends StatefulWidget {
-
   @override
   _UserSettingsScreenState createState() => _UserSettingsScreenState();
 }
@@ -97,21 +97,18 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Welcome, -',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  'Welcome ${userModel.tg_first_name ?? userModel.tg_username ?? ''}',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26),
                 ),
-                Text(
-                  'Имя: ${userModel.firstname ?? ''}',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
+                Text('apiId: ${userModel.apiId ?? ''}'),
+                Text('Name: ${userModel.name ?? ''}'),
                 Text('Username: ${userModel.tg_username ?? ''}'),
                 Text('Email: ${userModel.email ?? ''}'),
-                Text('API ID: ${userModel.apiId ?? ''}'),
                 Text('Telegram ID: ${userModel.telegram_id ?? ''}'),
                 Text('Фамилия: ${userModel.tg_last_name ?? ''}'),
                 Text('Telegram Язык: ${userModel.tg_language_code ?? ''}'),
                 Text('Язык: ${userModel.language_code ?? ''}'),
-                Text('Уровень пользователя: ${userModel.user_lvl ?? ''}'),
+                Text('Уровень : ${userModel.user_lvl ?? ''}'),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.pushReplacement(
@@ -122,8 +119,21 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
                   },
                   child: Text('Change Lang'),
                 ),
+                SizedBox(
+                  height: 10,
+                ),
+                // ElevatedButton(
+                //   onPressed: () {
+                //     // Navigator.pushReplacement(
+                //     //   context,
+                //     //   MaterialPageRoute(builder: (context) => TgTestInfoScreen()),
+                //     // );
+                //     //context.read<ProviderUserControl>().updateUserLanguageCode(userModel.token!, 'en');
+                //   },
+                //   child: Text('Test Telegram'),
+                // ),
                 Text(
-                  'Current Input: ${_inputSequence.join(' ')}',
+                  _inputSequence.join(' '),
                   style: TextStyle(color: Colors.grey, fontSize: 16),
                 ),
               ],

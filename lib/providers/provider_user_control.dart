@@ -38,7 +38,6 @@ class ProviderUserControl with ChangeNotifier {
     );
     _userModel.update(language_code: languageCode);
     notifyListeners();
-    print(response.statusCode);
 
     if (response.statusCode != 200) {
       throw Exception('Failed to update language code on server');

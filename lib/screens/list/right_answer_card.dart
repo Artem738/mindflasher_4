@@ -45,7 +45,7 @@ class RightAnswerCard extends StatelessWidget {
                           padding: EdgeInsets.zero,
                         ),
                         child: Center(
-                          child: Icon(Icons.warning, color: Colors.white),
+                          child: Icon(Icons.timer_outlined, color: Colors.white),
                         ),
                       ),
                     ),
@@ -80,7 +80,7 @@ class RightAnswerCard extends StatelessWidget {
                           padding: EdgeInsets.zero,
                         ),
                         child: Center(
-                          child: Icon(Icons.edit),
+                          child: Icon(Icons.access_time_outlined),
                         ),
                       ),
                     ),

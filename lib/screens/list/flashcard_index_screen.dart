@@ -4,6 +4,7 @@ import 'package:mindflasher_4/models/flashcard_model.dart';
 import 'package:mindflasher_4/models/user_model.dart';
 
 import 'package:mindflasher_4/providers/flashcard_provider.dart';
+import 'package:mindflasher_4/providers/provider_user_login.dart';
 import 'package:provider/provider.dart';
 
 import 'swipeable_card.dart';
@@ -36,6 +37,7 @@ class FlashcardIndexScreen extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final String? token = context.read<UserModel>().token;
+    context.read<ProviderUserLogin>().expandTelegram();
 
     return Scaffold(
       appBar: AppBar(

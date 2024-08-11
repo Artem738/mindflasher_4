@@ -7,6 +7,7 @@ class UserModel extends ChangeNotifier {
   String? firstname;
   String? tg_last_name;
   String? tg_language_code;
+  String? language_code;
   String? email;
   String? token;
   int? authDate;
@@ -21,6 +22,7 @@ class UserModel extends ChangeNotifier {
     this.firstname,
     this.tg_last_name,
     this.tg_language_code,
+    this.language_code,
     this.email,
     this.token,
     this.authDate,
@@ -36,6 +38,7 @@ class UserModel extends ChangeNotifier {
     String? firstname,
     String? tg_last_name,
     String? tg_language_code,
+    String? language_code,
     String? email,
     String? token,
     int? authDate,
@@ -49,6 +52,7 @@ class UserModel extends ChangeNotifier {
     this.firstname = firstname ?? this.firstname;
     this.tg_last_name = tg_last_name ?? this.tg_last_name;
     this.tg_language_code = tg_language_code ?? this.tg_language_code;
+    this.language_code = language_code ?? this.language_code;
     this.email = email ?? this.email;
     this.token = token ?? this.token;
     this.authDate = authDate ?? this.authDate;
@@ -64,7 +68,7 @@ class UserModel extends ChangeNotifier {
   }
 
   String log() {
-    return 'UserModel - apiId: ${apiId ?? 'null'}, telegram_id: ${telegram_id ?? 'null'}, tg_username: ${tg_username ?? 'null'}, firstname: ${firstname ?? 'null'}, tg_last_name: ${tg_last_name ?? 'null'}, tg_language_code: ${tg_language_code ?? 'null'}, email: ${email ?? 'null'}, token: ${token ?? 'null'}, authDate: ${authDate ?? 'null'}, hash: ${hash ?? 'null'}, user_lvl: ${user_lvl ?? 'null'}, isFirstEnter: ${isFirstEnter ?? 'null'}';
+    return 'UserModel - apiId: ${apiId ?? 'null'}, telegram_id: ${telegram_id ?? 'null'}, tg_username: ${tg_username ?? 'null'}, firstname: ${firstname ?? 'null'}, tg_last_name: ${tg_last_name ?? 'null'}, tg_language_code: ${tg_language_code ?? 'null'}, language_code: ${language_code ?? 'null'}, email: ${email ?? 'null'}, token: ${token ?? 'null'}, authDate: ${authDate ?? 'null'}, hash: ${hash ?? 'null'}, user_lvl: ${user_lvl ?? 'null'}, isFirstEnter: ${isFirstEnter ?? 'null'}';
   }
 
 }

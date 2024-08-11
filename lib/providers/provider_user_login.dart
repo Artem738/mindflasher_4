@@ -62,8 +62,8 @@ class ProviderUserLogin extends ChangeNotifier {
     _isLoading = false;
   }
 
-  final String _firstEnterSpName = "firstEnterB4512";
-  bool _isSharedPreferencesLoaded = false;
+  final String _firstEnterSpName = "firstEnterVarName";
+  bool isSharedPreferencesLoaded = false;
 
   Future<void> _initializeSharedPreferences() async {
     try {
@@ -74,6 +74,10 @@ class ProviderUserLogin extends ChangeNotifier {
         if (lastEmail != null) {
           _userModel.update(email: lastEmail);
         }
+        String? language_code = _sharedPreferences!.getString('language_code');
+        if (language_code != null) {
+          _userModel.update(language_code: language_code);
+        }
 
         bool? firstEnter = await _sharedPreferences!.getBool(_firstEnterSpName);
         if (firstEnter == null) {
@@ -83,10 +87,10 @@ class ProviderUserLogin extends ChangeNotifier {
           _userModel.update(isFirstEnter: false);
           await _sharedPreferences!.setBool(_firstEnterSpName, false);
         }
-        _isSharedPreferencesLoaded = true;
+        isSharedPreferencesLoaded = true;
       }
     } catch (e) {
-      _isSharedPreferencesLoaded = false;
+      isSharedPreferencesLoaded = false;
 
       /// ТАК и должно быть потому, что в телеграмме это не работает
       // _hasError = true;
@@ -101,7 +105,7 @@ class ProviderUserLogin extends ChangeNotifier {
     _userModel.update(
       isFirstEnter: setVal,
     );
-    if (_isSharedPreferencesLoaded) {
+    if (isSharedPreferencesLoaded) {
       await _sharedPreferences!.setBool(_firstEnterSpName, setVal);
     }
     notifyListeners();
@@ -159,7 +163,8 @@ class ProviderUserLogin extends ChangeNotifier {
       final response = await http.post(
         Uri.parse(url),
         headers: headers,
-        body: jsonEncode({'initData': initData}),
+        body: jsonEncode({'initData': initData, 'language_code': userModel.language_code}),
+
       );
 
       if (response.statusCode == 200) {
@@ -168,6 +173,7 @@ class ProviderUserLogin extends ChangeNotifier {
 
         final userData = responseData['user'];
 
+        ///TODO SEND language_code !!!
         // Обновляем модель пользователя данными из ответа сервера
         _userModel?.update(
           apiId: userData['id'],
@@ -176,7 +182,8 @@ class ProviderUserLogin extends ChangeNotifier {
           tg_username: userData['tg_username'],
           firstname: userData['tg_first_name'],
           tg_last_name: userData['tg_last_name'],
-          tg_language_code: userData['language_code'],
+          tg_language_code: userData['tg_language_code'],
+          language_code: userData['language_code'],
           token: responseData['token'],
           authDate: userData['auth_date'],
           user_lvl: userData['user_lvl'],
@@ -217,9 +224,14 @@ class ProviderUserLogin extends ChangeNotifier {
       final response = await http.post(Uri.parse(url), headers: headers, body: body);
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        _userModel.update(token: responseData['access_token'], email: email);
+        ApiLogger.apiPrint("responseData TO ADD: ${response.body}");
+        _userModel.update(
+          email: email,
+          token: responseData['access_token'],
+         // token: responseData['access_token'],
+        );
         ApiLogger.apiPrint("Login email done: ${_userModel.log()}");
-        if (_isSharedPreferencesLoaded) {
+        if (isSharedPreferencesLoaded) {
           await _sharedPreferences!.setString('lastEmail', email);
         }
         if (!kIsWeb) {
@@ -244,6 +256,7 @@ class ProviderUserLogin extends ChangeNotifier {
       'email': email,
       'password': password,
       'password_confirmation': passwordConfirmation,
+      'language_code': _userModel.language_code,
     });
 
     try {

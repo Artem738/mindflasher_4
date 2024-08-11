@@ -68,7 +68,7 @@ class IndexScreen extends StatelessWidget {
       ApiLogger.apiPrint("Error with login: ${userLogin.errorMessage}");
     }
 
-    if (userModel.tg_language_code == null && userLogin.isLoading == false) {
+    if (userModel.language_code == null && userLogin.isLoading == false) {
       // Если languageCode отсутствует, показываем экран выбора языка
       return LanguageSelectionScreen();
     }

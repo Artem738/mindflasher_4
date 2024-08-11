@@ -11,19 +11,35 @@ import 'package:mindflasher_4/services/api_logger.dart';
 import 'package:mindflasher_4/translates/login_screen_translate.dart';
 import 'package:provider/provider.dart';
 
-class LoginScreen extends StatelessWidget {
-  late TextEditingController _emailController = TextEditingController();
-  late TextEditingController _passwordController = TextEditingController();
+class LoginScreen extends StatefulWidget {
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
 
+class _LoginScreenState extends State<LoginScreen> {
+  late TextEditingController _emailController;
+  late TextEditingController _passwordController;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController = TextEditingController(
+        text: context.read<ProviderUserLogin>().userModel.email);
+    _passwordController = TextEditingController(
+        text: context.read<ProviderUserLogin>().lastPass);
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    var txt = LoginScreenTranslate(context.read<UserModel>().language_code ?? 'en');
 
-    //final providerUserLogin = context.watch<ProviderUserLogin>().userModel;
-    _emailController = TextEditingController(text: context.watch<ProviderUserLogin>().userModel.email);
-    _passwordController = TextEditingController(text: context.watch<ProviderUserLogin>().lastPass);
-    var txt = LoginScreenTranslate(context.read<UserModel>().tg_language_code ?? 'uk');
-// Text(txt.tr('add_deck_prompt')),
     return Scaffold(
       appBar: AppBar(
         title: Text(txt.tt('title')),
@@ -49,18 +65,19 @@ class LoginScreen extends StatelessWidget {
                   _emailController.text,
                   _passwordController.text,
                 );
-                if (provider.userModel.token != null) {
+                if (mounted && provider.userModel.token != null) {
                   ApiLogger.apiPrint("Token after login: ${provider.userModel.token} ");
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => IndexScreen()),
-                    //MaterialPageRoute(builder: (context) => TemplateDeckIndexScreen()),
                   );
                 } else {
-                  ApiLogger.apiPrint("Login failed: ${provider.userModel.token} ");
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(txt.tt('login_failed'))),
-                  );
+                  if (mounted) {
+                    ApiLogger.apiPrint("Login failed: ${provider.userModel.token} ");
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(txt.tt('login_failed'))),
+                    );
+                  }
                 }
               },
               child: Text(txt.tt('login')),

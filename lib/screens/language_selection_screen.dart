@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mindflasher_4/providers/provider_user_control.dart';
+import 'package:mindflasher_4/providers/provider_user_login.dart';
 import 'package:provider/provider.dart';
 import 'package:mindflasher_4/models/user_model.dart';
 
@@ -17,12 +19,11 @@ enum Language {
 
   static Language fromCode(String? code) {
     return Language.values.firstWhere(
-          (lang) => lang.code == code,
+      (lang) => lang.code == code,
       orElse: () => Language.english, // Default language
     );
   }
 }
-
 
 class LanguageSelectionScreen extends StatelessWidget {
   @override
@@ -60,12 +61,23 @@ class LanguageSelectionScreen extends StatelessWidget {
     );
   }
 
-  void _setLanguage(BuildContext context, Language language) {
+  void _setLanguage(BuildContext context, Language language) async {
     final userModel = Provider.of<UserModel>(context, listen: false);
-    userModel.tg_language_code = language.code;
-    Navigator.of(context).pushReplacement(
+    final userControl = Provider.of<ProviderUserControl>(context, listen: false);
+    final userLogin = Provider.of<ProviderUserLogin>(context, listen: false);
+
+    userModel.language_code = language.code;
+    if (userModel.token != null) {
+      userControl.updateUserLanguageCode(userModel.token!, language.code);
+    }
+    // Navigator.of(context).pop();
+    Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (context) => IndexScreen()),
+      (Route<dynamic> route) => false,
     );
+    if (userLogin.isSharedPreferencesLoaded) {
+      await userLogin.sharedPreferences!.setString('language_code', language.code);
+  }
+
   }
 }
-

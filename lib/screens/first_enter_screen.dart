@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/main.dart';
+import 'package:mindflasher_4/models/user_model.dart';
 import 'package:mindflasher_4/providers/provider_user_login.dart';
+import 'package:mindflasher_4/translates/first_enterScreen_translate.dart';
 import 'package:provider/provider.dart';
 
 class FirstEnterScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    var txt = FirstEnterScreenTranslate(context.read<UserModel>().language_code ?? 'en');
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('title'),
+        title: Text(txt.tt('title')),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Добро пожаловать !!!',
+              txt.tt('welcome'),
               style: TextStyle(fontSize: 26),
             ),
             SizedBox(height: 20), // Добавляем отступ между текстом и кнопкой
@@ -29,7 +33,7 @@ class FirstEnterScreen extends StatelessWidget {
                   //MaterialPageRoute(builder: (context) => TemplateDeckIndexScreen()),
                 );
               },
-              child: Text('Start', style: TextStyle(fontSize: 20)),
+              child: Text(txt.tt('start'), style: TextStyle(fontSize: 20)),
             ),
           ],
         ),

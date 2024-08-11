@@ -23,12 +23,12 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
   @override
   void initState() {
     super.initState();
-    txt = DeckIndexScreenTranslate(context.read<UserModel>().tg_language_code ?? 'en');
     _fetchDecksFuture = context.read<DeckProvider>().fetchDecks(context.read<UserModel>().token!);
   }
 
   @override
   Widget build(BuildContext context) {
+   var  txt = DeckIndexScreenTranslate(context.read<UserModel>().language_code ?? 'en');
     final deckProvider = context.watch<DeckProvider>();
 
     return Scaffold(

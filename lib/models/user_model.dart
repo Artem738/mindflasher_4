@@ -12,6 +12,7 @@ class UserModel extends ChangeNotifier {
   int? authDate;
   String? hash;
   int? user_lvl;
+  bool? firstEnter;
 
   UserModel({
     this.apiId,
@@ -25,6 +26,7 @@ class UserModel extends ChangeNotifier {
     this.authDate,
     this.hash,
     this.user_lvl,
+    this.firstEnter,
   });
 
   void update({
@@ -39,6 +41,7 @@ class UserModel extends ChangeNotifier {
     int? authDate,
     String? hash,
     int? user_lvl,
+    bool? firstEnter,
   }) {
     this.apiId = apiId ?? this.apiId;
     this.telegram_id = telegram_id ?? this.telegram_id;
@@ -51,6 +54,7 @@ class UserModel extends ChangeNotifier {
     this.authDate = authDate ?? this.authDate;
     this.hash = hash ?? this.hash;
     this.user_lvl = user_lvl ?? this.user_lvl;
+    this.firstEnter = firstEnter ?? this.firstEnter;
     notifyListeners();
   }
 
@@ -60,6 +64,7 @@ class UserModel extends ChangeNotifier {
   }
 
   String log() {
-    return 'UserModel - apiId: $apiId, telegram_id: $telegram_id, tg_username: $tg_username, firstname: $firstname, tg_last_name: $tg_last_name, languageCode: $languageCode, email: $email, token: $token, authDate: $authDate, hash: $hash, user_lvl: $user_lvl';
+    return 'UserModel - apiId: ${apiId ?? 'null'}, telegram_id: ${telegram_id ?? 'null'}, tg_username: ${tg_username ?? 'null'}, firstname: ${firstname ?? 'null'}, tg_last_name: ${tg_last_name ?? 'null'}, languageCode: ${languageCode ?? 'null'}, email: ${email ?? 'null'}, token: ${token ?? 'null'}, authDate: ${authDate ?? 'null'}, hash: ${hash ?? 'null'}, user_lvl: ${user_lvl ?? 'null'}, firstEnter: ${firstEnter ?? 'null'}';
   }
+
 }

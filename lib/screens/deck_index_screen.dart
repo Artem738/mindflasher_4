@@ -18,13 +18,13 @@ class DeckIndexScreen extends StatefulWidget {
 
 class _DeckIndexScreenState extends State<DeckIndexScreen> {
   late final DeckIndexScreenTranslate txt;
+  late Future<void> _fetchDecksFuture;
 
   @override
   void initState() {
     super.initState();
-    final deckProvider = context.read<DeckProvider>();
-    deckProvider.fetchDecks(context.read<UserModel>().token!);
     txt = DeckIndexScreenTranslate(context.read<UserModel>().languageCode ?? 'en');
+    _fetchDecksFuture = context.read<DeckProvider>().fetchDecks(context.read<UserModel>().token!);
   }
 
   @override
@@ -47,34 +47,45 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
           ),
         ],
       ),
-      body: deckProvider.decks.isEmpty
-          ? Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 150),
-            Text(
-              txt.tt('no_decks'),
-              style: const TextStyle(fontSize: 20),
-            ),
-            const SizedBox(height: 10),
-            Text(txt.tt('add_deck_prompt')),
-          ],
-        ),
-      )
-          : ListView.builder(
-        itemCount: deckProvider.decks.length,
-        itemBuilder: (ctx, i) => ListTile(
-          title: Text(deckProvider.decks[i].name),
-          subtitle: Text(deckProvider.decks[i].description),
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => FlashcardIndexScreen(deck: deckProvider.decks[i]),
+      body: FutureBuilder(
+        future: _fetchDecksFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error loading decks.'));
+          } else {
+            return deckProvider.decks.isEmpty
+                ? Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 150),
+                  Text(
+                    txt.tt('no_decks'),
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(txt.tt('add_deck_prompt')),
+                ],
+              ),
+            )
+                : ListView.builder(
+              itemCount: deckProvider.decks.length,
+              itemBuilder: (ctx, i) => ListTile(
+                title: Text(deckProvider.decks[i].name),
+                subtitle: Text(deckProvider.decks[i].description),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => FlashcardIndexScreen(deck: deckProvider.decks[i]),
+                    ),
+                  );
+                },
               ),
             );
-          },
-        ),
+          }
+        },
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {

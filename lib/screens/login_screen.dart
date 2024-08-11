@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mindflasher_4/main.dart';
 import 'package:mindflasher_4/models/user_model.dart';
 import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/providers/provider_user_login.dart';
@@ -6,6 +7,7 @@ import 'package:mindflasher_4/screens/deck_index_screen.dart';
 import 'package:mindflasher_4/screens/template_deck_index_screen.dart';
 import 'package:mindflasher_4/screens/user_settings_screen.dart';
 import 'package:mindflasher_4/screens/registration_screen.dart'; // Импортируем экран регистрации
+import 'package:mindflasher_4/services/api_logger.dart';
 import 'package:mindflasher_4/translates/login_screen_translate.dart';
 import 'package:provider/provider.dart';
 
@@ -48,12 +50,14 @@ class LoginScreen extends StatelessWidget {
                   _passwordController.text,
                 );
                 if (provider.userModel.token != null) {
+                  ApiLogger.apiPrint("Token after login: ${provider.userModel.token} ");
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => DeckIndexScreen()),
+                    MaterialPageRoute(builder: (context) => IndexScreen()),
                     //MaterialPageRoute(builder: (context) => TemplateDeckIndexScreen()),
                   );
                 } else {
+                  ApiLogger.apiPrint("Login failed: ${provider.userModel.token} ");
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(txt.tt('login_failed'))),
                   );

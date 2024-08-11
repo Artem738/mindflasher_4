@@ -4,6 +4,8 @@ import 'package:mindflasher_4/providers/flashcard_provider.dart';
 import 'package:mindflasher_4/providers/template_deck_provider.dart';
 import 'package:mindflasher_4/providers/template_flashcard_provider.dart';
 import 'package:mindflasher_4/screens/deck_index_screen.dart';
+import 'package:mindflasher_4/screens/first_enter_screen.dart';
+import 'package:mindflasher_4/screens/language_selection_screen.dart';
 import 'package:mindflasher_4/screens/template_deck_index_screen.dart';
 import 'package:mindflasher_4/services/api_logger.dart';
 import 'package:provider/provider.dart';
@@ -63,15 +65,26 @@ class IndexScreen extends StatelessWidget {
     }
 
     if (userLogin.hasError) {
-      ApiLogger.apiPrint("Error: ${userLogin.errorMessage}");
+      ApiLogger.apiPrint("Error with login: ${userLogin.errorMessage}");
     }
+
+    if (userModel.languageCode == null && userLogin.isLoading == false) {
+      // Если languageCode отсутствует, показываем экран выбора языка
+      return LanguageSelectionScreen();
+    }
+
 
     if (userModel.token == null && userLogin.isLoading == false) {
       return LoginScreen();
     } else {
-      //return DeckListScreen();
-      return DeckIndexScreen();
-      return TemplateDeckIndexScreen();
+      if (userModel.firstEnter == true) {
+        // Если languageCode отсутствует, показываем экран выбора языка
+        return FirstEnterScreen();
+      } else {
+        return DeckIndexScreen();
+        //return TemplateDeckIndexScreen();
+      }
+
     }
   }
 }

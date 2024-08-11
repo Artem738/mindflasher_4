@@ -14,11 +14,6 @@ import 'devise_special_load/telegram_web_app_stub.dart' // Импортируе�
 class ProviderUserLogin extends ChangeNotifier {
   final UserModel _userModel;
 
-  ProviderUserLogin(this._userModel) {
-    // Класс инициализируется сразу.
-    initialize();
-  }
-
   bool _isLoading = true;
   bool _hasError = false;
   String _errorMessage = '';
@@ -40,20 +35,85 @@ class ProviderUserLogin extends ChangeNotifier {
 
   FlutterSecureStorage? _secureStorage;
 
+  String _lastPass = '';
+
+  String get lastPass => _lastPass;
+
+  /// Initialise Class on First Run!
+  ProviderUserLogin(this._userModel) {
+    // Класс инициализируется сразу.
+    initialize();
+  }
+
   Future<void> initialize() async {
+    if (kIsWeb) {
+      EnvConfig.mainApiUrl = EnvConfig.webApiUrl;
+    } else {
+      EnvConfig.mainApiUrl = EnvConfig.localApiUrl;
+    }
     await _initializeSharedPreferences();
     if (kIsWeb) {
       await _initializeTelegram();
     } else {
       await _initializeSecureStorage();
     }
-    _isLoading = false;
+
     notifyListeners();
+    _isLoading = false;
   }
 
-  String _lastPass = '';
+  final String _firstEnterSpName = "firstEnterB451";
 
-  String get lastPass => _lastPass;
+  Future<void> _initializeSharedPreferences() async {
+    try {
+      _sharedPreferences = await SharedPreferences.getInstance();
+
+      if (_sharedPreferences != null) {
+        String? lastEmail = _sharedPreferences!.getString('lastEmail');
+        ApiLogger.apiPrint("Last email loaded: $lastEmail");
+
+        if (lastEmail != null) {
+          _userModel.update(email: lastEmail);
+        } else {
+          ApiLogger.apiPrint("No email found in SharedPreferences.");
+        }
+
+        bool? firstEnter = await _sharedPreferences!.getBool(_firstEnterSpName);
+        ApiLogger.apiPrint("First enter flag loaded: $firstEnter");
+
+        if (firstEnter == null) {
+          _userModel.update(firstEnter: true);
+          await _sharedPreferences!.setBool(_firstEnterSpName, true);
+          ApiLogger.apiPrint("First enter flag set to true.");
+        } else {
+          _userModel.update(firstEnter: false);
+          await _sharedPreferences!.setBool(_firstEnterSpName, false);
+          ApiLogger.apiPrint("First enter flag set to false.");
+        }
+
+        ApiLogger.apiPrint("UserModel updated: ${_userModel.log()}");
+      } else {
+        _hasError = true;
+        _errorMessage = 'SharedPreferences is null';
+        ApiLogger.apiPrint("Error: SharedPreferences is null");
+      }
+    } catch (e) {
+      _hasError = true;
+      _errorMessage = 'Error initializing SharedPreferences: $e';
+      ApiLogger.apiPrint("Error initializing SharedPreferences: $e");
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<void> setFirstEnterSharedPreferences() async {
+    _userModel.update(
+      firstEnter: false,
+    );
+    await _sharedPreferences!.setBool(_firstEnterSpName, false);
+
+    notifyListeners();
+  }
 
   Future<void> _initializeSecureStorage() async {
     if (!kIsWeb) {
@@ -67,24 +127,6 @@ class ProviderUserLogin extends ChangeNotifier {
       } else {
         _lastPass = "";
       }
-    }
-  }
-
-  Future<void> _initializeSharedPreferences() async {
-    try {
-      _sharedPreferences = await SharedPreferences.getInstance();
-
-      String? lastEmail = sharedPreferences?.getString('lastEmail');
-      if (lastEmail != null) {
-        _userModel.update(
-          email: lastEmail,
-        );
-      }
-    } catch (e) {
-      _hasError = true;
-      _errorMessage = e.toString();
-    } finally {
-      notifyListeners();
     }
   }
 
@@ -110,12 +152,18 @@ class ProviderUserLogin extends ChangeNotifier {
   }
 
   Future<void> _loginWithTelegram() async {
-    const url = '${EnvConfig.mainApiUrl}/api/telegram/auth';
+    final url = '${EnvConfig.mainApiUrl}/api/telegram/auth';
     final headers = {'Content-Type': 'application/json'};
     final initData = TelegramWebApp.instance.initData?.raw;
 
+    if (initData == null) {
+      _hasError = true;
+      _errorMessage = 'Init data is null';
+      ApiLogger.apiPrint("Init data is null: ${_userModel?.log()}");
+      return;
+    }
+
     try {
-      // Отправляем как-бы не не наши API данные с полями, которые дал Telegram (initData)
       final response = await http.post(
         Uri.parse(url),
         headers: headers,
@@ -129,7 +177,7 @@ class ProviderUserLogin extends ChangeNotifier {
         final userData = responseData['user'];
 
         // Обновляем модель пользователя данными из ответа сервера
-        _userModel.update(
+        _userModel?.update(
           apiId: userData['id'],
           telegram_id: userData['telegram_id'],
           email: userData['email'],
@@ -141,11 +189,19 @@ class ProviderUserLogin extends ChangeNotifier {
           authDate: userData['auth_date'],
           user_lvl: userData['user_lvl'],
         );
+
+        if (_userModel == null) {
+          _hasError = true;
+          _errorMessage = 'UserModel is null';
+          ApiLogger.apiPrint("UserModel is null");
+          return;
+        }
+
         // Необходимое удаление email если был логин с email, но не зарегистрированный.
         if (userData['email'] != null) {
-          await _sharedPreferences!.setString('lastEmail', userData['email']);
+          await _sharedPreferences?.setString('lastEmail', userData['email']);
         } else {
-          await _sharedPreferences!.remove('lastEmail');
+          // await _sharedPreferences?.remove('lastEmail');
         }
         ApiLogger.apiPrint("Login with TG Success: ${_userModel.log()}");
       } else {
@@ -155,23 +211,26 @@ class ProviderUserLogin extends ChangeNotifier {
     } catch (e) {
       _hasError = true;
       _errorMessage = 'Error TG login: $e';
-      ApiLogger.apiPrint("Error TG login: $e ${_userModel.log()}");
+      ApiLogger.apiPrint("Error TG login: $e ${_userModel?.log()}");
     }
   }
 
-
   Future<void> loginWithEmail(String email, String password) async {
-    const url = '${EnvConfig.mainApiUrl}/api/login';
+    ApiLogger.apiPrint('loginWithEmail flutter: $email $password');
+    final url = '${EnvConfig.mainApiUrl}/api/login';
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({'email': email, 'password': password});
-    await _sharedPreferences!.setString('lastEmail', email);
-    await _secureStorage?.write(key: 'lastPass', value: password);
+
     try {
       final response = await http.post(Uri.parse(url), headers: headers, body: body);
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         _userModel.update(token: responseData['access_token'], email: email);
         ApiLogger.apiPrint("Login email done: ${_userModel.log()}");
+        await _sharedPreferences!.setString('lastEmail', email);
+        if (!kIsWeb) {
+          await _secureStorage?.write(key: 'lastPass', value: password);
+        }
         notifyListeners();
       } else {
         // Login failed: Nothing to do yet...
@@ -184,7 +243,7 @@ class ProviderUserLogin extends ChangeNotifier {
   }
 
   Future<void> registerWithEmail(String name, String email, String password, String passwordConfirmation) async {
-    const url = '${EnvConfig.mainApiUrl}/api/register';
+    final url = '${EnvConfig.mainApiUrl}/api/register';
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({
       'name': name,

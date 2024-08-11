@@ -8,6 +8,7 @@ import 'package:mindflasher_4/models/deck_model.dart';
 class DeckProvider extends ChangeNotifier {
   List<DeckModel> _decks = [];
 
+
   List<DeckModel> get decks => _decks;
 
   Future<void> fetchDecks(String token) async {

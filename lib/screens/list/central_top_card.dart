@@ -51,7 +51,7 @@ class CentralTopCard extends StatelessWidget {
             Expanded(
               child: Text(
                 "${flashcard.question}",
-                style: TextStyle(fontSize: 17),
+                style: TextStyle(fontSize: 19),
                 textAlign: TextAlign.center,
               ),
             ),

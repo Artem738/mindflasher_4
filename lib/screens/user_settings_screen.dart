@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mindflasher_4/screens/font_size_adjustment_screen.dart';
 import 'package:mindflasher_4/screens/language_selection_screen.dart';
 import 'package:mindflasher_4/screens/test_info_screen.dart';
 import 'package:mindflasher_4/screens/tg_test_info_screen.dart';
@@ -81,7 +82,8 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userModel = context.watch<ProviderUserControl>().userModel;
+    final userControl = context.watch<ProviderUserControl>();
+    final userModel = userControl.userModel;
 
     return Scaffold(
       appBar: AppBar(
@@ -109,6 +111,21 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
                 Text('Telegram Язык: ${userModel.tg_language_code ?? ''}'),
                 Text('Язык: ${userModel.language_code ?? ''}'),
                 Text('Уровень : ${userModel.user_lvl ?? ''}'),
+                Text('Размер шрифта : ${userModel.base_font_size ?? ''}'),
+
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FontSizeAdjustmentScreen(),
+                      ),
+                    );
+                  },
+                  child: Text('Изменить размер шрифта', style: TextStyle(fontSize: 20)),
+                ),
+                SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.pushReplacement(

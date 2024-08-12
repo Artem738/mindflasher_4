@@ -58,8 +58,8 @@ class RightAnswerCard extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: Text(
-                        flashcard.answer,
-                        style: TextStyle(color: Colors.black),
+                        flashcard.answer.replaceAll('\\n', '\n'),
+                        style: TextStyle(color: Colors.black, fontSize: 18),
                         textAlign: TextAlign.right,
                       ),
                     ),

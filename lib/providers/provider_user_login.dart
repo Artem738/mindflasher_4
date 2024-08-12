@@ -184,7 +184,9 @@ class ProviderUserLogin extends ChangeNotifier {
         ApiLogger.apiPrint("Tg login responseData: $responseData");
 
         final userData = responseData['user'];
-
+        if (userData['base_font_size'] != null) {
+          _userModel.update(base_font_size: (userData['base_font_size'] as int).toDouble());
+        }
         ///TODO SEND language_code !!!
         // Обновляем модель пользователя данными из ответа сервера
         _userModel?.update(
@@ -200,6 +202,7 @@ class ProviderUserLogin extends ChangeNotifier {
           token: responseData['token'],
           authDate: userData['auth_date'],
           user_lvl: userData['user_lvl'],
+         // base_font_size: userData['base_font_size'],
         );
 
         if (_userModel == null) {
@@ -239,20 +242,24 @@ class ProviderUserLogin extends ChangeNotifier {
         final responseData = jsonDecode(response.body);
         ApiLogger.apiPrint("user TO ADD: ${responseData['user']}");
         final userData = responseData['user'];
+        if (userData['base_font_size'] != null) {
+          _userModel.update(base_font_size: (userData['base_font_size'] as int).toDouble());
+        }
         _userModel.update(
           apiId: userData['id'],
           email: email,
           name: userData['name'],
           token: responseData['access_token'],
-          language_code: userData['language_code'],
           user_lvl: userData['user_lvl'],
           telegram_id: userData['telegram_id'],
           tg_username: userData['tg_username'],
-           tg_first_name: userData['tg_first_name'],
-           tg_last_name: userData['tg_last_name'],
+          tg_first_name: userData['tg_first_name'],
+          tg_last_name: userData['tg_last_name'],
           tg_language_code: userData['tg_language_code'],
+          language_code: userData['language_code'],
+          //userModel.base_font_size = userData['base_font_size'] ?? userModel.base_font_size,
         );
-       // final userData = responseData['user'];
+        // final userData = responseData['user'];
 
         ApiLogger.apiPrint("Login email done: ${_userModel.log()}");
         if (isSharedPreferencesLoaded) {

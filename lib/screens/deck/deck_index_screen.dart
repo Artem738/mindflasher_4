@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/models/user_model.dart';
+import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/providers/provider_user_login.dart';
 import 'package:mindflasher_4/screens/first_enter_screen.dart';
 import 'package:mindflasher_4/screens/list/flashcard_index_screen.dart';
@@ -8,8 +9,9 @@ import 'package:mindflasher_4/screens/user_settings_screen.dart';
 
 import 'package:provider/provider.dart';
 
-import '../providers/deck_provider.dart';
-import '../translates/deck_index_screen_translate.dart';
+import '../../providers/deck_provider.dart';
+import '../../translates/deck_index_screen_translate.dart';
+import 'deck_card.dart';
 
 class DeckIndexScreen extends StatefulWidget {
   const DeckIndexScreen({Key? key}) : super(key: key);
@@ -30,7 +32,7 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var token = context.read<UserModel>().token!;
+    final userModel = context.read<UserModel>();
     context.read<ProviderUserLogin>().expandTelegram();
     var txt = DeckIndexScreenTranslate(context.read<UserModel>().language_code ?? 'en');
     final deckProvider = context.watch<DeckProvider>();
@@ -44,7 +46,7 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
             onPressed: () {
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (context) => FirstEnterScreen()),
-                    (Route<dynamic> route) => false,
+                (Route<dynamic> route) => false,
               );
               // Navigator.of(context).push(
               //   MaterialPageRoute(
@@ -60,7 +62,6 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
                 MaterialPageRoute(
                   builder: (context) => UserSettingsScreen(),
                 ),
-
               );
             },
           ),
@@ -90,19 +91,14 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
                     ),
                   )
                 : ListView.builder(
-                    itemCount: deckProvider.decks.length,
-                    itemBuilder: (ctx, i) => ListTile(
-                      title: Text(deckProvider.decks[i].name),
-                      subtitle: Text(deckProvider.decks[i].description),
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => FlashcardIndexScreen(deck: deckProvider.decks[i]),
-                          ),
-                        );
-                      },
-                    ),
-                  );
+              itemCount: deckProvider.decks.length,
+              itemBuilder: (ctx, i) {
+                return DeckCard(
+                  deck: deckProvider.decks[i],
+                  baseFontSize: context.watch<ProviderUserControl>().userModel.base_font_size,
+                );
+              },
+            );
           }
         },
       ),

@@ -178,7 +178,6 @@ class ProviderUserLogin extends ChangeNotifier {
         headers: headers,
         body: jsonEncode({'initData': initData, 'language_code': userModel.language_code}),
       );
-
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         ApiLogger.apiPrint("Tg login responseData: $responseData");
@@ -187,8 +186,6 @@ class ProviderUserLogin extends ChangeNotifier {
         if (userData['base_font_size'] != null) {
           _userModel.update(base_font_size: (userData['base_font_size'] as int).toDouble());
         }
-        ///TODO SEND language_code !!!
-        // Обновляем модель пользователя данными из ответа сервера
         _userModel?.update(
           apiId: userData['id'],
           telegram_id: userData['telegram_id'],
@@ -202,7 +199,6 @@ class ProviderUserLogin extends ChangeNotifier {
           token: responseData['token'],
           authDate: userData['auth_date'],
           user_lvl: userData['user_lvl'],
-         // base_font_size: userData['base_font_size'],
         );
 
         if (_userModel == null) {

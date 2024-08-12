@@ -97,14 +97,14 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Welcome ${userModel.tg_first_name ?? userModel.tg_username ?? ''}',
+                  'Welcome ${userModel.tg_first_name ?? userModel.name ?? ''}',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26),
                 ),
                 Text('apiId: ${userModel.apiId ?? ''}'),
+                Text('Telegram ID: ${userModel.telegram_id ?? ''}'),
                 Text('Name: ${userModel.name ?? ''}'),
                 Text('Username: ${userModel.tg_username ?? ''}'),
                 Text('Email: ${userModel.email ?? ''}'),
-                Text('Telegram ID: ${userModel.telegram_id ?? ''}'),
                 Text('Фамилия: ${userModel.tg_last_name ?? ''}'),
                 Text('Telegram Язык: ${userModel.tg_language_code ?? ''}'),
                 Text('Язык: ${userModel.language_code ?? ''}'),

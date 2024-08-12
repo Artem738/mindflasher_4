@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:mindflasher_4/models/deck_model.dart';
 import 'package:mindflasher_4/models/flashcard_model.dart';
 import 'package:mindflasher_4/models/user_model.dart';
+import 'package:mindflasher_4/providers/deck_provider.dart';
 
 import 'package:mindflasher_4/providers/flashcard_provider.dart';
 import 'package:mindflasher_4/providers/provider_user_login.dart';
+import 'package:mindflasher_4/screens/deck_index_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'swipeable_card.dart';
@@ -32,16 +34,48 @@ class FlashcardIndexScreen extends StatelessWidget {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
-
     final String? token = context.read<UserModel>().token;
     context.read<ProviderUserLogin>().expandTelegram();
 
     return Scaffold(
       appBar: AppBar(
         title: Text(deck.name),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.delete_outline),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    content: Text('Вы уверены, что хотите удалить этот элемент?'),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(); // Закрываем диалог
+                        },
+                        child: Text('Отмена'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          context.read<DeckProvider>().deleteUserDeck(deck.id, token!);
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(builder: (context) => DeckIndexScreen()),
+                            (Route<dynamic> route) => false,
+                          );
+                        },
+                        child: Text('Удалить'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+          ),
+
+        ],
       ),
       body: FutureBuilder(
         future: Provider.of<FlashcardProvider>(context, listen: false).fetchAndPopulateFlashcards(token!, deck.id),

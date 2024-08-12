@@ -30,6 +30,7 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var token = context.read<UserModel>().token!;
     context.read<ProviderUserLogin>().expandTelegram();
     var txt = DeckIndexScreenTranslate(context.read<UserModel>().language_code ?? 'en');
     final deckProvider = context.watch<DeckProvider>();

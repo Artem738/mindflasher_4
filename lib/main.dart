@@ -73,18 +73,18 @@ class IndexScreen extends StatelessWidget {
       return LanguageSelectionScreen();
     }
 
-
     if (userModel.token == null && userLogin.isLoading == false) {
       return LoginScreen();
     } else {
-      if (userModel.isFirstEnter == true) {
+      if (userModel.isFirstEnter == true && userModel.language_code == null) {
         // Если languageCode отсутствует, показываем экран выбора языка
+        return LanguageSelectionScreen();
+      } else if (userModel.isFirstEnter == true && userModel.language_code != null) {
         return FirstEnterScreen();
       } else {
         return DeckIndexScreen();
         //return TemplateDeckIndexScreen();
       }
-
     }
   }
 }

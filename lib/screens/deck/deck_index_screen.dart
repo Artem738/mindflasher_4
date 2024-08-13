@@ -36,6 +36,7 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
     context.read<ProviderUserLogin>().expandTelegram();
     var txt = DeckIndexScreenTranslate(context.read<UserModel>().language_code ?? 'en');
     final deckProvider = context.watch<DeckProvider>();
+    var baseFontSize = context.watch<ProviderUserControl>().userModel.base_font_size;
 
     return Scaffold(
       appBar: AppBar(
@@ -44,14 +45,9 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
           IconButton(
             icon: Icon(Icons.info_outline),
             onPressed: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => FirstEnterScreen()),
-                (Route<dynamic> route) => false,
-              );
-              // Navigator.of(context).push(
-              //   MaterialPageRoute(
-              //     builder: (context) => FirstEnterScreen(),
-              //   ),
+              // Navigator.of(context).pushAndRemoveUntil(
+              //   MaterialPageRoute(builder: (context) => FirstEnterScreen()),
+              //   (Route<dynamic> route) => false,
               // );
             },
           ),
@@ -77,28 +73,41 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
           } else {
             return deckProvider.decks.isEmpty
                 ? Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 150),
-                        Text(
-                          txt.tt('no_decks'),
-                          style: const TextStyle(fontSize: 20),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(txt.tt('add_deck_prompt')),
-                      ],
+                    child: Padding(
+                      padding: const EdgeInsets.all(25.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 170),
+                          Text(
+                            txt.tt('no_decks'),
+                            style: TextStyle(fontSize: (baseFontSize + 5).clamp(15.0 + 5, 20.0 + 5)),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            txt.tt('add_deck_prompt'),
+                            style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0),),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 50),
+                          Text(
+                            txt.tt('description') ,
+                            style: TextStyle(fontSize: (baseFontSize-1).clamp(15.0, 20.0),),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
                     ),
                   )
                 : ListView.builder(
-              itemCount: deckProvider.decks.length,
-              itemBuilder: (ctx, i) {
-                return DeckCard(
-                  deck: deckProvider.decks[i],
-                  baseFontSize: context.watch<ProviderUserControl>().userModel.base_font_size,
-                );
-              },
-            );
+                    itemCount: deckProvider.decks.length,
+                    itemBuilder: (ctx, i) {
+                      return DeckCard(
+                        deck: deckProvider.decks[i],
+                        baseFontSize: context.watch<ProviderUserControl>().userModel.base_font_size,
+                      );
+                    },
+                  );
           }
         },
       ),
@@ -110,7 +119,10 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
             ),
           );
         },
-        label: Text(txt.tt('add_deck')),
+        label: Text(
+          txt.tt('add_deck'),
+          style: TextStyle(fontSize: (baseFontSize).clamp(20.0, 25.0)),
+        ),
         icon: const Icon(Icons.add),
       ),
     );

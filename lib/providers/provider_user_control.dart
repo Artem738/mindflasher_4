@@ -18,18 +18,34 @@ class ProviderUserControl with ChangeNotifier {
   }
 
   void increaseFontSize() {
-    if (_userModel.base_font_size < 35) {
-      _userModel.base_font_size += 1;
+    if (_userModel.base_font_size < 30) {
+      _userModel.base_font_size = ((_userModel.base_font_size + 1) * 10).round() / 10;
       notifyListeners();
     }
   }
 
   void decreaseFontSize() {
-    if (_userModel.base_font_size > 5) {
-      _userModel.base_font_size -= 1;
+    if (_userModel.base_font_size > 4) {
+      _userModel.base_font_size = ((_userModel.base_font_size - 1) * 10).round() / 10;
       notifyListeners();
     }
   }
+
+  void increaseFontSizeByTenth() {
+    if (_userModel.base_font_size < 30) {
+      _userModel.base_font_size = ((_userModel.base_font_size + 0.1) * 10).round() / 10;
+      notifyListeners();
+    }
+  }
+
+  void decreaseFontSizeByTenth() {
+    if (_userModel.base_font_size > 4) {
+      _userModel.base_font_size = ((_userModel.base_font_size - 0.1) * 10).round() / 10;
+      notifyListeners();
+    }
+  }
+
+
 
   Future<void> updateUserBaseFontSize(String token, double baseFontSize) async {
     if (token == null) {

@@ -5,6 +5,7 @@ import 'package:mindflasher_4/models/user_model.dart';
 import 'package:mindflasher_4/providers/deck_provider.dart';
 
 import 'package:mindflasher_4/providers/flashcard_provider.dart';
+import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/providers/provider_user_login.dart';
 import 'package:mindflasher_4/screens/deck/deck_index_screen.dart';
 import 'package:provider/provider.dart';

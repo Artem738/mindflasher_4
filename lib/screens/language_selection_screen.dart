@@ -76,7 +76,7 @@ class LanguageSelectionScreen extends StatelessWidget {
       (Route<dynamic> route) => false,
     );
     if (userLogin.isSharedPreferencesLoaded) {
-      await userLogin.sharedPreferences!.setString('language_code', language.code);
+      await userLogin.sharedPreferences!.setString(userLogin.language_codeSpName, language.code);
   }
 
   }

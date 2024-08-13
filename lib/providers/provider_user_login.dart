@@ -62,7 +62,11 @@ class ProviderUserLogin extends ChangeNotifier {
     _isLoading = false;
   }
 
-  final String _firstEnterSpName = "firstEnterVarName1";
+  /** Shared Preferences */
+
+  final String firstEnterSpName = "firstEnter_${EnvConfig.StorageAndSharedPreferencesKey}";
+  final String lastEmailSpName = "lastEmail_${EnvConfig.StorageAndSharedPreferencesKey}";
+  final String language_codeSpName = "language_${EnvConfig.StorageAndSharedPreferencesKey}";
   bool isSharedPreferencesLoaded = false;
 
   Future<void> _initializeSharedPreferences() async {
@@ -70,22 +74,22 @@ class ProviderUserLogin extends ChangeNotifier {
       _sharedPreferences = await SharedPreferences.getInstance();
 
       if (_sharedPreferences != null) {
-        String? lastEmail = _sharedPreferences!.getString('lastEmail');
+        String? lastEmail = _sharedPreferences!.getString(lastEmailSpName);
         if (lastEmail != null) {
           _userModel.update(email: lastEmail);
         }
-        String? language_code = _sharedPreferences!.getString('language_code');
+        String? language_code = _sharedPreferences!.getString(language_codeSpName);
         if (language_code != null) {
           _userModel.update(language_code: language_code);
         }
 
-        bool? firstEnter = await _sharedPreferences!.getBool(_firstEnterSpName);
+        bool? firstEnter = await _sharedPreferences!.getBool(firstEnterSpName);
         if (firstEnter == null) {
           _userModel.update(isFirstEnter: true);
-          await _sharedPreferences!.setBool(_firstEnterSpName, true);
+          await _sharedPreferences!.setBool(firstEnterSpName, true);
         } else {
           _userModel.update(isFirstEnter: false);
-          await _sharedPreferences!.setBool(_firstEnterSpName, false);
+          await _sharedPreferences!.setBool(firstEnterSpName, false);
         }
         isSharedPreferencesLoaded = true;
       }
@@ -106,7 +110,7 @@ class ProviderUserLogin extends ChangeNotifier {
       isFirstEnter: setVal,
     );
     if (isSharedPreferencesLoaded) {
-      await _sharedPreferences!.setBool(_firstEnterSpName, setVal);
+      await _sharedPreferences!.setBool(firstEnterSpName, setVal);
     }
     notifyListeners();
   }
@@ -115,7 +119,7 @@ class ProviderUserLogin extends ChangeNotifier {
     if (!kIsWeb) {
       _secureStorage = const FlutterSecureStorage();
 
-      String? lastPass = await _secureStorage?.read(key: 'lastPass');
+      String? lastPass = await _secureStorage?.read(key: 'lastPass_${EnvConfig.StorageAndSharedPreferencesKey}');
 
       if (lastPass != null) {
         _lastPass = lastPass;
@@ -184,7 +188,7 @@ class ProviderUserLogin extends ChangeNotifier {
 
         final userData = responseData['user'];
         if (userData['base_font_size'] != null) {
-          _userModel.update(base_font_size: (userData['base_font_size'] as int).toDouble());
+          _userModel.update(base_font_size: userData['base_font_size'].toDouble());
         }
         _userModel?.update(
           apiId: userData['id'],
@@ -210,9 +214,9 @@ class ProviderUserLogin extends ChangeNotifier {
 
         // Необходимое удаление email если был логин с email, но не зарегистрированный.
         if (userData['email'] != null) {
-          await _sharedPreferences?.setString('lastEmail', userData['email']);
+          await _sharedPreferences?.setString(lastEmailSpName, userData['email']);
         } else {
-          // await _sharedPreferences?.remove('lastEmail');
+          ///TODO await _sharedPreferences?.remove(lastEmailSpName); // ???
         }
         ApiLogger.apiPrint("Login with TG Success: ${_userModel.log()}");
       } else {
@@ -239,7 +243,7 @@ class ProviderUserLogin extends ChangeNotifier {
         ApiLogger.apiPrint("user TO ADD: ${responseData['user']}");
         final userData = responseData['user'];
         if (userData['base_font_size'] != null) {
-          _userModel.update(base_font_size: (userData['base_font_size'] as int).toDouble());
+          _userModel.update(base_font_size: userData['base_font_size'].toDouble());
         }
         _userModel.update(
           apiId: userData['id'],
@@ -259,10 +263,10 @@ class ProviderUserLogin extends ChangeNotifier {
 
         ApiLogger.apiPrint("Login email done: ${_userModel.log()}");
         if (isSharedPreferencesLoaded) {
-          await _sharedPreferences!.setString('lastEmail', email);
+          await _sharedPreferences!.setString(lastEmailSpName, email);
         }
         if (!kIsWeb) {
-          await _secureStorage?.write(key: 'lastPass', value: password);
+          await _secureStorage?.write(key: 'lastPass_${EnvConfig.StorageAndSharedPreferencesKey}', value: password);
         }
         notifyListeners();
       } else {

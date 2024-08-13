@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mindflasher_4/models/flashcard_model.dart';
 import 'package:mindflasher_4/models/user_model.dart';
 import 'package:mindflasher_4/providers/flashcard_provider.dart';
+import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/tech_data/weight_delays_enum.dart';
 
 import 'package:provider/provider.dart';
@@ -17,6 +18,7 @@ class CentralTopCard extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final String? token = context.read<UserModel>().token;
+    final baseFontSize = context.watch<ProviderUserControl>().userModel.base_font_size;
 
     return Card(
       child: Padding(
@@ -51,7 +53,7 @@ class CentralTopCard extends StatelessWidget {
             Expanded(
               child: Text(
                 "${flashcard.question}",
-                style: TextStyle(fontSize: 19),
+                style: TextStyle(fontSize: baseFontSize),
                 textAlign: TextAlign.center,
               ),
             ),

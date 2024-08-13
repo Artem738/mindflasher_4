@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mindflasher_4/models/flashcard_model.dart';
 import 'package:mindflasher_4/models/user_model.dart';
 import 'package:mindflasher_4/providers/flashcard_provider.dart';
+import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/tech_data/weight_delays_enum.dart';
 
 import 'package:provider/provider.dart';
@@ -19,6 +20,8 @@ class RightAnswerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String? token = context.read<UserModel>().token;
+    final baseFontSize = context.read<ProviderUserControl>().userModel.base_font_size;
+
     return Align(
       alignment: Alignment.centerRight,
       child: FractionallySizedBox(
@@ -59,7 +62,7 @@ class RightAnswerCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: Text(
                         flashcard.answer.replaceAll('\\n', '\n'),
-                        style: TextStyle(color: Colors.black, fontSize: 18),
+                        style: TextStyle(color: Colors.black, fontSize: baseFontSize),
                         textAlign: TextAlign.right,
                       ),
                     ),

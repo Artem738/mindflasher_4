@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:mindflasher_4/screens/deck/deck_index_screen.dart';
+import 'package:mindflasher_4/screens/first_enter_screen.dart';
 import 'package:mindflasher_4/screens/font_size_adjustment_screen.dart';
 import 'package:mindflasher_4/screens/language_selection_screen.dart';
 import 'package:mindflasher_4/screens/tap_code_screen.dart'; // Добавлен новый экран
+import 'package:mindflasher_4/translates/font_size_adjustment_screen.dart';
+import 'package:mindflasher_4/translates/user_settings_screen_translate.dart';
 import 'package:provider/provider.dart';
 import '../providers/provider_user_control.dart';
 
@@ -10,10 +14,26 @@ class UserSettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final userControl = context.watch<ProviderUserControl>();
     final userModel = userControl.userModel;
+    final baseFontSize = userModel.base_font_size;
+
+    var txt = UserSettingsScreenTranslate(userModel.language_code ?? 'en');
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('User Settings Screen'),
+        title: Text(txt.tt('user_settings_title')),
+        leading: ModalRoute.of(context)?.canPop == true
+            ? null // Если есть роут возврата, оставляем стандартный AppBar
+            : IconButton(
+                // Если роута возврата нет, добавляем свою кнопку
+                icon: Icon(Icons.arrow_back),
+                onPressed: () {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => DeckIndexScreen(),
+                    ),
+                  );
+                },
+              ),
       ),
       body: Center(
         child: Container(
@@ -22,31 +42,70 @@ class UserSettingsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Welcome ${userModel.tg_first_name ?? userModel.name ?? ''}',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26),
+                ' ${txt.tt('welcome')} ${userModel.tg_first_name ?? userModel.name ?? ''}',
+                style: TextStyle(fontWeight: FontWeight.normal, fontSize: (baseFontSize + 5).clamp(15.0 + 5, 20.0 + 5)),
               ),
-              Text('apiId: ${userModel.apiId ?? ''}'),
-              Text('Telegram ID: ${userModel.telegram_id ?? ''}'),
-              Text('Name: ${userModel.name ?? ''}'),
-              Text('Username: ${userModel.tg_username ?? ''}'),
-              Text('Email: ${userModel.email ?? ''}'),
-              Text('Фамилия: ${userModel.tg_last_name ?? ''}'),
-              Text('Telegram Язык: ${userModel.tg_language_code ?? ''}'),
-              Text('Язык: ${userModel.language_code ?? ''}'),
-              Text('Уровень : ${userModel.user_lvl ?? ''}'),
-              Text('Размер шрифта : ${userModel.base_font_size  ?? ''}'),
+              Text(
+                '${txt.tt('api_id')}: ${userModel.apiId ?? ''}',
+                style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
+              ),
+              Text(
+                '${txt.tt('api_id')}: ${userModel.apiId ?? ''}',
+                style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
+              ),
+              Text(
+                '${txt.tt('telegram_id')}: ${userModel.telegram_id ?? ''}',
+                style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
+              ),
+              Text(
+                '${txt.tt('name')}: ${userModel.name ?? ''}',
+                style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
+              ),
+              Text(
+                '${txt.tt('username')}: ${userModel.tg_username ?? ''}',
+                style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
+              ),
+              Text(
+                '${txt.tt('email')}: ${userModel.email ?? ''}',
+                style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
+              ),
+              Text(
+                '${txt.tt('last_name')}: ${userModel.tg_last_name ?? ''}',
+                style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
+              ),
+              Text(
+                '${txt.tt('telegram_language')}: ${userModel.tg_language_code ?? ''}',
+                style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
+              ),
+              Text(
+                '${txt.tt('language')}: ${userModel.language_code ?? ''}',
+                style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
+              ),
+              Text(
+                '${txt.tt('user_level')}: ${userModel.user_lvl ?? ''}',
+                style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
+              ),
+              Text(
+                '${txt.tt('font_size')}: ${userModel.base_font_size ?? ''}',
+                style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
+              ),
+              Text(
+                '${txt.tt('isFirstEnter')}: ${userModel.isFirstEnter.toString()}',
+                style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
+              ),
 
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
+                  Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(
                       builder: (context) => FontSizeAdjustmentScreen(),
                     ),
+                    (Route<dynamic> route) => false,
                   );
                 },
-                child: Text('Изменить размер шрифта', style: TextStyle(fontSize: 20)),
+                child: Text(txt.tt('adjust_font_size_button'), style: TextStyle(fontSize: 20)),
               ),
               SizedBox(height: 20),
               ElevatedButton(
@@ -56,7 +115,16 @@ class UserSettingsScreen extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => LanguageSelectionScreen()),
                   );
                 },
-                child: Text('Change Lang', style: TextStyle(fontSize: 20)),
+                child: Text(txt.tt('change_lang_button'), style: TextStyle(fontSize: 20)),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => FirstEnterScreen()),
+                  );
+                },
+                child: Text(txt.tt('information'), style: TextStyle(fontSize: 20)),
               ),
               SizedBox(height: 20),
               // ElevatedButton(
@@ -76,7 +144,7 @@ class UserSettingsScreen extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => TapCodeScreen()),
                   );
                 },
-                child: Text('Tap Code Screen', style: TextStyle(fontSize: 20)),
+                child: Text(txt.tt('tap_code_screen_button'), style: TextStyle(fontSize: 20)),
               ),
             ],
           ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/models/flashcard_model.dart';
+import 'package:mindflasher_4/providers/provider_user_control.dart';
+import 'package:provider/provider.dart';
 
 
 import 'central_top_card.dart';

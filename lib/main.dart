@@ -7,6 +7,7 @@ import 'package:mindflasher_4/screens/deck/deck_index_screen.dart';
 import 'package:mindflasher_4/screens/first_enter_screen.dart';
 import 'package:mindflasher_4/screens/language_selection_screen.dart';
 import 'package:mindflasher_4/screens/template_deck_index_screen.dart';
+import 'package:mindflasher_4/screens/font_size_adjustment_screen.dart';
 import 'package:mindflasher_4/services/api_logger.dart';
 import 'package:provider/provider.dart';
 import 'providers/provider_user_control.dart';
@@ -80,7 +81,7 @@ class IndexScreen extends StatelessWidget {
         // Если languageCode отсутствует, показываем экран выбора языка
         return LanguageSelectionScreen();
       } else if (userModel.isFirstEnter == true && userModel.language_code != null) {
-        return FirstEnterScreen();
+        return FontSizeAdjustmentScreen();
       } else {
         return DeckIndexScreen();
         //return TemplateDeckIndexScreen();

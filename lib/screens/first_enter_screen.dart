@@ -11,10 +11,14 @@ class FirstEnterScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     var txt = FirstEnterScreenTranslate(context.read<UserModel>().language_code ?? 'en');
     final userModel = context.read<UserModel>();
+    final baseFontSize = userModel.base_font_size;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(txt.tt('title')),
+        title: Text(
+          txt.tt('title'),
+          style: TextStyle(fontSize: (baseFontSize + 5).clamp(15.0 + 5, 20.0 + 5)),
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -30,22 +34,22 @@ class FirstEnterScreen extends StatelessWidget {
               ] else ...[
                 Text(
                   txt.tt('alternative_welcome'),
-                  style: TextStyle(fontSize: 26),
+                  style: TextStyle(fontSize: (baseFontSize + 5).clamp(15.0 + 5, 20.0 + 5)),
                 ),
                 Text(
                   "First enter ${userModel.isFirstEnter.toString()}",
-                  style: TextStyle(fontSize: 26),
+                  style: TextStyle(fontSize: (baseFontSize + 5).clamp(15.0 + 5, 20.0 + 5)),
                 ),
                 SizedBox(height: 20),
               ],
               Text(
                 txt.tt('leitner_method'),
-                style: TextStyle(fontSize: 18),
+                style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
               ),
               SizedBox(height: 10),
               Text(
                 txt.tt('deck_instruction'),
-                style: TextStyle(fontSize: 18),
+                style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
               ),
               SizedBox(height: 10),
               Row(
@@ -66,7 +70,7 @@ class FirstEnterScreen extends StatelessWidget {
                   Expanded(
                     child: Text(
                       txt.tt('green_icon_explanation'),
-                      style: TextStyle(fontSize: 18),
+                      style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
                       softWrap: true, // Включаем перенос текста
                       overflow: TextOverflow.clip, // Обрезка текста в пределах экрана
                     ),
@@ -77,7 +81,7 @@ class FirstEnterScreen extends StatelessWidget {
               SizedBox(height: 10),
               Text(
                 txt.tt('yellow_red_buttons'),
-                style: TextStyle(fontSize: 18),
+                style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
               ),
               SizedBox(height: 10),
 
@@ -99,7 +103,7 @@ class FirstEnterScreen extends StatelessWidget {
                   Expanded(
                     child: Text(
                       txt.tt('yellow_button_explanation'),
-                      style: TextStyle(fontSize: 18),
+                      style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
                       softWrap: true, // Включаем перенос текста
                       overflow: TextOverflow.clip, // Обрезка текста в пределах экрана
                     ),
@@ -111,7 +115,7 @@ class FirstEnterScreen extends StatelessWidget {
               SizedBox(height: 10),
               Text(
                 txt.tt('evaluation_reminder'),
-                style: TextStyle(fontSize: 18),
+                style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
               ),
               SizedBox(height: 10),
               Row(
@@ -132,7 +136,7 @@ class FirstEnterScreen extends StatelessWidget {
                   Expanded(
                     child: Text(
                       txt.tt('red_button_explanation'),
-                      style: TextStyle(fontSize: 18),
+                      style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
                       softWrap: true, // Включаем перенос текста
                       overflow: TextOverflow.clip, // Обрезка текста в пределах экрана
                     ),
@@ -153,7 +157,10 @@ class FirstEnterScreen extends StatelessWidget {
                         MaterialPageRoute(builder: (context) => IndexScreen()),
                       );
                     },
-                    child: Text(txt.tt('start'), style: TextStyle(fontSize: 20)),
+                    child: Text(
+                      txt.tt('start'),
+                      style: TextStyle(fontSize: (baseFontSize + 5).clamp(15.0 + 5, 20.0 + 5)),
+                    ),
                   ),
                 ),
               ] else ...[
@@ -166,7 +173,10 @@ class FirstEnterScreen extends StatelessWidget {
                         MaterialPageRoute(builder: (context) => UserSettingsScreen()),
                       );
                     },
-                    child: Text(txt.tt('back'), style: TextStyle(fontSize: 20)),
+                    child: Text(
+                      txt.tt('back'),
+                      style: TextStyle(fontSize: (baseFontSize + 5).clamp(15.0 + 5, 20.0 + 5)),
+                    ),
                   ),
                 ),
               ],

@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:mindflasher_4/models/deck_model.dart';
 import 'package:mindflasher_4/screens/list/flashcard_index_screen.dart';
 
-
 class DeckCard extends StatelessWidget {
   final DeckModel deck;
   final double baseFontSize;
+  final bool isClickOnCardWork;
 
-  const DeckCard({Key? key, required this.deck, required this.baseFontSize}) : super(key: key);
-
-
+  const DeckCard({
+    Key? key,
+    required this.deck,
+    required this.baseFontSize,
+    this.isClickOnCardWork = true,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,18 +22,20 @@ class DeckCard extends StatelessWidget {
       child: ListTile(
         title: Text(
           deck.name,
-          style: TextStyle(fontSize: baseFontSize +3),
+          style: TextStyle(fontSize: baseFontSize + 3),
         ),
         subtitle: Text(
           deck.description,
           style: TextStyle(fontSize: baseFontSize),
         ),
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => FlashcardIndexScreen(deck: deck),
-            ),
-          );
+          if (isClickOnCardWork) {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => FlashcardIndexScreen(deck: deck),
+              ),
+            );
+          }
         },
       ),
     );

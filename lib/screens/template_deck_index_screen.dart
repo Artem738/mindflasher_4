@@ -16,11 +16,9 @@ class TemplateDeckIndexScreen extends StatelessWidget {
     final baseFontSize = context.read<ProviderUserControl>().userModel.base_font_size;
     var txt = TemplateDeckIndexScreenTranslate(context.read<ProviderUserControl>().userModel.language_code ?? 'en');
 
-
-
     return Scaffold(
       appBar: AppBar(
-        title: Text( txt.tt('template_decks') ),
+        title: Text(txt.tt('template_decks')),
       ),
       body: FutureBuilder(
         future: context.read<TemplateDeckProvider>().fetchDecks(token!),
@@ -37,11 +35,11 @@ class TemplateDeckIndexScreen extends StatelessWidget {
                   minLeadingWidth: 0,
                   title: Text(
                     deckProvider.decks[i].name,
-                    style: TextStyle(fontSize: (baseFontSize + 5).clamp(15.0 + 5, 20.0 + 5)),
+                    style: TextStyle(fontSize: (baseFontSize + 5)), //.clamp(10.0 + 5, 20.0 + 5))
                   ),
                   subtitle: Text(
                     deckProvider.decks[i].description,
-                    style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
+                    style: TextStyle(fontSize: (baseFontSize)), // .clamp(15.0, 20.0))
                   ),
                   onTap: () {
                     Navigator.of(context).push(
@@ -50,25 +48,40 @@ class TemplateDeckIndexScreen extends StatelessWidget {
                       ),
                     );
                   },
-                  trailing: ElevatedButton.icon(
-                    onPressed: () async {
-                      bool success = await context.read<TemplateFlashcardProvider>().addTemplateBaseToUser(
-                            context,
-                            deckProvider.decks[i].id,
-                            token!,
+                  trailing: SizedBox(
+                    width: 50, // Устанавливаем фиксированную ширину для кнопки
+                    height: 50, // Устанавливаем фиксированную высоту для кнопки
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        bool success = await context.read<TemplateFlashcardProvider>().addTemplateBaseToUser(
+                              context,
+                              deckProvider.decks[i].id,
+                              token!,
+                            );
+                        if (success) {
+                          Navigator.pop(context);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(txt.tt('failed_to_add')),
+                            ),
                           );
-                      if (success) {
-                        Navigator.pop(context);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(txt.tt('failed_to_add')),
+                        }
+                      },
+                      child: Center(
+                        child: Text(
+                          '+',
+                          style: TextStyle(
+                            fontSize: 30, // Размер шрифта
+                            height: 0.1, // Настройка высоты строки для выравнивания по центру
                           ),
-                        );
-                      }
-                    },
-                    icon: Icon(Icons.add),
-                    label: Text('Add'),
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        shape: CircleBorder(), // Делаем кнопку круглой
+                        padding: EdgeInsets.all(8), // Настраиваем отступы для круглой формы
+                      ),
+                    ),
                   ),
                 ),
               ),

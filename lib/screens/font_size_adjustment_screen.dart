@@ -43,7 +43,7 @@ class FontSizeAdjustmentScreen extends StatelessWidget {
               child: ListView.builder(
                 itemCount: decks.length,
                 itemBuilder: (context, index) {
-                  return DeckCard(deck: decks[index], baseFontSize: userModel.base_font_size);
+                  return DeckCard(deck: decks[index], baseFontSize: userModel.base_font_size, isClickOnCardWork: false);
                 },
               ),
             ),

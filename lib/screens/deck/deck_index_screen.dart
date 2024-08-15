@@ -121,7 +121,7 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
         },
         label: Text(
           txt.tt('add_deck'),
-          style: TextStyle(fontSize: (baseFontSize).clamp(20.0, 25.0)),
+          style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 25.0),),
         ),
         icon: const Icon(Icons.add),
       ),

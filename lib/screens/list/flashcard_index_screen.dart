@@ -22,6 +22,7 @@ class FlashcardIndexScreen extends StatelessWidget {
       sizeFactor: animation,
       child: SwipeableCard(
         flashcard: card,
+        /// DO NOT DELETE THIS COMMENT
         // onRemove: () {
         //  // context.read<FlashcardProvider>().updateCardWeight(card.id, 1);
         // },

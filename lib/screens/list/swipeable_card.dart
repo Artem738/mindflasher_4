@@ -34,13 +34,14 @@ class SwipeableCardState extends State<SwipeableCard>
   late AnimationController _animationController;
   late Animation<double> _animation;
   final int _closeAndTriggerRedActionAfterSeconds = 5; //TODO - make changeable
+  final int _afterMainTapOpenSwipeTimeMs = 200;
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 200),
+      duration: Duration(milliseconds: _afterMainTapOpenSwipeTimeMs),
     );
     _animation = Tween<double>(begin: 0, end: 0).animate(_animationController)
       ..addListener(() {

@@ -57,6 +57,9 @@ class FlashcardProvider with ChangeNotifier {
   }
 
   Future<void> updateCardWeight(String token, int id, WeightDelaysEnum weightDelayEnum) async {
+   int tileCloseTime = 220;
+   int tileOpenTime = 400;
+
     final index = _flashcards.indexWhere((card) => card.id == id);
     if (index != -1) {
       final flashcard = _flashcards[index];
@@ -65,7 +68,7 @@ class FlashcardProvider with ChangeNotifier {
       listKey.currentState?.removeItem(
         index,
             (context, animation) => _buildRemovedCardItem(flashcard, animation, weightDelayEnum),
-        duration: const Duration(milliseconds: 150),
+        duration: Duration(milliseconds: tileCloseTime),
       );
 
       _flashcards.removeAt(index);
@@ -75,7 +78,7 @@ class FlashcardProvider with ChangeNotifier {
         final newIndex = _flashcards.indexOf(updatedCard);
         listKey.currentState?.insertItem(
           newIndex,
-          duration: const Duration(milliseconds: 200),
+          duration: Duration(milliseconds: tileOpenTime),
         );
         notifyListeners();
       });

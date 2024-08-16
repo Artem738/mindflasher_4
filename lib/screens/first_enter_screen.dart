@@ -55,7 +55,7 @@ class FirstEnterScreen extends StatelessWidget {
               Row(
                 children: [
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () => _showSnackBar(context, txt.tt('green_snackbar_message'), Colors.green, Icons.more_time_rounded),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green, // Задаем цвет фона кнопки
                       padding: EdgeInsets.all(12), // Добавляем отступы для создания круглой формы
@@ -77,18 +77,16 @@ class FirstEnterScreen extends StatelessWidget {
                   ),
                 ],
               ),
-
               SizedBox(height: 10),
               Text(
                 txt.tt('yellow_red_buttons'),
                 style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
               ),
               SizedBox(height: 10),
-
               Row(
                 children: [
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () => _showSnackBar(context, txt.tt('yellow_snackbar_message'), Colors.yellow, Icons.access_time_outlined),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.yellow, // Задаем цвет фона кнопки
                       padding: EdgeInsets.all(12), // Добавляем отступы для создания круглой формы
@@ -110,18 +108,16 @@ class FirstEnterScreen extends StatelessWidget {
                   ),
                 ],
               ),
-
-
               SizedBox(height: 10),
               Text(
-                txt.tt('evaluation_reminder'),
+                txt.tt('wait_explanation'),
                 style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
               ),
               SizedBox(height: 10),
               Row(
                 children: [
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () => _showSnackBar(context, txt.tt('red_snackbar_message'), Colors.redAccent, Icons.timer_outlined),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.redAccent, // Задаем цвет фона кнопки
                       padding: EdgeInsets.all(12), // Добавляем отступы для создания круглой формы
@@ -143,9 +139,11 @@ class FirstEnterScreen extends StatelessWidget {
                   ),
                 ],
               ),
-
-
-
+              SizedBox(height: 10),
+              Text(
+                txt.tt('evaluation_reminder'),
+                style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
+              ),
               SizedBox(height: 20),
               if (userModel.isFirstEnter == true) ...[
                 Center(
@@ -179,9 +177,42 @@ class FirstEnterScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+                SizedBox(height: 30),
               ],
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  void _showSnackBar(BuildContext context, String message, Color buttonColor, IconData buttonIcon) {
+    final double baseFontSize = context.read<UserModel>().base_font_size;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                backgroundColor: buttonColor,
+                padding: EdgeInsets.all(12),
+                shape: CircleBorder(),
+                minimumSize: Size(24, 24),
+              ),
+              child: Icon(
+                buttonIcon,
+                size: 16,
+              ),
+            ),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                message,
+                style: TextStyle(fontSize: baseFontSize),
+              ),
+            ),
+          ],
         ),
       ),
     );

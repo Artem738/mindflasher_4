@@ -91,6 +91,12 @@ class UserSettingsScreenTranslate {
       'ru': 'Экран Tap Code',
       'uk': 'Екран Tap Code',
     },
+    // txt.tt('to_main')  ${txt.tt('to_main')}
+    'to_main': {
+      'en': 'To Main',
+      'ru': 'На главную',
+      'uk': 'На головну',
+    },
 
 
 

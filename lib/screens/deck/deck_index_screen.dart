@@ -45,6 +45,15 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
           IconButton(
             icon: Icon(Icons.info_outline),
             onPressed: () {
+              // Navigator.pushReplacement(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => FirstEnterScreen()),
+              // );
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => FirstEnterScreen(),
+                ),
+              );
               // Navigator.of(context).pushAndRemoveUntil(
               //   MaterialPageRoute(builder: (context) => FirstEnterScreen()),
               //   (Route<dynamic> route) => false,

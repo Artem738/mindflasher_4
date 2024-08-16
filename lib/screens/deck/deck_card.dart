@@ -22,7 +22,7 @@ class DeckCard extends StatelessWidget {
       child: ListTile(
         title: Text(
           deck.name,
-          style: TextStyle(fontSize: baseFontSize + 3),
+          style: TextStyle(fontSize: baseFontSize + 2),
         ),
         subtitle: Text(
           deck.description,

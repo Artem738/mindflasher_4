@@ -19,58 +19,74 @@ class CentralTopCard extends StatelessWidget {
     final baseFontSize = context.watch<ProviderUserControl>().userModel.base_font_size;
 
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Колонка с кнопками
-            Column(
-              mainAxisSize: MainAxisSize.min,
+      child: Stack(
+        children: [
+          // Основное содержимое карточки
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(
-                  width: 40,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Provider.of<FlashcardProvider>(context, listen: false)
-                          .updateCardWeight(token!, flashcard.id, WeightDelaysEnum.goodLongDelay);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green, // Задаем цвет фона кнопки
-                      padding: EdgeInsets.zero, // Убираем внутренние отступы
-                    ),
-                    child: Center(
-                      child: Icon(Icons.more_time_rounded),
-                    ),
+                // Колонка с кнопками
+                GestureDetector(
+                  onTap: () {}, // Пустой обработчик, чтобы кнопка была интерактивной
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 45,
+                        height: 45,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Provider.of<FlashcardProvider>(context, listen: false)
+                                .updateCardWeight(token!, flashcard.id, WeightDelaysEnum.goodLongDelay);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green, // Задаем цвет фона кнопки
+                            padding: EdgeInsets.zero, // Убираем внутренние отступы
+                          ),
+                          child: Center(
+                            child: Icon(Icons.more_time_rounded),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 8.0),
+                    ],
                   ),
                 ),
-                SizedBox(height: 8.0),
+                SizedBox(width: 8.0),
+                // Текст
+                Expanded(
+                  child: Text(
+                    flashcard.question,
+                    style: TextStyle(fontSize: baseFontSize),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
               ],
             ),
-            SizedBox(width: 8.0),
-            // Текст
-            Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  print("Card tapped: ${flashcard.question}"); // Вывод в консоль для проверки
+          ),
+          // Невидимая зона для обработки нажатий
+          Positioned.fill(
+            left: 60, // Смещение области обработки нажатий вправо, чтобы не перекрывать зеленую кнопку
+            child: GestureDetector(
+              onTap: () {
+               // print("Card tapped: ${flashcard.question}"); // Вывод в консоль для проверки
 
-                  // Имитируем сворачивание карточки влево
-                  final swipeableCardState = context.findAncestorStateOfType<SwipeableCardState>();
-                  if (swipeableCardState != null) {
-                    swipeableCardState.triggerLeftSwipeAndStartTimer();
-                  } else {
-                    print("SwipeableCardState не найден");
-                  }
-                },
-                child: Text(
-                  flashcard.question,
-                  style: TextStyle(fontSize: baseFontSize),
-                  textAlign: TextAlign.center,
-                ),
+                // Имитируем сворачивание карточки влево
+                final swipeableCardState = context.findAncestorStateOfType<SwipeableCardState>();
+                if (swipeableCardState != null) {
+                  swipeableCardState.triggerLeftSwipeAndStartTimer();
+                } else {
+                 // print("SwipeableCardState не найден");
+                }
+              },
+              child: Container(
+                color: Colors.transparent, // Невидимая область
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

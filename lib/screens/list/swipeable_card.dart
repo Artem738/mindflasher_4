@@ -33,6 +33,7 @@ class SwipeableCardState extends State<SwipeableCard>
   Timer? _timer; // Таймер для текущей карточки
   late AnimationController _animationController;
   late Animation<double> _animation;
+  final int _closeAndTriggerRedActionAfterSeconds = 5; //TODO - make changeable
 
   @override
   void initState() {
@@ -93,11 +94,11 @@ class SwipeableCardState extends State<SwipeableCard>
       });
 
     _animationController.forward().then((_) {
-      print("Card swiped left!");
+     // print("Card swiped left!");
 
       _timer?.cancel(); // Отменяем предыдущий таймер, если он был
-      _timer = Timer(Duration(seconds: 5), () {
-        print("3 seconds passed, triggering action!");
+      _timer = Timer(Duration(seconds: _closeAndTriggerRedActionAfterSeconds), () {
+        //print("3 seconds passed, triggering action!");
         final String? token = context.read<UserModel>().token;
 
         // Вызываем метод для обновления веса карточки с задержкой 'badSmallDelay'

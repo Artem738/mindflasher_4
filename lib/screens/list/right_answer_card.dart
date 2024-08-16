@@ -28,70 +28,92 @@ class RightAnswerCard extends StatelessWidget {
         widthFactor: stopThreshold,
         child: Card(
           surfaceTintColor: Colors.orangeAccent.withOpacity(0.05),
-          child: Container(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Левая колонка с кнопкой
-                Column(
-                  mainAxisSize: MainAxisSize.min,
+          child: Stack(
+            children: [
+              // Основное содержимое карточки
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    SizedBox(
-                      width: 40,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Provider.of<FlashcardProvider>(context, listen: false).updateCardWeight(token!, flashcard.id, WeightDelaysEnum.badSmallDelay);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.redAccent,
-                          padding: EdgeInsets.zero,
+                    // Левая колонка с кнопкой
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 45,
+                          height: 45,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Provider.of<FlashcardProvider>(context, listen: false)
+                                  .updateCardWeight(token!, flashcard.id, WeightDelaysEnum.badSmallDelay);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.redAccent,
+                              padding: EdgeInsets.zero,
+                            ),
+                            child: Center(
+                              child: Icon(Icons.timer_outlined, color: Colors.white),
+                            ),
+                          ),
                         ),
-                        child: Center(
-                          child: Icon(Icons.timer_outlined, color: Colors.white),
+                      ],
+                    ),
+                    // Текст
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0), // Уменьшение отступа
+                          child: Text(
+                            flashcard.answer.replaceAll('\\n', '\n'),
+                            style: TextStyle(color: Colors.black, fontSize: baseFontSize),
+                            textAlign: TextAlign.right,
+                          ),
                         ),
                       ),
+                    ),
+                    // Правая колонка с кнопкой
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Provider.of<FlashcardProvider>(context, listen: false)
+                                  .updateCardWeight(token!, flashcard.id, WeightDelaysEnum.normMedDelay);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.yellow,
+                              padding: EdgeInsets.zero,
+                            ),
+                            child: Center(
+                              child: Icon(Icons.access_time_outlined),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 8.0),
+                      ],
                     ),
                   ],
                 ),
-                // Текст
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      child: Text(
-                        flashcard.answer.replaceAll('\\n', '\n'),
-                        style: TextStyle(color: Colors.black, fontSize: baseFontSize),
-                        textAlign: TextAlign.right,
-                      ),
-                    ),
+              ),
+              // Невидимая зона для обработки нажатий
+              Positioned.fill(
+                left: 55, // Смещение области обработки нажатий вправо, чтобы не перекрывать текст
+                child: GestureDetector(
+                  onTap: () {
+                    Provider.of<FlashcardProvider>(context, listen: false)
+                        .updateCardWeight(token!, flashcard.id, WeightDelaysEnum.normMedDelay);
+                  },
+                  child: Container(
+                    color: Colors.transparent, // Невидимая область
                   ),
                 ),
-                // Правая колонка с кнопкой
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      width: 40,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Provider.of<FlashcardProvider>(context, listen: false).updateCardWeight(token!, flashcard.id, WeightDelaysEnum.normMedDelay);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.yellow,
-                          padding: EdgeInsets.zero,
-                        ),
-                        child: Center(
-                          child: Icon(Icons.access_time_outlined),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 8.0),
-                  ],
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

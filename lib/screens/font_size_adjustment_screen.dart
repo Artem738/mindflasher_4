@@ -6,6 +6,7 @@ import 'package:mindflasher_4/translates/font_size_adjustment_screen.dart';
 import 'package:provider/provider.dart';
 import '../models/deck_model.dart';
 import '../providers/provider_user_control.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class FontSizeAdjustmentScreen extends StatelessWidget {
   @override
@@ -49,7 +50,7 @@ class FontSizeAdjustmentScreen extends StatelessWidget {
             ),
             SizedBox(height: 10),
             Text(
-              txt.tt('current_font_size ${context.watch<ProviderUserControl>().userModel.base_font_size}'),
+              ("${txt.tt('current_font_size')} ${context.watch<ProviderUserControl>().userModel.base_font_size}"),
               style: TextStyle(
                 fontSize: (userModel.base_font_size + 5).clamp(14.0, 18.0),
                 fontStyle: FontStyle.italic,
@@ -58,6 +59,7 @@ class FontSizeAdjustmentScreen extends StatelessWidget {
               //style: TextStyle(fontSize: userModel.base_font_size + 5),
               textAlign: TextAlign.center,
             ),
+            SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -67,18 +69,21 @@ class FontSizeAdjustmentScreen extends StatelessWidget {
                   },
                   child: Text('—', style: TextStyle(fontSize: 30)),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    userControl.decreaseFontSizeByTenth(); // Уменьшение на 0.1
-                  },
-                  child: Text('—0.1', style: TextStyle(fontSize: 20)),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    userControl.increaseFontSizeByTenth(); // Увеличение на 0.1
-                  },
-                  child: Text('+0.1', style: TextStyle(fontSize: 20)),
-                ),
+                ///TODO make stable var...
+                if (!kIsWeb) ...[
+                  ElevatedButton(
+                    onPressed: () {
+                      userControl.decreaseFontSizeByTenth(); // Уменьшение на 0.1
+                    },
+                    child: Text('—0.1', style: TextStyle(fontSize: 20)),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      userControl.increaseFontSizeByTenth(); // Увеличение на 0.1
+                    },
+                    child: Text('+0.1', style: TextStyle(fontSize: 20)),
+                  ),
+                ],
                 ElevatedButton(
                   onPressed: () {
                     userControl.increaseFontSize();
@@ -87,7 +92,7 @@ class FontSizeAdjustmentScreen extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 20),
             Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Распределяем кнопки равномерно по горизонтали
@@ -139,7 +144,7 @@ class FontSizeAdjustmentScreen extends StatelessWidget {
                         ); // Переход на другой экран
                       },
                       child: Text(
-                        txt.tt('continue'),
+                        txt.tt('continue_button'),
                         style: TextStyle(
                           fontSize: (userModel.base_font_size + 5).clamp(15.0 + 5, 20.0 + 5),
                         ),

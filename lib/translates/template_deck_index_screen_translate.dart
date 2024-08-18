@@ -19,6 +19,14 @@ class TemplateDeckIndexScreenTranslate {
       'ru': 'Не удалось добавить шаблонную базу',
       'uk': 'Не вдалося додати шаблонну базу',
     },
+
+    // txt.tt('add_own_deck')  ${txt.tt('add_own_deck')}
+    'add_own_deck': {
+      'en': 'Add Own Deck',
+      'ru': 'Добавить собственную колоду',
+      'uk': 'Додати власну колоду',
+    },
+
     // txt.tt('add_button')  ${txt.tt('add_button')}
     'add_button': {
       'en': 'Add',

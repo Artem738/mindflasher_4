@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/env_config.dart';
+import 'package:mindflasher_4/models/deck_model.dart';
 
 import 'package:mindflasher_4/models/flashcard_model.dart';
+import 'package:mindflasher_4/providers/deck_provider.dart';
 import 'package:mindflasher_4/screens/list/central_top_card.dart';
 import 'package:mindflasher_4/screens/list/left_swipe_card.dart';
 import 'package:mindflasher_4/screens/list/right_answer_card.dart';
@@ -59,7 +61,96 @@ class FlashcardProvider with ChangeNotifier {
     }
   }
 
-  Future<void> updateCardWeight(String token, int id, WeightDelaysEnum weightDelayEnum) async {
+  Future<bool> updateFlashcard(int deckId, int cardId, String question, String answer, String token) async {
+    if (token == null) {
+      throw Exception('User not authenticated');
+    }
+
+    print (deckId);
+    print ("wtf");
+
+
+    final url = Uri.parse('${EnvConfig.mainApiUrl}/api/flashcards/$cardId');
+    final response = await http.put(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: json.encode({
+        'deck_id': deckId,
+        'question': question,
+        'answer': answer,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print (response.body);
+
+      final index = _flashcards.indexWhere((card) => card.id == cardId);
+      if (index != -1) {
+        _flashcards[index] = _flashcards[index].copyWith(
+          question: question,
+          answer: answer,
+        );
+        notifyListeners();
+      }
+      return true;
+    } else {
+      print('Failed to update flashcard: ${response.body}');
+      return false;
+    }
+  }
+
+  Future<bool> createFlashcard(
+    int deckId,
+    String question,
+    String answer,
+    String token,
+  ) async {
+    if (token == null) {
+      throw Exception('User not authenticated');
+    }
+
+    final url = Uri.parse('${EnvConfig.mainApiUrl}/api/flashcards');
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: json.encode({
+        'deck_id': deckId,
+        'question': question,
+        'answer': answer,
+      }),
+    );
+    if (response.statusCode == 201) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      final newFlashcard = FlashcardModel(
+        id: data['id'],
+        question: data['question'],
+        answer: data['answer'],
+        weight: data['weight'] ?? 0,
+        deckId: data['deck_id'],
+      );
+      _flashcards.add(newFlashcard);
+      _sortFlashcardsByWeight();
+      notifyListeners();
+      return true;
+    } else {
+      print('Failed to create flashcard: ${response.body}');
+      return false;
+    }
+  }
+
+  Future<void> updateCardWeight(
+    DeckModel deck,
+    String token,
+    int id,
+    WeightDelaysEnum weightDelayEnum,
+  ) async {
     int tileCloseTime = 220;
     int tileOpenTime = 400;
 
@@ -73,7 +164,7 @@ class FlashcardProvider with ChangeNotifier {
 
       listKey.currentState?.removeItem(
         index,
-        (context, animation) => _buildRemovedCardItem(flashcard, animation, weightDelayEnum),
+        (context, animation) => _buildRemovedCardItem(deck, flashcard, animation, weightDelayEnum),
         duration: Duration(milliseconds: tileCloseTime),
       );
 
@@ -121,6 +212,38 @@ class FlashcardProvider with ChangeNotifier {
     }
   }
 
+  Future<bool> deleteFlashcard(int cardId, String token) async {
+    if (token == null) {
+      throw Exception('User not authenticated');
+    }
+
+    final url = Uri.parse('${EnvConfig.mainApiUrl}/api/flashcards/$cardId');
+    final response = await http.delete(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final index = _flashcards.indexWhere((card) => card.id == cardId);
+      if (index != -1) {
+        listKey.currentState?.removeItem(
+          index,
+              (context, animation) => SizedBox.shrink(), // Удаляем виджет с анимацией
+        );
+        _flashcards.removeAt(index);
+        notifyListeners();
+      }
+      return true;
+    } else {
+      print('Failed to delete flashcard: ${response.body}');
+      return false;
+    }
+  }
+
+
   void _sortFlashcardsByWeight() {
     _flashcards.sort((a, b) {
       int weightComparison = a.weight.compareTo(b.weight);
@@ -132,11 +255,12 @@ class FlashcardProvider with ChangeNotifier {
     });
   }
 
-  Widget _buildRemovedCardItem(FlashcardModel card, Animation<double> animation, WeightDelaysEnum weightDelayEnum) {
+  Widget _buildRemovedCardItem(DeckModel deck, FlashcardModel card, Animation<double> animation, WeightDelaysEnum weightDelayEnum) {
     if (weightDelayEnum == WeightDelaysEnum.noDelay) {
       return SizeTransition(
         sizeFactor: animation,
         child: LeftSwipeCard(
+          deck: deck,
           flashcard: card,
           stopThreshold: 0.4, // DRY !!!!
         ),
@@ -145,14 +269,16 @@ class FlashcardProvider with ChangeNotifier {
       return SizeTransition(
         sizeFactor: animation,
         child: RightAnswerCard(
+          deck: deck,
           flashcard: card,
-          stopThreshold: 0.9, // Пример значения для другого экрана
+          stopThreshold: 0.9,  // Пример значения для другого экрана
         ),
       );
     } else if (weightDelayEnum == WeightDelaysEnum.goodLongDelay) {
       return SizeTransition(
         sizeFactor: animation,
         child: CentralTopCard(
+          deck: deck,
           flashcard: card,
         ),
       );
@@ -160,6 +286,7 @@ class FlashcardProvider with ChangeNotifier {
       return SizeTransition(
         sizeFactor: animation,
         child: CentralTopCard(
+          deck: deck,
           flashcard: card,
         ),
       );

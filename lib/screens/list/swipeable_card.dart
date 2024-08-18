@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mindflasher_4/models/deck_model.dart';
 import 'package:mindflasher_4/models/flashcard_model.dart';
 import 'package:mindflasher_4/models/user_model.dart';
 import 'package:mindflasher_4/providers/flashcard_provider.dart';
@@ -13,18 +14,19 @@ import 'right_answer_card.dart';
 
 class SwipeableCard extends StatefulWidget {
   final FlashcardModel flashcard;
+  final DeckModel deck;
 
   const SwipeableCard({
     Key? key,
     required this.flashcard,
+   required this.deck,
   }) : super(key: key);
 
   @override
   SwipeableCardState createState() => SwipeableCardState();
 }
 
-class SwipeableCardState extends State<SwipeableCard>
-    with SingleTickerProviderStateMixin {
+class SwipeableCardState extends State<SwipeableCard> with SingleTickerProviderStateMixin {
   double _dragExtent = 0.0;
   final double _stopThresholdLeft = 0.4;
   final double _stopThresholdRight = 0.9;
@@ -95,7 +97,7 @@ class SwipeableCardState extends State<SwipeableCard>
       });
 
     _animationController.forward().then((_) {
-     // print("Card swiped left!");
+      // print("Card swiped left!");
 
       _timer?.cancel(); // Отменяем предыдущий таймер, если он был
       _timer = Timer(Duration(seconds: _closeAndTriggerRedActionAfterSeconds), () {
@@ -104,7 +106,7 @@ class SwipeableCardState extends State<SwipeableCard>
 
         // Вызываем метод для обновления веса карточки с задержкой 'badSmallDelay'
         Provider.of<FlashcardProvider>(context, listen: false)
-            .updateCardWeight(token!, widget.flashcard.id, WeightDelaysEnum.badSmallDelay);
+            .updateCardWeight(widget.deck, token!, widget.flashcard.id, WeightDelaysEnum.badSmallDelay);
 
         // Возвращаем карточку в начальное положение
         _animation = Tween<double>(begin: _dragExtent, end: 0.0).animate(_animationController)
@@ -133,15 +135,20 @@ class SwipeableCardState extends State<SwipeableCard>
       child: Stack(
         children: [
           if (_dragExtent > 0)
-            LeftSwipeCard(flashcard: widget.flashcard, stopThreshold: _stopThresholdLeft)
+            LeftSwipeCard(
+              deck: widget.deck,
+              flashcard: widget.flashcard,
+              stopThreshold: _stopThresholdLeft,
+            )
           else if (_dragExtent < 0)
             RightAnswerCard(
               flashcard: widget.flashcard,
               stopThreshold: _stopThresholdRight,
+              deck: widget.deck,
             ),
           Transform.translate(
             offset: Offset(_dragExtent, 0),
-            child: CentralTopCard(flashcard: widget.flashcard),
+            child: CentralTopCard(deck: widget.deck, flashcard: widget.flashcard),
           ),
         ],
       ),

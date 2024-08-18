@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mindflasher_4/models/user_model.dart';
 import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/providers/provider_user_login.dart';
+import 'package:mindflasher_4/screens/deck/deck_management_screen.dart';
 import 'package:mindflasher_4/screens/first_enter_screen.dart';
 import 'package:mindflasher_4/screens/list/flashcard_index_screen.dart';
 import 'package:mindflasher_4/screens/template_deck_index_screen.dart';
@@ -32,11 +33,13 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userModel = context.read<UserModel>();
     context.read<ProviderUserLogin>().expandTelegram();
+
+   // final userModel = context.read<UserModel>();
     var txt = DeckIndexScreenTranslate(context.read<UserModel>().language_code ?? 'en');
     final deckProvider = context.watch<DeckProvider>();
     var baseFontSize = context.watch<ProviderUserControl>().userModel.base_font_size;
+    final String? token = context.read<UserModel>().token;
 
     return Scaffold(
       appBar: AppBar(
@@ -95,13 +98,17 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
                           const SizedBox(height: 10),
                           Text(
                             txt.tt('add_deck_prompt'),
-                            style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0),),
+                            style: TextStyle(
+                              fontSize: (baseFontSize).clamp(15.0, 20.0),
+                            ),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 50),
                           Text(
-                            txt.tt('description') ,
-                            style: TextStyle(fontSize: (baseFontSize-1).clamp(15.0, 20.0),),
+                            txt.tt('description'),
+                            style: TextStyle(
+                              fontSize: (baseFontSize - 1).clamp(15.0, 20.0),
+                            ),
                             textAlign: TextAlign.center,
                           ),
                         ],
@@ -120,19 +127,54 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => TemplateDeckIndexScreen(),
+      floatingActionButton: Stack(
+        children: [
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              //mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                FloatingActionButton.extended(
+                  heroTag: 'add_own_deck',
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => DeckManagementScreen(token: token!),
+                      ),
+                    );
+                  },
+                  label: Text(
+                    txt.tt('add_own_deck'),
+                    style: TextStyle(
+                      fontSize: (baseFontSize).clamp(10.0, 25.0),
+                    ),
+                  ),
+                  icon: const Icon(Icons.add_to_photos_outlined),
+                ),
+                SizedBox(height: 10),
+                FloatingActionButton.extended(
+                  heroTag: 'add_template_deck',
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => TemplateDeckIndexScreen(),
+                      ),
+                    );
+                  },
+                  label: Text(
+                    txt.tt('add_template_deck'),
+                    style: TextStyle(
+                      fontSize: (baseFontSize).clamp(10.0, 25.0),
+                    ),
+                  ),
+                  icon: const Icon(Icons.add),
+                ),
+              ],
             ),
-          );
-        },
-        label: Text(
-          txt.tt('add_deck'),
-          style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 25.0),),
-        ),
-        icon: const Icon(Icons.add),
+          ),
+        ],
       ),
     );
   }

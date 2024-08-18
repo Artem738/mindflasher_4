@@ -13,6 +13,8 @@ class DeckProvider extends ChangeNotifier {
   // Метод для создания новой колоды
   Future<bool> createDeck(String name, String description, String token, {int? templateDeckId}) async {
     String apiUrl = '${EnvConfig.mainApiUrl}/api/decks';
+    print(apiUrl);
+    print(token);
     final response = await http.post(
       Uri.parse(apiUrl),
       headers: {
@@ -85,7 +87,7 @@ class DeckProvider extends ChangeNotifier {
   }
 
   // Метод для удаления колоды пользователя
-  Future<bool> deleteUserDeck(int deckId, String token) async {
+  Future<bool> deleteDeck(int deckId, String token) async {
     String apiUrl = '${EnvConfig.mainApiUrl}/api/decks/$deckId';
     final response = await http.delete(
       Uri.parse(apiUrl),

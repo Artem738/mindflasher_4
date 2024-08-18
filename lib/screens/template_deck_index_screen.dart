@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mindflasher_4/providers/template_deck_provider.dart';
 import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/providers/template_flashcard_provider.dart';
+import 'package:mindflasher_4/screens/deck/deck_management_screen.dart';
 import 'package:mindflasher_4/screens/template_flashcard_index_screen.dart';
 import 'package:mindflasher_4/translates/template_deck_index_screen_translate.dart';
 import 'package:provider/provider.dart';
@@ -88,6 +89,23 @@ class TemplateDeckIndexScreen extends StatelessWidget {
             );
           }
         },
+      ),
+      floatingActionButton:  FloatingActionButton.extended(
+        heroTag: 'add_own_deck',
+        onPressed: () {
+          // Navigator.of(context).push(
+          //   MaterialPageRoute(
+          //     builder: (context) => DeckManagementScreen(token: token!),
+          //   ),
+          // );
+        },
+        label: Text(
+          txt.tt('add_own_deck'),
+          style: TextStyle(
+            fontSize: (baseFontSize).clamp(10.0, 25.0),
+          ),
+        ),
+        icon: const Icon(Icons.add_to_photos_outlined),
       ),
     );
   }

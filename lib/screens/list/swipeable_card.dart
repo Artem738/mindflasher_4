@@ -33,7 +33,7 @@ class SwipeableCardState extends State<SwipeableCard>
   Timer? _timer; // Таймер для текущей карточки
   late AnimationController _animationController;
   late Animation<double> _animation;
-  final int _closeAndTriggerRedActionAfterSeconds = 5; //TODO - make changeable
+  final int _closeAndTriggerRedActionAfterSeconds = 3; //TODO - make changeable
   final int _afterMainTapOpenSwipeTimeMs = 200;
 
   @override

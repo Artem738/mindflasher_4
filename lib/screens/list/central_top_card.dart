@@ -71,18 +71,29 @@ class CentralTopCard extends StatelessWidget {
             left: 60, // Смещение области обработки нажатий вправо, чтобы не перекрывать зеленую кнопку
             child: GestureDetector(
               onTap: () {
-               // print("Card tapped: ${flashcard.question}"); // Вывод в консоль для проверки
-
                 // Имитируем сворачивание карточки влево
                 final swipeableCardState = context.findAncestorStateOfType<SwipeableCardState>();
                 if (swipeableCardState != null) {
                   swipeableCardState.triggerLeftSwipeAndStartTimer();
                 } else {
-                 // print("SwipeableCardState не найден");
+                  // print("SwipeableCardState не найден");
                 }
               },
               child: Container(
                 color: Colors.transparent, // Невидимая область
+              ),
+            ),
+          ),
+          // Лампочка в правом верхнем углу
+          Positioned(
+            top: 4.0,
+            right: 4.0,
+            child: Container(
+              width: 9.0,
+              height: 9.0,
+              decoration: BoxDecoration(
+                color: WeightDelaysEnum.getColor(flashcard.lastAnswerWeight), // Цвет лампочки
+                shape: BoxShape.circle,
               ),
             ),
           ),

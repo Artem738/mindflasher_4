@@ -5,6 +5,7 @@ class FlashcardModel  {
   final int weight; // вес карточки
   final int? deckId;
   final String? lastReviewedAt;
+  final int? lastAnswerWeight;
 
   FlashcardModel ({
     required this.id,
@@ -13,6 +14,7 @@ class FlashcardModel  {
     this.weight = 0, // начальный вес
     this.deckId,
     this.lastReviewedAt,
+    this.lastAnswerWeight,
   });
 
   FlashcardModel  copyWith({
@@ -22,6 +24,7 @@ class FlashcardModel  {
     int? weight,
     int? deckId,
     String? lastReviewedAt,
+    int? lastAnswerWeight,
   }) {
     return FlashcardModel (
       id: id ?? this.id,
@@ -30,6 +33,7 @@ class FlashcardModel  {
       weight: weight ?? this.weight,
       deckId: deckId ?? this.deckId,
       lastReviewedAt: lastReviewedAt ?? this.lastReviewedAt,
+      lastAnswerWeight: lastAnswerWeight ?? this.lastAnswerWeight,
     );
   }
 }

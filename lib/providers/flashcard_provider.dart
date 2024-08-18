@@ -7,19 +7,18 @@ import 'package:mindflasher_4/models/flashcard_model.dart';
 import 'package:mindflasher_4/screens/list/central_top_card.dart';
 import 'package:mindflasher_4/screens/list/left_swipe_card.dart';
 import 'package:mindflasher_4/screens/list/right_answer_card.dart';
+import 'package:mindflasher_4/services/api_logger.dart';
 import 'package:mindflasher_4/tech_data/words_translations.dart';
 
 import 'package:provider/provider.dart';
 
 import '../tech_data/weight_delays_enum.dart'; // Импортируем Provider для получения токена
 
-
 class FlashcardProvider with ChangeNotifier {
   final List<FlashcardModel> _flashcards = [];
   final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
 
   List<FlashcardModel> get flashcards => _flashcards;
-
 
   Future<void> fetchAndPopulateFlashcards(String token, int deckId) async {
     if (token == null) {
@@ -44,9 +43,13 @@ class FlashcardProvider with ChangeNotifier {
           id: item['id'],
           question: item['question'],
           answer: item['answer'],
-          weight: item['weight'] ?? 0, // Если weight отсутствует, используем 0
-          deckId: item['deck_id'], // Добавляем поле deckId
-          lastReviewedAt: item['last_reviewed_at'], // Добавляем поле lastReviewedAt
+          weight: item['weight'] ?? 0,
+          // Если weight отсутствует, используем 0
+          deckId: item['deck_id'],
+          // Добавляем поле deckId
+          lastReviewedAt: item['last_reviewed_at'],
+          // Добавляем поле lastReviewedAt
+          lastAnswerWeight: item['last_answer_weight'], // Добавляем поле lastReviewedAt
         ));
       }
       _sortFlashcardsByWeight();
@@ -57,17 +60,20 @@ class FlashcardProvider with ChangeNotifier {
   }
 
   Future<void> updateCardWeight(String token, int id, WeightDelaysEnum weightDelayEnum) async {
-   int tileCloseTime = 220;
-   int tileOpenTime = 400;
+    int tileCloseTime = 220;
+    int tileOpenTime = 400;
 
     final index = _flashcards.indexWhere((card) => card.id == id);
     if (index != -1) {
       final flashcard = _flashcards[index];
-      final updatedCard = flashcard.copyWith(weight: flashcard.weight + weightDelayEnum.value);
+      final updatedCard = flashcard.copyWith(
+        weight: flashcard.weight + weightDelayEnum.value,
+        lastAnswerWeight: weightDelayEnum.value,
+      );
 
       listKey.currentState?.removeItem(
         index,
-            (context, animation) => _buildRemovedCardItem(flashcard, animation, weightDelayEnum),
+        (context, animation) => _buildRemovedCardItem(flashcard, animation, weightDelayEnum),
         duration: Duration(milliseconds: tileCloseTime),
       );
 
@@ -84,15 +90,18 @@ class FlashcardProvider with ChangeNotifier {
       });
 
       // Обновление веса карточки на сервере
-      await updateCardWeightOnServer(token, id, updatedCard.weight);
+      await updateCardWeightOnServer(token, id, weightDelayEnum);
     }
   }
 
-  Future<void> updateCardWeightOnServer(String token, int id, int weight) async {
+  Future<void> updateCardWeightOnServer(String token, int id, WeightDelaysEnum weightDelayEnum) async {
     // Получение токена из UserProvider
     if (token == null) {
       throw Exception('User not authenticated');
     }
+    //print(weightDelayEnum.name);
+    print(weightDelayEnum.value);
+//
     ///flashcards/{flashcardId}/progress/weight'
     final url = Uri.parse('${EnvConfig.mainApiUrl}/api/flashcards/$id/progress/weight');
     final response = await http.post(
@@ -101,12 +110,14 @@ class FlashcardProvider with ChangeNotifier {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
       },
-      body: json.encode({'weight': weight}),
+      body: json.encode({'weight': weightDelayEnum.value, 'last_answer_weight': weightDelayEnum.value}),
     );
     print(response.statusCode);
     print(response.body);
     if (response.statusCode != 200) {
-      throw Exception('Failed to update weight on server');
+      String err = 'updateCardWeightOnServer: Failed to update weight on server';
+      ApiLogger.apiPrint(err);
+      throw Exception(err);
     }
   }
 

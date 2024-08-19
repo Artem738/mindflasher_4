@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/models/deck_model.dart';
+import 'package:mindflasher_4/models/user_model.dart';
 import 'package:mindflasher_4/providers/deck_provider.dart';
 import 'package:mindflasher_4/screens/deck/deck_index_screen.dart';
+import 'package:mindflasher_4/translates/deck_management_screen_translate.dart';
 import 'package:provider/provider.dart';
 
 class DeckManagementScreen extends StatefulWidget {
@@ -35,9 +37,10 @@ class _DeckManagementScreenState extends State<DeckManagementScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var txt = DeckManagementScreenTranslate(context.read<UserModel>().language_code ?? 'en');
     final isEditing = widget.deck != null;
-    final title = isEditing ? ('Edit ${widget.deck!.name}') : 'Create Deck';
-    final actionButtonLabel = isEditing ? 'Update' : 'Create';
+    final title = isEditing ? ("${txt.tt('edit_deck_title')} ${widget.deck!.name}") : txt.tt('create_deck_title');
+    final actionButtonLabel = isEditing ? txt.tt('update_button') : txt.tt('create_button');
 
     return Scaffold(
       appBar: AppBar(
@@ -49,11 +52,11 @@ class _DeckManagementScreenState extends State<DeckManagementScreen> {
           children: [
             TextField(
               controller: _nameController,
-              decoration: InputDecoration(labelText: 'Deck Name'),
+              decoration: InputDecoration(labelText: txt.tt('deck_name_label')),
             ),
             TextField(
               controller: _descriptionController,
-              decoration: InputDecoration(labelText: 'Description'),
+              decoration: InputDecoration(labelText: txt.tt('description_label')),
             ),
             SizedBox(height: 20),
             ElevatedButton(
@@ -74,11 +77,11 @@ class _DeckManagementScreenState extends State<DeckManagementScreen> {
                       MaterialPageRoute(
                         builder: (context) => DeckIndexScreen(),
                       ),
-                          (Route<dynamic> route) => false,
+                      (Route<dynamic> route) => false,
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to update deck')),
+                      SnackBar(content: Text(txt.tt('failed_to_update_deck'))),
                     );
                   }
                 } else {
@@ -92,15 +95,13 @@ class _DeckManagementScreenState extends State<DeckManagementScreen> {
                     Navigator.pop(context);
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to create deck')),
+                      SnackBar(content: Text(txt.tt('failed_to_create_deck'))),
                     );
                   }
                 }
-
               },
               child: Text(actionButtonLabel),
             ),
-
           ],
         ),
       ),

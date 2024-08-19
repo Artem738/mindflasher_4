@@ -149,6 +149,6 @@ class FirstEnterScreenTranslate {
   FirstEnterScreenTranslate(this.languageCode);
 
   String tt(String key) {
-    return translations[key]?[languageCode] ?? translations[key]?['en'] ?? 'Default $key';
+    return translations[key]?[languageCode] ?? translations[key]?['en'] ?? '$key default';
   }
 }

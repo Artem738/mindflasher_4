@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/models/deck_model.dart';
 import 'package:mindflasher_4/models/flashcard_model.dart';
+import 'package:mindflasher_4/models/user_model.dart';
 import 'package:mindflasher_4/providers/flashcard_provider.dart';
+import 'package:mindflasher_4/translates/flashcard_management_screen_translate.dart';
 import 'package:provider/provider.dart';
 
 class FlashcardManagementScreen extends StatefulWidget {
@@ -36,9 +38,10 @@ class _FlashcardManagementScreenState extends State<FlashcardManagementScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var txt = FlashcardManagementScreenTranslate(context.read<UserModel>().language_code ?? 'en');
     final isEditing = widget.flashcard != null;
-    final title = isEditing ? 'Edit Flashcard' : 'Create Flashcard';
-    final actionButtonLabel = isEditing ? 'Update' : 'Add';
+    final title = isEditing ? txt.tt('edit_flashcard_title') : txt.tt('create_flashcard_title');
+    final actionButtonLabel = isEditing ? txt.tt('update_button') :txt.tt('add_button');
 
     return Scaffold(
       appBar: AppBar(
@@ -50,11 +53,11 @@ class _FlashcardManagementScreenState extends State<FlashcardManagementScreen> {
           children: [
             TextField(
               controller: _questionController,
-              decoration: InputDecoration(labelText: 'Question'),
+              decoration: InputDecoration(labelText: txt.tt('question_label') ),
             ),
             TextField(
               controller: _answerController,
-              decoration: InputDecoration(labelText: 'Answer'),
+              decoration: InputDecoration(labelText: txt.tt('answer_label')),
             ),
             SizedBox(height: 20),
             ElevatedButton(
@@ -74,7 +77,7 @@ class _FlashcardManagementScreenState extends State<FlashcardManagementScreen> {
                     Navigator.pop(context);
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to update flashcard')),
+                      SnackBar(content: Text(txt.tt('failed_to_update_flashcard'))),
                     );
                   }
                 } else {
@@ -89,7 +92,7 @@ class _FlashcardManagementScreenState extends State<FlashcardManagementScreen> {
                     Navigator.pop(context);
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to create flashcard')),
+                      SnackBar(content: Text(txt.tt('failed_to_create_flashcard'))),
                     );
                   }
                 }
@@ -106,11 +109,11 @@ class _FlashcardManagementScreenState extends State<FlashcardManagementScreen> {
                     Navigator.pop(context);
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to delete flashcard')),
+                      SnackBar(content: Text( txt.tt('failed_to_update_flashcard'))),
                     );
                   }
                 },
-                child: Text('Delete'),
+                child: Text(txt.tt('delete_button')),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red, // Цвет кнопки удаления
                 ),

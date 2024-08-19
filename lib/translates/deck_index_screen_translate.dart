@@ -46,6 +46,6 @@ class DeckIndexScreenTranslate {
   DeckIndexScreenTranslate(this.languageCode);
 
   String tt(String key) {
-    return translations[key]?[languageCode] ?? translations[key]?['en'] ?? 'Default $key';
+    return translations[key]?[languageCode] ?? translations[key]?['en'] ?? '$key default';
   }
 }

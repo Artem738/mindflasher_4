@@ -66,9 +66,8 @@ class FlashcardProvider with ChangeNotifier {
       throw Exception('User not authenticated');
     }
 
-    print (deckId);
-    print ("wtf");
-
+    print(deckId);
+    print("wtf");
 
     final url = Uri.parse('${EnvConfig.mainApiUrl}/api/flashcards/$cardId');
     final response = await http.put(
@@ -85,7 +84,7 @@ class FlashcardProvider with ChangeNotifier {
     );
 
     if (response.statusCode == 200) {
-      print (response.body);
+      print(response.body);
 
       final index = _flashcards.indexWhere((card) => card.id == cardId);
       if (index != -1) {
@@ -141,6 +140,53 @@ class FlashcardProvider with ChangeNotifier {
       return true;
     } else {
       print('Failed to create flashcard: ${response.body}');
+      return false;
+    }
+  }
+
+    /**
+    aasd;rtyyy
+    333;3333
+    555;777
+    */
+
+  Future<bool> csvInsert(int deckId, String csvData, String token) async {
+    if (token == null) {
+      throw Exception('User not authenticated');
+    }
+
+
+
+    final url = Uri.parse('${EnvConfig.mainApiUrl}/api/flashcards/csv-insert');
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: json.encode({
+        'deck_id': deckId,
+        'csv_data': csvData,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      // final newFlashcard = FlashcardModel(
+      //   id: data['id'],
+      //   question: data['question'],
+      //   answer: data['answer'],
+      //   weight: data['weight'] ?? 0,
+      //   deckId: data['deck_id'],
+      // );
+      // _flashcards.add(newFlashcard);
+      // _sortFlashcardsByWeight();
+      // notifyListeners();
+     // print(response.body);
+      // Обработка успешного ответа
+      return true;
+    } else {
+      print('Failed to insert CSV data: ${response.body}');
       return false;
     }
   }
@@ -231,7 +277,7 @@ class FlashcardProvider with ChangeNotifier {
       if (index != -1) {
         listKey.currentState?.removeItem(
           index,
-              (context, animation) => SizedBox.shrink(), // Удаляем виджет с анимацией
+          (context, animation) => SizedBox.shrink(), // Удаляем виджет с анимацией
         );
         _flashcards.removeAt(index);
         notifyListeners();
@@ -242,7 +288,6 @@ class FlashcardProvider with ChangeNotifier {
       return false;
     }
   }
-
 
   void _sortFlashcardsByWeight() {
     _flashcards.sort((a, b) {
@@ -271,7 +316,7 @@ class FlashcardProvider with ChangeNotifier {
         child: RightAnswerCard(
           deck: deck,
           flashcard: card,
-          stopThreshold: 0.9,  // Пример значения для другого экрана
+          stopThreshold: 0.9, // Пример значения для другого экрана
         ),
       );
     } else if (weightDelayEnum == WeightDelaysEnum.goodLongDelay) {

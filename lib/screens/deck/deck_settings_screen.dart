@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/models/deck_model.dart';
 import 'package:mindflasher_4/providers/deck_provider.dart';
+import 'package:mindflasher_4/providers/flashcard_provider.dart';
 import 'package:mindflasher_4/providers/provider_user_control.dart';
+import 'package:mindflasher_4/screens/csv_management_screen.dart';
 import 'package:mindflasher_4/screens/deck/deck_index_screen.dart';
 import 'package:mindflasher_4/screens/deck/deck_management_screen.dart';
 import 'package:mindflasher_4/screens/first_enter_screen.dart';
 import 'package:mindflasher_4/screens/font_size_adjustment_screen.dart';
 import 'package:mindflasher_4/screens/language_selection_screen.dart';
 import 'package:mindflasher_4/screens/tap_code_screen.dart'; // Добавлен новый экран
+import 'package:mindflasher_4/translates/deck_settings_screen_translate.dart';
 import 'package:mindflasher_4/translates/font_size_adjustment_screen.dart';
 import 'package:mindflasher_4/translates/user_settings_screen_translate.dart';
 import 'package:provider/provider.dart';
@@ -23,12 +26,12 @@ class DeckSettingsScreen extends StatelessWidget {
     final userModel = userControl.userModel;
     final baseFontSize = userModel.base_font_size;
     final token = userModel.token;
+    var txt = DeckSettingsScreenTranslate (userModel.language_code ?? 'en');
 
-    var txt = UserSettingsScreenTranslate(userModel.language_code ?? 'en');
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(txt.tt('Deck_settings_title')),
+        title: Text(txt.tt('deck_settings_title')),
         leading: ModalRoute.of(context)?.canPop == true
             ? null // Если есть роут возврата, оставляем стандартный AppBar
             : IconButton(
@@ -52,7 +55,7 @@ class DeckSettingsScreen extends StatelessWidget {
                 builder: (BuildContext context) {
                   return AlertDialog(
                     content: Text(
-                      'Вы уверены, что хотите удалить эту колоду?',
+                      txt.tt('delete_confirmation') ,
                       style: TextStyle(fontSize: 22),
                       textAlign: TextAlign.center,
                     ),
@@ -69,7 +72,7 @@ class DeckSettingsScreen extends StatelessWidget {
                               );
                             },
                             child: Text(
-                              'Удалить',
+                              txt.tt('delete_button'),
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.red,
@@ -82,7 +85,7 @@ class DeckSettingsScreen extends StatelessWidget {
                               Navigator.of(context).pop(); // Закрываем диалог
                             },
                             child: Text(
-                              'Отмена !',
+                              txt.tt('cancel_button'),
                               style: TextStyle(fontSize: 21),
                             ),
                           ),
@@ -123,15 +126,57 @@ class DeckSettingsScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => DeckManagementScreen(
+                        builder: (context) => DeckManagementScreen(
+                          token: token!,
+                          deck: deck,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    txt.tt('edit_deck'),
+                    style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
+                  ),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CsvManagementScreen(
                                 token: token!,
                                 deck: deck,
                               )),
                     );
                   },
-
                   child: Text(
-                    txt.tt('edit_deck'),
+                    txt.tt('csv_insert'),
+                    style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
+                  ),
+                ),
+                SizedBox(height: 20),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    // Получаем CSV
+                    final flashcards = context.read<FlashcardProvider>().flashcards;
+                    final csvLines = flashcards.map((card) => '${card.question};${card.answer}').toList();
+                    final csvString = csvLines.join('\n');
+                    //print(csvString);
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CsvManagementScreen(
+                                token: token!,
+                                deck: deck,
+                                csvData: csvString,
+                              )),
+                    );
+                  },
+                  child: Text(
+                    txt.tt('csv_get_data'),
                     style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
                   ),
                 ),

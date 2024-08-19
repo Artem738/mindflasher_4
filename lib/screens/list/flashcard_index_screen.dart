@@ -8,6 +8,7 @@ import 'package:mindflasher_4/providers/provider_user_login.dart';
 import 'package:mindflasher_4/screens/deck/deck_index_screen.dart';
 import 'package:mindflasher_4/screens/deck/deck_settings_screen.dart';
 import 'package:mindflasher_4/screens/flashcard_management_screen.dart';
+import 'package:mindflasher_4/translates/flashcard_index_screen_translate.dart';
 import 'package:provider/provider.dart';
 import 'swipeable_card.dart';
 
@@ -62,6 +63,7 @@ class _FlashcardIndexScreenState extends State<FlashcardIndexScreen> {
   @override
   Widget build(BuildContext context) {
     final String? token = context.read<UserModel>().token;
+    var txt = FlashcardIndexScreenTranslate(context.read<UserModel>().language_code ?? 'en');
 
     return Scaffold(
       appBar: AppBar(
@@ -122,12 +124,12 @@ class _FlashcardIndexScreenState extends State<FlashcardIndexScreen> {
               );
         },
         label: Text(
-          "txt.tt('add_flashcard')",
+          txt.tt('add_flashcard'),
           // style: TextStyle(
           //   fontSize: (baseFontSize).clamp(10.0, 25.0),
           // ),
         ),
-        icon: const Icon(Icons.add_to_photos_outlined),
+        icon: const Icon(Icons.add_box_outlined),
       ),
     );
   }

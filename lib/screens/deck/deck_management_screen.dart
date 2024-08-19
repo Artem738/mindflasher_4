@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/models/deck_model.dart';
 import 'package:mindflasher_4/providers/deck_provider.dart';
+import 'package:mindflasher_4/screens/deck/deck_index_screen.dart';
 import 'package:provider/provider.dart';
 
 class DeckManagementScreen extends StatefulWidget {
-  final DeckModel? deck; // Если передана колода, значит, выполняется редактирование
-  final String token; // Токен для API-запросов
+  final DeckModel? deck;
+  final String token;
 
   const DeckManagementScreen({Key? key, this.deck, required this.token}) : super(key: key);
 
@@ -35,8 +36,8 @@ class _DeckManagementScreenState extends State<DeckManagementScreen> {
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.deck != null;
-    final title = isEditing ? 'Edit Deck' : 'Create Deck';
-    final actionButtonLabel = isEditing ? 'Update' : 'Add';
+    final title = isEditing ? ('Edit ${widget.deck!.name}') : 'Create Deck';
+    final actionButtonLabel = isEditing ? 'Update' : 'Create';
 
     return Scaffold(
       appBar: AppBar(
@@ -68,7 +69,13 @@ class _DeckManagementScreenState extends State<DeckManagementScreen> {
                     widget.token,
                   );
                   if (success) {
-                    Navigator.pop(context);
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DeckIndexScreen(),
+                      ),
+                          (Route<dynamic> route) => false,
+                    );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Failed to update deck')),
@@ -89,30 +96,11 @@ class _DeckManagementScreenState extends State<DeckManagementScreen> {
                     );
                   }
                 }
+
               },
               child: Text(actionButtonLabel),
             ),
-            if (isEditing) ...[
-              ElevatedButton(
-                onPressed: () async {
-                  final deckProvider = context.read<DeckProvider>();
 
-                  // Удаление колоды
-                  bool success = await deckProvider.deleteDeck(widget.deck!.id, widget.token);
-                  if (success) {
-                    Navigator.pop(context);
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to delete deck')),
-                    );
-                  }
-                },
-                child: Text('Delete'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red, // Цвет кнопки удаления
-                ),
-              ),
-            ],
           ],
         ),
       ),

@@ -6,6 +6,7 @@ import 'package:mindflasher_4/providers/deck_provider.dart';
 import 'package:mindflasher_4/providers/flashcard_provider.dart';
 import 'package:mindflasher_4/providers/provider_user_login.dart';
 import 'package:mindflasher_4/screens/deck/deck_index_screen.dart';
+import 'package:mindflasher_4/screens/deck/deck_settings_screen.dart';
 import 'package:mindflasher_4/screens/flashcard_management_screen.dart';
 import 'package:provider/provider.dart';
 import 'swipeable_card.dart';
@@ -13,7 +14,7 @@ import 'swipeable_card.dart';
 class FlashcardIndexScreen extends StatefulWidget {
   final DeckModel deck;
 
-  FlashcardIndexScreen({required this.deck});
+  FlashcardIndexScreen({super.key, required this.deck});
 
   @override
   _FlashcardIndexScreenState createState() => _FlashcardIndexScreenState();
@@ -67,68 +68,16 @@ class _FlashcardIndexScreenState extends State<FlashcardIndexScreen> {
         title: Text(widget.deck.name),
         actions: [
           IconButton(
-            icon: Icon(Icons.add_box_outlined), // Первая кнопка
+            icon: Icon(Icons.edit_note), // Первая кнопка
             onPressed: () {
-              Navigator.of(context)
-                  .push(
-                    MaterialPageRoute(
-                      builder: (context) => FlashcardManagementScreen(
-                        deck: widget.deck,
-                        token: token!,
-                      ),
-                    ),
-                  )
-                  .then((_) => _reloadFlashcards()); // Перезагрузка после возврата
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.delete_outline),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    content: Text(
-                      'Вы уверены, что хотите удалить этот элемент?',
-                      style: TextStyle(fontSize: 20),
-                      textAlign: TextAlign.center,
-                    ),
-                    actions: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center, // Центрирование кнопок
-                        children: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              context.read<DeckProvider>().deleteDeck(widget.deck.id, token!);
-                              Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(builder: (context) => DeckIndexScreen()),
-                                (Route<dynamic> route) => false,
-                              );
-                            },
-                            child: Text(
-                              'Удалить',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.red,
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 20), // Пробел между кнопками
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop(); // Закрываем диалог
-                            },
-                            child: Text(
-                              'Отмена !',
-                              style: TextStyle(fontSize: 21),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  );
-                },
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => DeckSettingsScreen(
+                    deck: widget.deck,
+                  ),
+                ),
               );
+              // Перезагрузка после возврата
             },
           ),
         ],
@@ -155,6 +104,30 @@ class _FlashcardIndexScreenState extends State<FlashcardIndexScreen> {
             );
           }
         },
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'add_own_deck',
+        onPressed: () {
+          Navigator.of(context)
+              .push(
+                MaterialPageRoute(
+                  builder: (context) => FlashcardManagementScreen(
+                    deck: widget.deck,
+                    token: token!,
+                  ),
+                ),
+              )
+              .then(
+                (_) => _reloadFlashcards(),
+              );
+        },
+        label: Text(
+          "txt.tt('add_flashcard')",
+          // style: TextStyle(
+          //   fontSize: (baseFontSize).clamp(10.0, 25.0),
+          // ),
+        ),
+        icon: const Icon(Icons.add_to_photos_outlined),
       ),
     );
   }

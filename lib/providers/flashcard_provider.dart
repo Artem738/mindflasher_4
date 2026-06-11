@@ -9,6 +9,7 @@ import 'package:mindflasher_4/providers/deck_provider.dart';
 import 'package:mindflasher_4/screens/list/central_top_card.dart';
 import 'package:mindflasher_4/screens/list/left_swipe_card.dart';
 import 'package:mindflasher_4/screens/list/right_answer_card.dart';
+import 'package:mindflasher_4/screens/util/table_parser.dart';
 import 'package:mindflasher_4/services/api_logger.dart';
 import 'package:mindflasher_4/tech_data/words_translations.dart';
 
@@ -144,19 +145,56 @@ class FlashcardProvider with ChangeNotifier {
     }
   }
 
-    /**
-    aasd;rtyyy
-    333;3333
-    555;777
-    */
+  // final url = "https://docs.google.com/spreadsheets/d/1bF-xeiOzezH-bKQAadJ8tpqDQH0iBVGExGVYklhXXco/pubhtml?gid=1056242600&single=true";
+
+  Future<bool> importTable(int deckId, String token, int questionColumn, int answerColumn) async {
+    if (token.isEmpty) {
+      throw Exception('User not authenticated');
+    }
+    questionColumn = questionColumn > 0 ? questionColumn - 1 : 2;
+    answerColumn = answerColumn > 0 ? answerColumn - 1 : 3;
+    //final String url = "https://table.example.url";
+    final url = "https://docs.google.com/spreadsheets/d/1qFEm9AQ6tq0a5W_ITX7yVcoUBhVrNiCe8k_x1xxufUs/pubhtml?gid=464824386&single=true";
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      var data = parseHtmlTable(response.body);
+
+      // Убедимся, что questionColumn и answerColumn заданы корректно
+
+      // Преобразование данных в CSV формат
+      List<String> csvRows = [];
+      for (var row in data) {
+        if (row.length > answerColumn) {
+          csvRows.add('${row[questionColumn]};${row[answerColumn]}');
+        }
+      }
+
+      // Объединяем все строки в один CSV
+      String csvData = csvRows.join('\n');
+
+      debugPrint(csvData, wrapWidth: 200);
+
+      if (await csvInsert(deckId, csvData, token)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+      aasd;rtyyy
+      333;3333
+      555;777
+   */
 
   Future<bool> csvInsert(int deckId, String csvData, String token) async {
     if (token == null) {
       throw Exception('User not authenticated');
     }
 
-
-
+    print(csvData);
     final url = Uri.parse('${EnvConfig.mainApiUrl}/api/flashcards/csv-insert');
 
     final response = await http.post(
@@ -172,6 +210,7 @@ class FlashcardProvider with ChangeNotifier {
     );
 
     if (response.statusCode == 201) {
+      print(response.body);
       // final newFlashcard = FlashcardModel(
       //   id: data['id'],
       //   question: data['question'],
@@ -182,7 +221,7 @@ class FlashcardProvider with ChangeNotifier {
       // _flashcards.add(newFlashcard);
       // _sortFlashcardsByWeight();
       // notifyListeners();
-     // print(response.body);
+      // print(response.body);
       // Обработка успешного ответа
       return true;
     } else {

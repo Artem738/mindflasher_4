@@ -8,6 +8,7 @@ import 'package:mindflasher_4/screens/deck/deck_index_screen.dart';
 import 'package:mindflasher_4/screens/deck/deck_management_screen.dart';
 import 'package:mindflasher_4/screens/first_enter_screen.dart';
 import 'package:mindflasher_4/screens/font_size_adjustment_screen.dart';
+import 'package:mindflasher_4/screens/import_table_screen.dart';
 import 'package:mindflasher_4/screens/language_selection_screen.dart';
 import 'package:mindflasher_4/screens/tap_code_screen.dart'; // Добавлен новый экран
 import 'package:mindflasher_4/translates/deck_settings_screen_translate.dart';
@@ -135,6 +136,24 @@ class DeckSettingsScreen extends StatelessWidget {
                   },
                   child: Text(
                     txt.tt('edit_deck'),
+                    style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
+                  ),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ImportTableScreen(
+                          //token: token!,
+                          deck: deck,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    txt.tt('import_table'),
                     style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
                   ),
                 ),

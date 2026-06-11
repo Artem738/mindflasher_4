@@ -47,7 +47,7 @@ class _DeckManagementScreenState extends State<DeckManagementScreen> {
         title: Text(title),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(30.0),
         child: Column(
           children: [
             TextField(

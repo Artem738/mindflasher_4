@@ -1,27 +1,41 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
+import 'package:flutter/material.dart';
 import 'package:mindflasher_4/env_config.dart';
 import 'package:mindflasher_4/models/deck_model.dart';
+import 'package:mindflasher_4/models/user_model.dart';
+import 'package:mindflasher_4/services/app_http_client.dart';
 
 class DeckProvider extends ChangeNotifier {
-  List<DeckModel> _decks = [];
+  DeckProvider(UserModel userModel, {AppHttpClient? httpClient})
+      : _userModel = userModel,
+        _httpClient = httpClient ?? AppHttpClient();
+
+  UserModel _userModel;
+  final AppHttpClient _httpClient;
+  final List<DeckModel> _decks = [];
 
   List<DeckModel> get decks => _decks;
 
+  void updateUserModel(UserModel userModel) {
+    _userModel = userModel;
+  }
+
+  String _token() => _userModel.requireToken();
+
+  Map<String, String> _headers() {
+    return _httpClient.jsonHeaders(
+      bearerToken: _token(),
+      extraHeaders: const {'Accept': 'application/json'},
+    );
+  }
+
   // Метод для создания новой колоды
-  Future<bool> createDeck(String name, String description, String token, {int? templateDeckId}) async {
-    String apiUrl = '${EnvConfig.mainApiUrl}/api/decks';
-    print(apiUrl);
-    print(token);
-    final response = await http.post(
+  Future<bool> createDeck(String name, String description, {int? templateDeckId}) async {
+    final apiUrl = '${EnvConfig.mainApiUrl}/api/decks';
+    final response = await _httpClient.post(
       Uri.parse(apiUrl),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: _headers(),
       body: jsonEncode({
         'name': name,
         'description': description,
@@ -30,25 +44,19 @@ class DeckProvider extends ChangeNotifier {
     );
 
     if (response.statusCode == 201) {
-      await fetchDecks(token);
-      print('Deck created successfully');
-      return true; // Успешное выполнение
-    } else {
-      print(response.body);
-      return false; // Неудача
+      await fetchDecks();
+      return true;
     }
+
+    return false;
   }
 
   // Метод для обновления существующей колоды
-  Future<bool> updateDeck(int deckId, String name, String description, String token) async {
-    String apiUrl = '${EnvConfig.mainApiUrl}/api/decks/$deckId';
-    final response = await http.put(
+  Future<bool> updateDeck(int deckId, String name, String description) async {
+    final apiUrl = '${EnvConfig.mainApiUrl}/api/decks/$deckId';
+    final response = await _httpClient.put(
       Uri.parse(apiUrl),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: _headers(),
       body: jsonEncode({
         'name': name,
         'description': description,
@@ -56,81 +64,61 @@ class DeckProvider extends ChangeNotifier {
     );
 
     if (response.statusCode == 200) {
-      await fetchDecks(token);
-      print('Deck updated successfully');
-      return true; // Успешное выполнение
-    } else {
-      print(response.body);
-      return false; // Неудача
+      await fetchDecks();
+      return true;
     }
+
+    return false;
   }
 
   // Метод для получения одной колоды по ID
-  Future<DeckModel?> getDeck(int deckId, String token) async {
-    String apiUrl = '${EnvConfig.mainApiUrl}/api/decks/$deckId';
-    final response = await http.get(
+  Future<DeckModel?> getDeck(int deckId) async {
+    final apiUrl = '${EnvConfig.mainApiUrl}/api/decks/$deckId';
+    final response = await _httpClient.get(
       Uri.parse(apiUrl),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: _headers(),
     );
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       return DeckModel.fromJson(data);
-    } else {
-      print(response.body);
-      return null; // Возвращаем null, если не удалось получить данные
     }
+
+    return null;
   }
 
   // Метод для удаления колоды пользователя
-  Future<bool> deleteDeck(int deckId, String token) async {
-    String apiUrl = '${EnvConfig.mainApiUrl}/api/decks/$deckId';
-    final response = await http.delete(
+  Future<bool> deleteDeck(int deckId) async {
+    final apiUrl = '${EnvConfig.mainApiUrl}/api/decks/$deckId';
+    final response = await _httpClient.delete(
       Uri.parse(apiUrl),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: _headers(),
     );
 
     if (response.statusCode == 200) {
-      await fetchDecks(token);
-      print('Deck deleted successfully');
-      notifyListeners();
-      return true; // Успешное выполнение
-    } else {
-      print(response.body);
-      return false; // Неудача
+      await fetchDecks();
+      return true;
     }
+
+    return false;
   }
 
   // Метод для получения всех колод пользователя
-  Future<void> fetchDecks(String token) async {
-    String apiUrl = '${EnvConfig.mainApiUrl}/api/decks';
-    final response = await http.get(
+  Future<void> fetchDecks() async {
+    final apiUrl = '${EnvConfig.mainApiUrl}/api/decks';
+    final response = await _httpClient.get(
       Uri.parse(apiUrl),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: _headers(),
     );
 
     if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
+      final List<dynamic> data = json.decode(response.body);
       _decks.clear();
 
-      for (var item in data) {
-        _decks.add(DeckModel.fromJson(item));
-      }
+      _decks.addAll(data.map((item) => DeckModel.fromJson(item)));
       notifyListeners();
     } else {
-      throw Exception('Failed to load decks');
+      throw AppHttpException('Failed to load decks', statusCode: response.statusCode);
     }
   }
 }

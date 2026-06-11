@@ -15,6 +15,17 @@ class TemplateDeckModel {
     this.answer_lang,
   });
 
+  factory TemplateDeckModel.fromJson(Map<String, dynamic> json) {
+    return TemplateDeckModel(
+      id: json['id'],
+      name: json['name'],
+      description: json['description'],
+      deck_lang: json['deck_lang'],
+      question_lang: json['question_lang'],
+      answer_lang: json['answer_lang'],
+    );
+  }
+
   String log() {
     return 'DeckModel - id: $id, name: $name, description: $description, deck_lang: $deck_lang, question_lang: $question_lang, answer_lang: $answer_lang';
   }

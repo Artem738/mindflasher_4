@@ -1,16 +1,18 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/env_config.dart';
 import 'package:mindflasher_4/models/deck_model.dart';
 
 import 'package:mindflasher_4/models/flashcard_model.dart';
+import 'package:mindflasher_4/models/user_model.dart';
 import 'package:mindflasher_4/providers/deck_provider.dart';
 import 'package:mindflasher_4/screens/list/central_top_card.dart';
 import 'package:mindflasher_4/screens/list/left_swipe_card.dart';
 import 'package:mindflasher_4/screens/list/right_answer_card.dart';
 import 'package:mindflasher_4/screens/util/table_parser.dart';
 import 'package:mindflasher_4/services/api_logger.dart';
+import 'package:mindflasher_4/services/app_http_client.dart';
 import 'package:mindflasher_4/tech_data/words_translations.dart';
 
 import 'package:provider/provider.dart';
@@ -18,65 +20,51 @@ import 'package:provider/provider.dart';
 import '../tech_data/weight_delays_enum.dart'; // Импортируем Provider для получения токена
 
 class FlashcardProvider with ChangeNotifier {
+  FlashcardProvider(UserModel userModel, {AppHttpClient? httpClient})
+      : _userModel = userModel,
+        _httpClient = httpClient ?? AppHttpClient();
+
+  UserModel _userModel;
+  final AppHttpClient _httpClient;
   final List<FlashcardModel> _flashcards = [];
   final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
 
   List<FlashcardModel> get flashcards => _flashcards;
 
-  Future<void> fetchAndPopulateFlashcards(String token, int deckId) async {
-    if (token == null) {
-      throw Exception('User not authenticated');
-    }
+  void updateUserModel(UserModel userModel) {
+    _userModel = userModel;
+  }
 
+  String _token() => _userModel.requireToken();
+
+  Map<String, String> _headers() {
+    return _httpClient.jsonHeaders(bearerToken: _token());
+  }
+
+  Future<void> fetchAndPopulateFlashcards(int deckId) async {
     final apiUrl = '${EnvConfig.mainApiUrl}/api/decks/$deckId/flashcards';
-    final response = await http.get(
+    final response = await _httpClient.get(
       Uri.parse(apiUrl),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: _headers(),
     );
 
     if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
+      final List<dynamic> data = json.decode(response.body);
       _flashcards.clear(); // Очистим массив перед заполнением
 
-      for (var item in data) {
-        _flashcards.add(FlashcardModel(
-          id: item['id'],
-          question: item['question'],
-          answer: item['answer'],
-          weight: item['weight'] ?? 0,
-          // Если weight отсутствует, используем 0
-          deckId: item['deck_id'],
-          // Добавляем поле deckId
-          lastReviewedAt: item['last_reviewed_at'],
-          // Добавляем поле lastReviewedAt
-          lastAnswerWeight: item['last_answer_weight'], // Добавляем поле lastReviewedAt
-        ));
-      }
+      _flashcards.addAll(data.map((item) => FlashcardModel.fromJson(item)));
       _sortFlashcardsByWeight();
       notifyListeners();
     } else {
-      throw Exception('Failed to load flashcards');
+      throw AppHttpException('Failed to load flashcards', statusCode: response.statusCode);
     }
   }
 
-  Future<bool> updateFlashcard(int deckId, int cardId, String question, String answer, String token) async {
-    if (token == null) {
-      throw Exception('User not authenticated');
-    }
-
-    print(deckId);
-    print("wtf");
-
+  Future<bool> updateFlashcard(int deckId, int cardId, String question, String answer) async {
     final url = Uri.parse('${EnvConfig.mainApiUrl}/api/flashcards/$cardId');
-    final response = await http.put(
+    final response = await _httpClient.put(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: _headers(),
       body: json.encode({
         'deck_id': deckId,
         'question': question,
@@ -85,8 +73,6 @@ class FlashcardProvider with ChangeNotifier {
     );
 
     if (response.statusCode == 200) {
-      print(response.body);
-
       final index = _flashcards.indexWhere((card) => card.id == cardId);
       if (index != -1) {
         _flashcards[index] = _flashcards[index].copyWith(
@@ -96,30 +82,21 @@ class FlashcardProvider with ChangeNotifier {
         notifyListeners();
       }
       return true;
-    } else {
-      print('Failed to update flashcard: ${response.body}');
-      return false;
     }
+
+    return false;
   }
 
   Future<bool> createFlashcard(
     int deckId,
     String question,
     String answer,
-    String token,
   ) async {
-    if (token == null) {
-      throw Exception('User not authenticated');
-    }
-
     final url = Uri.parse('${EnvConfig.mainApiUrl}/api/flashcards');
 
-    final response = await http.post(
+    final response = await _httpClient.post(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: _headers(),
       body: json.encode({
         'deck_id': deckId,
         'question': question,
@@ -128,35 +105,25 @@ class FlashcardProvider with ChangeNotifier {
     );
     if (response.statusCode == 201) {
       final Map<String, dynamic> data = json.decode(response.body);
-      final newFlashcard = FlashcardModel(
-        id: data['id'],
-        question: data['question'],
-        answer: data['answer'],
-        weight: data['weight'] ?? 0,
-        deckId: data['deck_id'],
-      );
+      final newFlashcard = FlashcardModel.fromJson(data);
       _flashcards.add(newFlashcard);
       _sortFlashcardsByWeight();
       notifyListeners();
       return true;
-    } else {
-      print('Failed to create flashcard: ${response.body}');
-      return false;
     }
+
+    return false;
   }
 
   // final url = "https://docs.google.com/spreadsheets/d/1bF-xeiOzezH-bKQAadJ8tpqDQH0iBVGExGVYklhXXco/pubhtml?gid=1056242600&single=true";
 
-  Future<bool> importTable(int deckId, String token, int questionColumn, int answerColumn) async {
-    if (token.isEmpty) {
-      throw Exception('User not authenticated');
-    }
+  Future<bool> importTable(int deckId, int questionColumn, int answerColumn) async {
     questionColumn = questionColumn > 0 ? questionColumn - 1 : 2;
     answerColumn = answerColumn > 0 ? answerColumn - 1 : 3;
     //final String url = "https://table.example.url";
     final url = "https://docs.google.com/spreadsheets/d/1qFEm9AQ6tq0a5W_ITX7yVcoUBhVrNiCe8k_x1xxufUs/pubhtml?gid=464824386&single=true";
 
-    final response = await http.get(Uri.parse(url));
+    final response = await _httpClient.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       var data = parseHtmlTable(response.body);
@@ -176,7 +143,7 @@ class FlashcardProvider with ChangeNotifier {
 
       debugPrint(csvData, wrapWidth: 200);
 
-      if (await csvInsert(deckId, csvData, token)) {
+      if (await csvInsert(deckId, csvData)) {
         return true;
       }
     }
@@ -189,20 +156,12 @@ class FlashcardProvider with ChangeNotifier {
       555;777
    */
 
-  Future<bool> csvInsert(int deckId, String csvData, String token) async {
-    if (token == null) {
-      throw Exception('User not authenticated');
-    }
-
-    print(csvData);
+  Future<bool> csvInsert(int deckId, String csvData) async {
     final url = Uri.parse('${EnvConfig.mainApiUrl}/api/flashcards/csv-insert');
 
-    final response = await http.post(
+    final response = await _httpClient.post(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: _headers(),
       body: json.encode({
         'deck_id': deckId,
         'csv_data': csvData,
@@ -210,29 +169,14 @@ class FlashcardProvider with ChangeNotifier {
     );
 
     if (response.statusCode == 201) {
-      print(response.body);
-      // final newFlashcard = FlashcardModel(
-      //   id: data['id'],
-      //   question: data['question'],
-      //   answer: data['answer'],
-      //   weight: data['weight'] ?? 0,
-      //   deckId: data['deck_id'],
-      // );
-      // _flashcards.add(newFlashcard);
-      // _sortFlashcardsByWeight();
-      // notifyListeners();
-      // print(response.body);
-      // Обработка успешного ответа
       return true;
-    } else {
-      print('Failed to insert CSV data: ${response.body}');
-      return false;
     }
+
+    return false;
   }
 
   Future<void> updateCardWeight(
     DeckModel deck,
-    String token,
     int id,
     WeightDelaysEnum weightDelayEnum,
   ) async {
@@ -266,49 +210,31 @@ class FlashcardProvider with ChangeNotifier {
       });
 
       // Обновление веса карточки на сервере
-      await updateCardWeightOnServer(token, id, weightDelayEnum);
+      await updateCardWeightOnServer(id, weightDelayEnum);
     }
   }
 
-  Future<void> updateCardWeightOnServer(String token, int id, WeightDelaysEnum weightDelayEnum) async {
-    // Получение токена из UserProvider
-    if (token == null) {
-      throw Exception('User not authenticated');
-    }
-    //print(weightDelayEnum.name);
-    print(weightDelayEnum.value);
-//
+  Future<void> updateCardWeightOnServer(int id, WeightDelaysEnum weightDelayEnum) async {
     ///flashcards/{flashcardId}/progress/weight'
     final url = Uri.parse('${EnvConfig.mainApiUrl}/api/flashcards/$id/progress/weight');
-    final response = await http.post(
+    final response = await _httpClient.post(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: _headers(),
       body: json.encode({'weight': weightDelayEnum.value, 'last_answer_weight': weightDelayEnum.value}),
     );
-    print(response.statusCode);
-    print(response.body);
+
     if (response.statusCode != 200) {
-      String err = 'updateCardWeightOnServer: Failed to update weight on server';
+      final err = 'updateCardWeightOnServer: Failed to update weight on server';
       ApiLogger.apiPrint(err);
-      throw Exception(err);
+      throw AppHttpException(err, statusCode: response.statusCode);
     }
   }
 
-  Future<bool> deleteFlashcard(int cardId, String token) async {
-    if (token == null) {
-      throw Exception('User not authenticated');
-    }
-
+  Future<bool> deleteFlashcard(int cardId) async {
     final url = Uri.parse('${EnvConfig.mainApiUrl}/api/flashcards/$cardId');
-    final response = await http.delete(
+    final response = await _httpClient.delete(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: _headers(),
     );
 
     if (response.statusCode == 200) {
@@ -322,10 +248,9 @@ class FlashcardProvider with ChangeNotifier {
         notifyListeners();
       }
       return true;
-    } else {
-      print('Failed to delete flashcard: ${response.body}');
-      return false;
     }
+
+    return false;
   }
 
   void _sortFlashcardsByWeight() {

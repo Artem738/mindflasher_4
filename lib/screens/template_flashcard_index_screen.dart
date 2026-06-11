@@ -13,7 +13,6 @@ class TemplateFlashcardIndexScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final token = context.watch<ProviderUserControl>().userModel.token;
     final baseFontSize = context.read<ProviderUserControl>().userModel.base_font_size;
     var txt = TemplateFlashcardIndexScreenTranslate(context.read<ProviderUserControl>().userModel.language_code ?? 'en');
 
@@ -25,7 +24,7 @@ class TemplateFlashcardIndexScreen extends StatelessWidget {
         ),
       ),
       body: FutureBuilder(
-        future: context.read<TemplateFlashcardProvider>().fetchFlashcards(deck.id, token!),
+        future: context.read<TemplateFlashcardProvider>().fetchFlashcards(deck.id),
         builder: (ctx, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -61,7 +60,7 @@ class TemplateFlashcardIndexScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
-          bool success = await context.read<TemplateFlashcardProvider>().addTemplateBaseToUser(context, deck.id, token!);
+          bool success = await context.read<TemplateFlashcardProvider>().addTemplateBaseToUser(context, deck.id);
           if (success) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(

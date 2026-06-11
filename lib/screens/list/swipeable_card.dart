@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/models/deck_model.dart';
 import 'package:mindflasher_4/models/flashcard_model.dart';
-import 'package:mindflasher_4/models/user_model.dart';
 import 'package:mindflasher_4/providers/flashcard_provider.dart';
 import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/tech_data/weight_delays_enum.dart';
@@ -102,11 +101,9 @@ class SwipeableCardState extends State<SwipeableCard> with SingleTickerProviderS
       _timer?.cancel(); // Отменяем предыдущий таймер, если он был
       _timer = Timer(Duration(seconds: _closeAndTriggerRedActionAfterSeconds), () {
         //print("3 seconds passed, triggering action!");
-        final String? token = context.read<UserModel>().token;
-
         // Вызываем метод для обновления веса карточки с задержкой 'badSmallDelay'
         Provider.of<FlashcardProvider>(context, listen: false)
-            .updateCardWeight(widget.deck, token!, widget.flashcard.id, WeightDelaysEnum.badSmallDelay);
+            .updateCardWeight(widget.deck, widget.flashcard.id, WeightDelaysEnum.badSmallDelay);
 
         // Возвращаем карточку в начальное положение
         _animation = Tween<double>(begin: _dragExtent, end: 0.0).animate(_animationController)

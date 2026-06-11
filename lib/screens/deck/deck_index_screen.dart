@@ -28,7 +28,7 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchDecksFuture = context.read<DeckProvider>().fetchDecks(context.read<UserModel>().token!);
+    _fetchDecksFuture = context.read<DeckProvider>().fetchDecks();
   }
 
   @override
@@ -39,8 +39,6 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
     var txt = DeckIndexScreenTranslate(context.read<UserModel>().language_code ?? 'en');
     final deckProvider = context.watch<DeckProvider>();
     var baseFontSize = context.watch<ProviderUserControl>().userModel.base_font_size;
-    final String? token = context.read<UserModel>().token;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(txt.tt('title')),
@@ -141,7 +139,7 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
                   onPressed: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => DeckManagementScreen(token: token!),
+                        builder: (context) => DeckManagementScreen(),
                       ),
                     );
                   },

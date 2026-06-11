@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/models/deck_model.dart';
 import 'package:mindflasher_4/models/flashcard_model.dart';
-import 'package:mindflasher_4/models/user_model.dart';
 import 'package:mindflasher_4/providers/deck_provider.dart';
 import 'package:mindflasher_4/providers/flashcard_provider.dart';
 import 'package:mindflasher_4/screens/flashcard_management_screen.dart';
@@ -23,7 +22,6 @@ class LeftSwipeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String? token = context.read<UserModel>().token;
     return Align(
       alignment: Alignment.centerLeft,
       child: FractionallySizedBox(
@@ -41,7 +39,6 @@ class LeftSwipeCard extends StatelessWidget {
                       MaterialPageRoute(
                         builder: (context) => FlashcardManagementScreen(
                           deck: deck,
-                          token: token!,
                           flashcard: flashcard,
                         ),
                       ),

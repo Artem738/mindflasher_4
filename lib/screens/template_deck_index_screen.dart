@@ -12,8 +12,6 @@ class TemplateDeckIndexScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final token = context.watch<ProviderUserControl>().userModel.token;
-
     final baseFontSize = context.read<ProviderUserControl>().userModel.base_font_size;
     var txt = TemplateDeckIndexScreenTranslate(context.read<ProviderUserControl>().userModel.language_code ?? 'en');
 
@@ -22,7 +20,7 @@ class TemplateDeckIndexScreen extends StatelessWidget {
         title: Text(txt.tt('template_decks')),
       ),
       body: FutureBuilder(
-        future: context.read<TemplateDeckProvider>().fetchDecks(token!),
+        future: context.read<TemplateDeckProvider>().fetchDecks(),
         builder: (ctx, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -57,7 +55,6 @@ class TemplateDeckIndexScreen extends StatelessWidget {
                         bool success = await context.read<TemplateFlashcardProvider>().addTemplateBaseToUser(
                               context,
                               deckProvider.decks[i].id,
-                              token!,
                             );
                         if (success) {
                           Navigator.pop(context);

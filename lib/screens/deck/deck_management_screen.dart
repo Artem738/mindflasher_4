@@ -8,9 +8,8 @@ import 'package:provider/provider.dart';
 
 class DeckManagementScreen extends StatefulWidget {
   final DeckModel? deck;
-  final String token;
 
-  const DeckManagementScreen({Key? key, this.deck, required this.token}) : super(key: key);
+  const DeckManagementScreen({Key? key, this.deck}) : super(key: key);
 
   @override
   _DeckManagementScreenState createState() => _DeckManagementScreenState();
@@ -69,7 +68,6 @@ class _DeckManagementScreenState extends State<DeckManagementScreen> {
                     widget.deck!.id,
                     _nameController.text,
                     _descriptionController.text,
-                    widget.token,
                   );
                   if (success) {
                     Navigator.pushAndRemoveUntil(
@@ -89,7 +87,6 @@ class _DeckManagementScreenState extends State<DeckManagementScreen> {
                   bool success = await deckProvider.createDeck(
                     _nameController.text,
                     _descriptionController.text,
-                    widget.token,
                   );
                   if (success) {
                     Navigator.pop(context);

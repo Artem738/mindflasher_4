@@ -27,15 +27,13 @@ class _FlashcardIndexScreenState extends State<FlashcardIndexScreen> {
   @override
   void initState() {
     super.initState();
-    final String? token = context.read<UserModel>().token;
-    _flashcardsFuture = Provider.of<FlashcardProvider>(context, listen: false).fetchAndPopulateFlashcards(token!, widget.deck.id);
+    _flashcardsFuture = Provider.of<FlashcardProvider>(context, listen: false).fetchAndPopulateFlashcards(widget.deck.id);
     context.read<ProviderUserLogin>().expandTelegram();
   }
 
   void _reloadFlashcards() {
-    final String? token = context.read<UserModel>().token;
     setState(() {
-      _flashcardsFuture = Provider.of<FlashcardProvider>(context, listen: false).fetchAndPopulateFlashcards(token!, widget.deck.id);
+      _flashcardsFuture = Provider.of<FlashcardProvider>(context, listen: false).fetchAndPopulateFlashcards(widget.deck.id);
     });
   }
 
@@ -62,7 +60,6 @@ class _FlashcardIndexScreenState extends State<FlashcardIndexScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final String? token = context.read<UserModel>().token;
     var txt = FlashcardIndexScreenTranslate(context.read<UserModel>().language_code ?? 'en');
 
     return Scaffold(
@@ -115,7 +112,6 @@ class _FlashcardIndexScreenState extends State<FlashcardIndexScreen> {
                 MaterialPageRoute(
                   builder: (context) => FlashcardManagementScreen(
                     deck: widget.deck,
-                    token: token!,
                   ),
                 ),
               )

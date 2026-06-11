@@ -8,13 +8,11 @@ import 'package:mindflasher_4/providers/flashcard_provider.dart';
 
 class CsvManagementScreen extends StatefulWidget {
   final DeckModel deck;
-  final String token;
   final String? csvData;
 
   const CsvManagementScreen({
     Key? key,
     required this.deck,
-    required this.token,
     this.csvData,
   }) : super(key: key);
 
@@ -70,7 +68,6 @@ class _CsvManagementScreenState extends State<CsvManagementScreen> {
                 bool success = await flashcardProvider.csvInsert(
                   widget.deck.id,
                   _csvController.text,
-                  widget.token,
                 );
                 if (success) {
                   Navigator.pushAndRemoveUntil(

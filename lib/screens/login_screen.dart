@@ -66,14 +66,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   _passwordController.text,
                 );
                 if (mounted && provider.userModel.token != null) {
-                  ApiLogger.apiPrint("Token after login: ${provider.userModel.token} ");
+                  ApiLogger.apiPrint('Login screen redirect after successful email auth');
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => IndexScreen()),
                   );
                 } else {
                   if (mounted) {
-                    ApiLogger.apiPrint("Login failed: ${provider.userModel.token} ");
+                    ApiLogger.apiPrint('Login screen shows authentication error');
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text(txt.tt('login_failed'))),
                     );

@@ -17,6 +17,18 @@ class FlashcardModel  {
     this.lastAnswerWeight,
   });
 
+  factory FlashcardModel.fromJson(Map<String, dynamic> json) {
+    return FlashcardModel(
+      id: json['id'],
+      question: json['question'],
+      answer: json['answer'],
+      weight: json['weight'] ?? 0,
+      deckId: json['deck_id'],
+      lastReviewedAt: json['last_reviewed_at'],
+      lastAnswerWeight: json['last_answer_weight'],
+    );
+  }
+
   FlashcardModel  copyWith({
     int? id,
     String? question,

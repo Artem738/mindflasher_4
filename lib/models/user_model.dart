@@ -83,4 +83,15 @@ class UserModel extends ChangeNotifier {
         'hash: ${hash ?? 'null'}, user_lvl: ${user_lvl ?? 'null'}, '
         'isFirstEnter: ${isFirstEnter ?? 'null'}, base_font_size: $base_font_size';
   }
+
+  String requireToken() {
+    final currentToken = token;
+    if (currentToken == null || currentToken.isEmpty) {
+      throw Exception('User not authenticated');
+    }
+
+    return currentToken;
+  }
+
+  bool get isAdminForDiagnostics => (user_lvl ?? 0) >= 10;
 }

@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:mindflasher_4/app/app_bootstrap_route.dart';
 import 'package:mindflasher_4/providers/deck_provider.dart';
 import 'package:mindflasher_4/providers/flashcard_provider.dart';
 import 'package:mindflasher_4/providers/template_deck_provider.dart';
 import 'package:mindflasher_4/providers/template_flashcard_provider.dart';
 import 'package:mindflasher_4/screens/deck/deck_index_screen.dart';
-import 'package:mindflasher_4/screens/first_enter_screen.dart';
 import 'package:mindflasher_4/screens/language_selection_screen.dart';
-import 'package:mindflasher_4/screens/template_deck_index_screen.dart';
 import 'package:mindflasher_4/screens/font_size_adjustment_screen.dart';
-import 'package:mindflasher_4/services/api_logger.dart';
 import 'package:provider/provider.dart';
 import 'providers/provider_user_control.dart';
 import 'providers/provider_user_login.dart';
-import 'screens/user_settings_screen.dart';
 import 'screens/login_screen.dart';
 import 'models/user_model.dart';
 
@@ -31,10 +28,34 @@ void main() {
           create: (context) => ProviderUserControl(userModel),
           update: (context, userModel, providerUserControl) => providerUserControl!,
         ),
-        ChangeNotifierProvider(create: (_) => TemplateDeckProvider()),
-        ChangeNotifierProvider(create: (_) => TemplateFlashcardProvider()),
-        ChangeNotifierProvider(create: (_) => DeckProvider()),
-        ChangeNotifierProvider(create: (_) => FlashcardProvider()),
+        ChangeNotifierProxyProvider<UserModel, TemplateDeckProvider>(
+          create: (_) => TemplateDeckProvider(userModel),
+          update: (_, userModel, provider) {
+            provider!.updateUserModel(userModel);
+            return provider;
+          },
+        ),
+        ChangeNotifierProxyProvider<UserModel, TemplateFlashcardProvider>(
+          create: (_) => TemplateFlashcardProvider(userModel),
+          update: (_, userModel, provider) {
+            provider!.updateUserModel(userModel);
+            return provider;
+          },
+        ),
+        ChangeNotifierProxyProvider<UserModel, DeckProvider>(
+          create: (_) => DeckProvider(userModel),
+          update: (_, userModel, provider) {
+            provider!.updateUserModel(userModel);
+            return provider;
+          },
+        ),
+        ChangeNotifierProxyProvider<UserModel, FlashcardProvider>(
+          create: (_) => FlashcardProvider(userModel),
+          update: (_, userModel, provider) {
+            provider!.updateUserModel(userModel);
+            return provider;
+          },
+        ),
       ],
       child: MyApp(),
     ),
@@ -46,46 +67,40 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: IndexScreen(),
+      home: AppBootstrapScreen(),
     );
   }
 }
 
-class IndexScreen extends StatelessWidget {
+class AppBootstrapScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userModel = Provider.of<UserModel>(context);
     final userLogin = context.watch<ProviderUserLogin>();
+    final route = resolveAppBootstrapRoute(
+      isLoading: userLogin.isLoading,
+      languageCode: userModel.language_code,
+      token: userModel.token,
+      isFirstEnter: userModel.isFirstEnter == true,
+    );
 
-    if (userLogin.isLoading) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
-    if (userLogin.hasError) {
-      ApiLogger.apiPrint("Error with login: ${userLogin.errorMessage}");
-    }
-
-    if (userModel.language_code == null && userLogin.isLoading == false) {
-      // Если languageCode отсутствует, показываем экран выбора языка
-      return LanguageSelectionScreen();
-    }
-
-    if (userModel.token == null && userLogin.isLoading == false) {
-      return LoginScreen();
-    } else {
-      if (userModel.isFirstEnter == true && userModel.language_code == null) {
-        // Если languageCode отсутствует, показываем экран выбора языка
+    switch (route) {
+      case AppBootstrapRoute.loading:
+        return const Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+      case AppBootstrapRoute.languageSelection:
         return LanguageSelectionScreen();
-      } else if (userModel.isFirstEnter == true && userModel.language_code != null) {
+      case AppBootstrapRoute.login:
+        return LoginScreen();
+      case AppBootstrapRoute.firstEnterSetup:
         return FontSizeAdjustmentScreen();
-      } else {
+      case AppBootstrapRoute.decks:
         return DeckIndexScreen();
-        //return TemplateDeckIndexScreen();
-      }
     }
   }
 }
+
+typedef IndexScreen = AppBootstrapScreen;

@@ -9,9 +9,8 @@ import 'package:provider/provider.dart';
 class FlashcardManagementScreen extends StatefulWidget {
   final DeckModel deck; //
   final FlashcardModel? flashcard; // Если передана карточка, значит, выполняется редактирование
-  final String token; // Токен для API-запросов
 
-  const FlashcardManagementScreen({Key? key, required this.deck, this.flashcard, required this.token}) : super(key: key);
+  const FlashcardManagementScreen({Key? key, required this.deck, this.flashcard}) : super(key: key);
 
   @override
   _FlashcardManagementScreenState createState() => _FlashcardManagementScreenState();
@@ -71,7 +70,6 @@ class _FlashcardManagementScreenState extends State<FlashcardManagementScreen> {
                     widget.flashcard!.id,
                     _questionController.text,
                     _answerController.text,
-                    widget.token,
                   );
                   if (success) {
                     Navigator.pop(context);
@@ -86,7 +84,6 @@ class _FlashcardManagementScreenState extends State<FlashcardManagementScreen> {
                     widget.deck.id,
                     _questionController.text,
                     _answerController.text,
-                    widget.token,
                   );
                   if (success) {
                     Navigator.pop(context);
@@ -104,7 +101,7 @@ class _FlashcardManagementScreenState extends State<FlashcardManagementScreen> {
                 onPressed: () async {
                   /// Удаление карточки
                   final flashcardProvider = context.read<FlashcardProvider>();
-                  bool success = await flashcardProvider.deleteFlashcard(widget.flashcard!.id, widget.token);
+                  bool success = await flashcardProvider.deleteFlashcard(widget.flashcard!.id);
                   if (success) {
                     Navigator.pop(context);
                   } else {

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/models/deck_model.dart';
 import 'package:mindflasher_4/models/flashcard_model.dart';
-import 'package:mindflasher_4/models/user_model.dart';
 import 'package:mindflasher_4/providers/flashcard_provider.dart';
 import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/tech_data/weight_delays_enum.dart';
@@ -22,7 +21,6 @@ class RightAnswerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String? token = context.read<UserModel>().token;
     final baseFontSize = context.read<ProviderUserControl>().userModel.base_font_size;
 
     return Align(
@@ -49,7 +47,7 @@ class RightAnswerCard extends StatelessWidget {
                           child: ElevatedButton(
                             onPressed: () {
                               Provider.of<FlashcardProvider>(context, listen: false)
-                                  .updateCardWeight(deck, token!, flashcard.id, WeightDelaysEnum.badSmallDelay);
+                                  .updateCardWeight(deck, flashcard.id, WeightDelaysEnum.badSmallDelay);
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.redAccent,
@@ -86,7 +84,7 @@ class RightAnswerCard extends StatelessWidget {
                           child: ElevatedButton(
                             onPressed: () {
                               Provider.of<FlashcardProvider>(context, listen: false)
-                                  .updateCardWeight(deck, token!, flashcard.id, WeightDelaysEnum.normMedDelay);
+                                  .updateCardWeight(deck, flashcard.id, WeightDelaysEnum.normMedDelay);
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.yellow,
@@ -109,7 +107,7 @@ class RightAnswerCard extends StatelessWidget {
                 child: GestureDetector(
                   onTap: () {
                     Provider.of<FlashcardProvider>(context, listen: false)
-                        .updateCardWeight(deck, token!, flashcard.id, WeightDelaysEnum.normMedDelay);
+                    .updateCardWeight(deck, flashcard.id, WeightDelaysEnum.normMedDelay);
                   },
                   child: Container(
                     color: Colors.transparent, // Невидимая область

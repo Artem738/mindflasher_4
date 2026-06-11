@@ -66,18 +66,14 @@ class LanguageSelectionScreen extends StatelessWidget {
     final userControl = Provider.of<ProviderUserControl>(context, listen: false);
     final userLogin = Provider.of<ProviderUserLogin>(context, listen: false);
 
-    userModel.language_code = language.code;
+    await userLogin.saveLanguageCode(language.code);
     if (userModel.token != null) {
-      userControl.updateUserLanguageCode(userModel.token!, language.code);
+      await userControl.updateUserLanguageCode(language.code);
     }
-    // Navigator.of(context).pop();
+
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (context) => IndexScreen()),
       (Route<dynamic> route) => false,
     );
-    if (userLogin.isSharedPreferencesLoaded) {
-      await userLogin.sharedPreferences!.setString(userLogin.language_codeSpName, language.code);
-  }
-
   }
 }

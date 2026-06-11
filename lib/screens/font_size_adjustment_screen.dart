@@ -117,7 +117,7 @@ class FontSizeAdjustmentScreen extends StatelessWidget {
                   if (userModel.isFirstEnter != true) ...[
                     ElevatedButton(
                       onPressed: () {
-                        userControl.updateUserBaseFontSize(userModel.token!, userModel.base_font_size);
+                        userControl.updateUserBaseFontSize(userModel.base_font_size);
 
                         Navigator.pushReplacement(
                           context,

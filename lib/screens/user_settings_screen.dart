@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mindflasher_4/screens/admin_log_screen.dart';
 import 'package:mindflasher_4/screens/deck/deck_index_screen.dart';
 import 'package:mindflasher_4/screens/first_enter_screen.dart';
 import 'package:mindflasher_4/screens/font_size_adjustment_screen.dart';
@@ -143,6 +144,21 @@ class UserSettingsScreen extends StatelessWidget {
                   },
                   child: Text(txt.tt('tap_code_screen_button'), style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0))),
                 ),
+                if (userModel.isAdminForDiagnostics) ...[
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const AdminLogScreen()),
+                      );
+                    },
+                    child: Text(
+                      'Admin logs',
+                      style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
+                    ),
+                  ),
+                ],
                 SizedBox(height: 30),
                 ElevatedButton(
                   onPressed: () {

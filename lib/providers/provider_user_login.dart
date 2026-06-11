@@ -1,11 +1,12 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/env_config.dart';
 import 'package:mindflasher_4/models/user_model.dart';
 import 'package:mindflasher_4/services/api_logger.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mindflasher_4/services/auth/auth_api.dart';
+import 'package:mindflasher_4/services/auth/auth_local_store.dart';
+import 'package:mindflasher_4/services/auth/telegram_auth_bridge.dart';
+import 'package:mindflasher_4/services/logging/app_logger.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb; // Импортирует переменную kIsWeb которая используется для определения Web
 import 'devise_special_load/telegram_web_app_stub.dart' // Импортируется заглушка для Классов
@@ -13,11 +14,15 @@ import 'devise_special_load/telegram_web_app_stub.dart' // Импортируе�
 
 class ProviderUserLogin extends ChangeNotifier {
   final UserModel _userModel;
+  final AuthApi _authApi;
+  final AuthLocalStore _authLocalStore;
+  final TelegramAuthBridge _telegramAuthBridge;
+  final AppLogger _logger;
 
   bool _isLoading = true;
   bool _hasError = false;
   String _errorMessage = '';
-  SharedPreferences? _sharedPreferences;
+  bool _isLocalPreferencesAvailable = false;
 
   bool get isLoading => _isLoading;
 
@@ -25,7 +30,7 @@ class ProviderUserLogin extends ChangeNotifier {
 
   String get errorMessage => _errorMessage;
 
-  SharedPreferences? get sharedPreferences => _sharedPreferences;
+  bool get isLocalPreferencesAvailable => _isLocalPreferencesAvailable;
 
   UserModel get userModel => _userModel;
 
@@ -33,289 +38,252 @@ class ProviderUserLogin extends ChangeNotifier {
 
   TelegramUser? get telegramUser => _telegramUser;
 
-  FlutterSecureStorage? _secureStorage;
-
   String _lastPass = '';
 
   String get lastPass => _lastPass;
 
   /// Initialise Class on First Run!
-  ProviderUserLogin(this._userModel) {
-    // Класс инициализируется сразу.
-    initialize();
+  ProviderUserLogin(
+    this._userModel, {
+    AuthApi? authApi,
+    AuthLocalStore? authLocalStore,
+    TelegramAuthBridge? telegramAuthBridge,
+    AppLogger? logger,
+    bool autoInitialize = true,
+  })  : _authApi = authApi ?? LaravelAuthApi(),
+        _authLocalStore = authLocalStore ?? DeviceAuthLocalStore(),
+        _telegramAuthBridge = telegramAuthBridge ?? TelegramWebAppBridge(),
+        _logger = logger ?? AppLogger.instance {
+    if (autoInitialize) {
+      initialize();
+    }
   }
 
   Future<void> initialize() async {
-    if (kIsWeb) {
-      EnvConfig.mainApiUrl = EnvConfig.webApiUrl;
-    } else {
-      EnvConfig.mainApiUrl = EnvConfig.localApiUrl;
-    }
-    await _initializeSharedPreferences();
-    if (kIsWeb) {
-      await _initializeTelegram();
-    } else {
-      await _initializeSecureStorage();
-    }
-
+    _isLoading = true;
+    _hasError = false;
+    _errorMessage = '';
     notifyListeners();
-    _isLoading = false;
-  }
 
-  /** Shared Preferences */
-
-  final String firstEnterSpName = "firstEnter_${EnvConfig.StorageAndSharedPreferencesKey}";
-  final String lastEmailSpName = "lastEmail_${EnvConfig.StorageAndSharedPreferencesKey}";
-  final String language_codeSpName = "language_${EnvConfig.StorageAndSharedPreferencesKey}";
-  bool isSharedPreferencesLoaded = false;
-
-  Future<void> _initializeSharedPreferences() async {
     try {
-      _sharedPreferences = await SharedPreferences.getInstance();
-
-      if (_sharedPreferences != null) {
-        String? lastEmail = _sharedPreferences!.getString(lastEmailSpName);
-        if (lastEmail != null) {
-          _userModel.update(email: lastEmail);
-        }
-        String? language_code = _sharedPreferences!.getString(language_codeSpName);
-        if (language_code != null) {
-          _userModel.update(language_code: language_code);
-        }
-
-        bool? firstEnter = await _sharedPreferences!.getBool(firstEnterSpName);
-        if (firstEnter == null) {
-          _userModel.update(isFirstEnter: true);
-          await _sharedPreferences!.setBool(firstEnterSpName, true);
-        } else {
-          _userModel.update(isFirstEnter: false);
-          await _sharedPreferences!.setBool(firstEnterSpName, false);
-        }
-        isSharedPreferencesLoaded = true;
+      if (kIsWeb) {
+        EnvConfig.mainApiUrl = EnvConfig.normalizeApiBaseUrl(EnvConfig.webApiUrl);
+        _logger.info('bootstrap', 'Running in web mode');
+      } else {
+        EnvConfig.mainApiUrl = EnvConfig.normalizeApiBaseUrl(EnvConfig.localApiUrl);
+        _logger.info('bootstrap', 'Running in app mode');
       }
-    } catch (e) {
-      isSharedPreferencesLoaded = false;
 
-      /// ТАК и должно быть потому, что в телеграмме это не работает
-      // _hasError = true;
-      // _errorMessage = 'Error initializing SharedPreferences: $e';
-      // ApiLogger.apiPrint("Error initializing SharedPreferences: $e");
+      await _loadLocalState();
+      await _initializeTelegram();
+    } catch (e) {
+      _hasError = true;
+      _errorMessage = 'Initialization error: $e';
+      _logger.error('auth', _errorMessage);
+      ApiLogger.apiPrint(_errorMessage);
     } finally {
+      _isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<void> _loadLocalState() async {
+    final localState = await _authLocalStore.load();
+    _isLocalPreferencesAvailable = localState.isPreferencesAvailable;
+    _lastPass = localState.lastPassword;
+    _logger.info(
+      'auth',
+      'Local auth state loaded: prefs=${localState.isPreferencesAvailable}, language=${localState.languageCode ?? 'none'}, firstEnter=${localState.isFirstEnter}',
+    );
+    _userModel.update(
+      email: localState.lastEmail,
+      language_code: localState.languageCode,
+      isFirstEnter: localState.isFirstEnter,
+    );
   }
 
   Future<void> setIsFirstEnter(bool setVal) async {
     _userModel.update(
       isFirstEnter: setVal,
     );
-    if (isSharedPreferencesLoaded) {
-      await _sharedPreferences!.setBool(firstEnterSpName, setVal);
-    }
+    await _authLocalStore.saveFirstEnter(setVal);
     notifyListeners();
-  }
-
-  Future<void> _initializeSecureStorage() async {
-    if (!kIsWeb) {
-      _secureStorage = const FlutterSecureStorage();
-
-      String? lastPass = await _secureStorage?.read(key: 'lastPass_${EnvConfig.StorageAndSharedPreferencesKey}');
-
-      if (lastPass != null) {
-        _lastPass = lastPass;
-        print(_lastPass);
-      } else {
-        _lastPass = "";
-      }
-    }
   }
 
   bool isTelegramFeatureWorks = false;
 
   Future<void> _initializeTelegram() async {
-    if (kIsWeb) {
-      try {
-        if (TelegramWebApp.instance.isSupported) {
-          await TelegramWebApp.instance.ready();
-          _telegramUser = TelegramWebApp.instance.initData?.user;
-          expandTelegram();
-          Future.delayed(const Duration(milliseconds: 10), TelegramWebApp.instance.expand);
-          if (_telegramUser != null) {
-            await _loginWithTelegram();
-          }
-          isTelegramFeatureWorks = true;
-        }
-      } catch (e) {
-        bool isTelegramFeatureWorks = false;
-        //
-        // Заглушка: Здесь намеренно игнорируем ошибку. Тут нет ошибки. Оставляем этот комментарий.
-        //
-      } finally {
-        notifyListeners();
-      }
-    } else {
+    if (!_telegramAuthBridge.isSupported) {
       isTelegramFeatureWorks = false;
-    }
-  }
-
-  Future<void> expandTelegram() async {
-    if (isTelegramFeatureWorks) {
-      Future.delayed(const Duration(milliseconds: 10), TelegramWebApp.instance.expand);
-    }
-  }
-
-  Future<void> _loginWithTelegram() async {
-    final url = '${EnvConfig.mainApiUrl}/api/telegram/auth';
-    final headers = {'Content-Type': 'application/json'};
-    final initData = TelegramWebApp.instance.initData?.raw;
-
-    if (initData == null) {
-      _hasError = true;
-      _errorMessage = 'Init data is null';
-      ApiLogger.apiPrint("Init data is null: ${_userModel?.log()}");
+      _logger.info('telegram', 'Telegram bridge not available for current platform');
       return;
     }
 
     try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: headers,
-        body: jsonEncode({'initData': initData, 'language_code': userModel.language_code}),
-      );
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        ApiLogger.apiPrint("Tg login responseData: $responseData");
+      await _telegramAuthBridge.ready();
+      _telegramUser = _telegramAuthBridge.user;
+      isTelegramFeatureWorks = true;
+      expandTelegram();
+      _logger.info('telegram', 'Telegram bridge ready');
 
-        final userData = responseData['user'];
-        if (userData['base_font_size'] != null) {
-          _userModel.update(base_font_size: userData['base_font_size'].toDouble());
-        }
-        _userModel?.update(
-          apiId: userData['id'],
-          telegram_id: userData['telegram_id'],
-          name: userData['name'],
-          email: userData['email'],
-          tg_username: userData['tg_username'],
-          tg_first_name: userData['tg_first_name'],
-          tg_last_name: userData['tg_last_name'],
-          tg_language_code: userData['tg_language_code'],
-          language_code: userData['language_code'],
-          token: responseData['token'],
-          authDate: userData['auth_date'],
-          user_lvl: userData['user_lvl'],
-        );
-
-        if (_userModel == null) {
-          _hasError = true;
-          _errorMessage = 'UserModel is null';
-          ApiLogger.apiPrint("UserModel is null");
-          return;
-        }
-
-        // Необходимое удаление email если был логин с email, но не зарегистрированный.
-        if (userData['email'] != null) {
-          await _sharedPreferences?.setString(lastEmailSpName, userData['email']);
-        } else {
-          ///TODO await _sharedPreferences?.remove(lastEmailSpName); // ???
-        }
-        ApiLogger.apiPrint("Login with TG Success: ${_userModel.log()}");
-      } else {
-        _hasError = true;
-        _errorMessage = 'Ошибка авторизации: ${response.statusCode}';
+      if (_telegramUser == null) {
+        _logger.warning('telegram', 'Telegram user is missing in init data');
+        return;
       }
-    } catch (e) {
-      _hasError = true;
-      _errorMessage = 'Error TG login: $e';
-      ApiLogger.apiPrint("Error TG login: $e ${_userModel?.log()}");
-    }
-  }
 
-  Future<void> loginWithEmail(String email, String password) async {
-    ApiLogger.apiPrint('loginWithEmail flutter: $email $password');
-    final url = '${EnvConfig.mainApiUrl}/api/login';
-    final headers = {'Content-Type': 'application/json'};
-    final body = jsonEncode({'email': email, 'password': password});
-
-    try {
-      final response = await http.post(Uri.parse(url), headers: headers, body: body);
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        ApiLogger.apiPrint("user TO ADD: ${responseData['user']}");
-        final userData = responseData['user'];
-        if (userData['base_font_size'] != null) {
-          _userModel.update(base_font_size: userData['base_font_size'].toDouble());
-        }
-        _userModel.update(
-          apiId: userData['id'],
-          email: email,
-          name: userData['name'],
-          token: responseData['access_token'],
-          user_lvl: userData['user_lvl'],
-          telegram_id: userData['telegram_id'],
-          tg_username: userData['tg_username'],
-          tg_first_name: userData['tg_first_name'],
-          tg_last_name: userData['tg_last_name'],
-          tg_language_code: userData['tg_language_code'],
-          language_code: userData['language_code'],
-          //userModel.base_font_size = userData['base_font_size'] ?? userModel.base_font_size,
-        );
-        // final userData = responseData['user'];
-
-        ApiLogger.apiPrint("Login email done: ${_userModel.log()}");
-        if (isSharedPreferencesLoaded) {
-          await _sharedPreferences!.setString(lastEmailSpName, email);
-        }
-        if (!kIsWeb) {
-          await _secureStorage?.write(key: 'lastPass_${EnvConfig.StorageAndSharedPreferencesKey}', value: password);
-        }
-        notifyListeners();
-      } else {
-        ApiLogger.apiPrint("loginWithEmail failed: $email $password");
+      if ((_userModel.language_code ?? '').isEmpty) {
+        _logger.info('telegram', 'Waiting for language selection before Telegram auth');
+        return;
       }
-    } catch (e) {
-      _hasError = true;
-      _errorMessage = 'loginWithEmail Network error: $e';
-      ApiLogger.apiPrint(_errorMessage);
-    }
-  }
 
-  Future<void> registerWithEmail(String name, String email, String password, String passwordConfirmation) async {
-    final url = '${EnvConfig.mainApiUrl}/api/register';
-    final headers = {'Content-Type': 'application/json'};
-    final body = jsonEncode({
-      'name': name,
-      'email': email,
-      'password': password,
-      'password_confirmation': passwordConfirmation,
-      'language_code': _userModel.language_code,
-    });
-
-    try {
-      final response = await http.post(Uri.parse(url), headers: headers, body: body);
-      if (response.statusCode == 201) {
-        await loginWithEmail(email, password);
-        if (_userModel.token != null) {
-          ApiLogger.apiPrint("Register with email success: ${_userModel.log()}");
-        }
-      } else {
-        _hasError = true;
-        _errorMessage = 'Registration failed: ${response.statusCode}';
-        ApiLogger.apiPrint(_errorMessage);
-      }
+      await _loginWithTelegram();
     } catch (e) {
-      _hasError = true;
-      _errorMessage = 'registerWithEmail Network error: $e';
-      ApiLogger.apiPrint(_errorMessage);
+      isTelegramFeatureWorks = false;
+      _logger.warning('telegram', 'Telegram initialization skipped: $e');
+      ApiLogger.apiPrint('Telegram initialization skipped: $e');
     } finally {
       notifyListeners();
     }
   }
 
-  void retry() {
+  Future<void> expandTelegram() async {
+    if (isTelegramFeatureWorks) {
+      Future.delayed(const Duration(milliseconds: 10), _telegramAuthBridge.expand);
+    }
+  }
+
+  Future<void> _loginWithTelegram() async {
+    final initData = _telegramAuthBridge.initDataRaw;
+
+    if (initData == null) {
+      _hasError = true;
+      _errorMessage = 'Init data is null';
+      _logger.warning('telegram', 'Init data is missing; Telegram login skipped');
+      ApiLogger.apiPrint('Init data is null');
+      return;
+    }
+
+    try {
+      _logger.info('telegram', 'Attempting Telegram auth');
+      final response = await _authApi.loginWithTelegram(
+        initData: initData,
+        languageCode: userModel.language_code,
+      );
+      await _applyAuthenticatedUser(response.userData, response.token, fallbackEmail: null);
+      _logger.info('telegram', 'Telegram auth succeeded');
+      ApiLogger.apiPrint('Login with Telegram succeeded');
+    } catch (e) {
+      _hasError = true;
+      _errorMessage = 'Error TG login: $e';
+      _logger.error('telegram', _errorMessage);
+      ApiLogger.apiPrint(_errorMessage);
+    }
+  }
+
+  Future<void> loginWithEmail(String email, String password) async {
     _isLoading = true;
     _hasError = false;
     _errorMessage = '';
-    initialize();
     notifyListeners();
+
+    try {
+      _logger.info('auth', 'Attempting email login');
+      final response = await _authApi.loginWithEmail(email: email, password: password);
+      await _applyAuthenticatedUser(response.userData, response.token, fallbackEmail: email);
+      await _authLocalStore.saveLastEmail(email);
+      await _authLocalStore.saveLastPassword(password);
+      _logger.info('auth', 'Email login succeeded');
+      ApiLogger.apiPrint('Login with email succeeded');
+    } catch (e) {
+      _hasError = true;
+      _errorMessage = 'loginWithEmail Network error: $e';
+      _logger.error('auth', _errorMessage);
+      ApiLogger.apiPrint(_errorMessage);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> registerWithEmail(String name, String email, String password, String passwordConfirmation) async {
+    _isLoading = true;
+    _hasError = false;
+    _errorMessage = '';
+    notifyListeners();
+
+    try {
+      _logger.info('auth', 'Attempting email registration');
+      await _authApi.registerWithEmail(
+        name: name,
+        email: email,
+        password: password,
+        passwordConfirmation: passwordConfirmation,
+        languageCode: _userModel.language_code,
+      );
+      await loginWithEmail(email, password);
+      if (_userModel.token != null) {
+        _logger.info('auth', 'Email registration succeeded');
+        ApiLogger.apiPrint('Register with email succeeded');
+      }
+    } catch (e) {
+      _hasError = true;
+      _errorMessage = 'registerWithEmail Network error: $e';
+      _logger.error('auth', _errorMessage);
+      ApiLogger.apiPrint(_errorMessage);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void retry() {
+    initialize();
+  }
+
+  Future<void> saveLanguageCode(String languageCode) async {
+    _userModel.update(language_code: languageCode);
+    await _authLocalStore.saveLanguageCode(languageCode);
+    _logger.info('auth', 'Language selected: $languageCode');
+
+    if (_userModel.token == null && _telegramAuthBridge.isSupported) {
+      _isLoading = true;
+      notifyListeners();
+      await _initializeTelegram();
+      _isLoading = false;
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> _applyAuthenticatedUser(
+    Map<String, dynamic> userData,
+    String token, {
+    required String? fallbackEmail,
+  }) async {
+    if (userData['base_font_size'] != null) {
+      _userModel.update(base_font_size: userData['base_font_size'].toDouble());
+    }
+
+    final resolvedEmail = userData['email'] ?? fallbackEmail;
+    _userModel.update(
+      apiId: userData['id'],
+      telegram_id: userData['telegram_id'],
+      name: userData['name'],
+      email: resolvedEmail,
+      tg_username: userData['tg_username'],
+      tg_first_name: userData['tg_first_name'],
+      tg_last_name: userData['tg_last_name'],
+      tg_language_code: userData['tg_language_code'],
+      language_code: userData['language_code'] ?? _userModel.language_code,
+      token: token,
+      authDate: userData['auth_date'],
+      user_lvl: userData['user_lvl'],
+    );
+
+    if (resolvedEmail != null && resolvedEmail.isNotEmpty) {
+      await _authLocalStore.saveLastEmail(resolvedEmail);
+    } else {
+      await _authLocalStore.clearLastEmail();
+    }
   }
 }

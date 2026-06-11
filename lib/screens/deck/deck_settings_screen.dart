@@ -26,7 +26,6 @@ class DeckSettingsScreen extends StatelessWidget {
     final userControl = context.watch<ProviderUserControl>();
     final userModel = userControl.userModel;
     final baseFontSize = userModel.base_font_size;
-    final token = userModel.token;
     var txt = DeckSettingsScreenTranslate (userModel.language_code ?? 'en');
 
 
@@ -66,7 +65,7 @@ class DeckSettingsScreen extends StatelessWidget {
                         children: <Widget>[
                           TextButton(
                             onPressed: () {
-                              context.read<DeckProvider>().deleteDeck(deck.id, token!);
+                              context.read<DeckProvider>().deleteDeck(deck.id);
                               Navigator.of(context).pushAndRemoveUntil(
                                 MaterialPageRoute(builder: (context) => DeckIndexScreen()),
                                 (Route<dynamic> route) => false,
@@ -128,7 +127,6 @@ class DeckSettingsScreen extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) => DeckManagementScreen(
-                          token: token!,
                           deck: deck,
                         ),
                       ),
@@ -164,7 +162,6 @@ class DeckSettingsScreen extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (context) => CsvManagementScreen(
-                                token: token!,
                                 deck: deck,
                               )),
                     );
@@ -188,7 +185,6 @@ class DeckSettingsScreen extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (context) => CsvManagementScreen(
-                                token: token!,
                                 deck: deck,
                                 csvData: csvString,
                               )),

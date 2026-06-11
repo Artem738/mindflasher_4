@@ -25,7 +25,6 @@ class ImportTableScreen extends StatelessWidget {
     final userControl = context.watch<ProviderUserControl>();
     final userModel = userControl.userModel;
     final baseFontSize = userModel.base_font_size;
-    final token = userModel.token;
     var txt = DeckSettingsScreenTranslate(userModel.language_code ?? 'en');
 
     return Scaffold(
@@ -57,7 +56,7 @@ class ImportTableScreen extends StatelessWidget {
                 Center(
                   child: ElevatedButton(
                     onPressed: () async {
-                      bool success = await context.read<FlashcardProvider>().importTable(deck.id, token!, 3, 4);
+                      bool success = await context.read<FlashcardProvider>().importTable(deck.id, 3, 4);
 
                       // Показываем соответствующий SnackBar в зависимости от результата
                       ScaffoldMessenger.of(context).showSnackBar(

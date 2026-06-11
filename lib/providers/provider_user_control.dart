@@ -17,6 +17,8 @@ class ProviderUserControl with ChangeNotifier {
     notifyListeners();
   }
 
+  String _token() => _userModel.requireToken();
+
   void increaseFontSize() {
     if (_userModel.base_font_size < 30) {
       _userModel.base_font_size = ((_userModel.base_font_size + 1) * 10).round() / 10;
@@ -47,17 +49,13 @@ class ProviderUserControl with ChangeNotifier {
 
 
 
-  Future<void> updateUserBaseFontSize(String token, double baseFontSize) async {
-    if (token == null) {
-      throw Exception('User not authenticated');
-    }
-
+  Future<void> updateUserBaseFontSize(double baseFontSize) async {
     final url = Uri.parse('${EnvConfig.mainApiUrl}/api/user/base-font-size');
     final response = await http.put(
       url, // Используем метод PUT, как указано в API маршрутах
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer ${_token()}',
       },
       body: json.encode({'base_font_size': baseFontSize}),
     );
@@ -71,17 +69,13 @@ class ProviderUserControl with ChangeNotifier {
     }
   }
 
-  Future<void> updateUserLanguageCode(String token, String languageCode) async {
-    if (token == null) {
-      throw Exception('User not authenticated');
-    }
-
+  Future<void> updateUserLanguageCode(String languageCode) async {
     final url = Uri.parse('${EnvConfig.mainApiUrl}/api/user/language');
     final response = await http.patch(
       url,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer ${_token()}',
       },
       body: json.encode({'language_code': languageCode}),
     );

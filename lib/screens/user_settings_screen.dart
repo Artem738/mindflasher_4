@@ -16,185 +16,185 @@ class UserSettingsScreen extends StatelessWidget {
     final userControl = context.watch<ProviderUserControl>();
     final userModel = userControl.userModel;
     final baseFontSize = userModel.base_font_size;
+    final colorScheme = Theme.of(context).colorScheme;
 
     var txt = UserSettingsScreenTranslate(userModel.language_code ?? 'en');
 
     return Scaffold(
       appBar: AppBar(
         title: Text(txt.tt('user_settings_title')),
-        leading: ModalRoute.of(context)?.canPop == true
-            ? null // Если есть роут возврата, оставляем стандартный AppBar
-            : IconButton(
-                // Если роута возврата нет, добавляем свою кнопку
-                icon: Icon(Icons.arrow_back),
-                onPressed: () {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder: (context) => DeckIndexScreen(),
-                    ),
-                  );
-                },
-              ),
       ),
       body: SingleChildScrollView(
-        child: Center(
-          child: Container(
-            padding: const EdgeInsets.all(25),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  ' ${txt.tt('welcome')} ${userModel.tg_first_name ?? userModel.name ?? ''}',
-                  style: TextStyle(fontWeight: FontWeight.normal, fontSize: (baseFontSize + 5).clamp(10.0 + 5, 22.0 + 5)),
-                ),
-                const SizedBox(height: 15),
-                Text(
-                  '${txt.tt('api_id')}: ${userModel.apiId ?? ''}',
-                  style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
-                ),
-                Text(
-                  '${txt.tt('telegram_id')}: ${userModel.telegram_id ?? ''}',
-                  style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
-                ),
-                Text(
-                  '${txt.tt('name')}: ${userModel.name ?? ''}',
-                  style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
-                ),
-                Text(
-                  '${txt.tt('username')}: ${userModel.tg_username ?? ''}',
-                  style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
-                ),
-                Text(
-                  '${txt.tt('email')}: ${userModel.email ?? ''}',
-                  style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
-                ),
-                Text(
-                  '${txt.tt('last_name')}: ${userModel.tg_last_name ?? ''}',
-                  style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
-                ),
-                Text(
-                  '${txt.tt('telegram_language')}: ${userModel.tg_language_code ?? ''}',
-                  style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
-                ),
-                Text(
-                  '${txt.tt('language')}: ${userModel.language_code ?? ''}',
-                  style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
-                ),
-                Text(
-                  '${txt.tt('user_level')}: ${userModel.user_lvl ?? ''}',
-                  style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
-                ),
-                Text(
-                  '${txt.tt('font_size')}: ${userModel.base_font_size ?? ''}',
-                  style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
-                ),
-                Text(
-                  '${txt.tt('isFirstEnter')}: ${userModel.isFirstEnter.toString()}',
-                  style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => FontSizeAdjustmentScreen(),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      CircleAvatar(
+                        radius: 40,
+                        backgroundColor: colorScheme.primaryContainer,
+                        child: Text(
+                          (userModel.tg_first_name ?? userModel.name ?? '?')[0]
+                              .toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onPrimaryContainer,
+                          ),
+                        ),
                       ),
-                      (Route<dynamic> route) => false,
-                    );
-                  },
-                  child: Text(
-                    txt.tt('adjust_font_size_button'),
-                    style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
+                      const SizedBox(height: 16),
+                      Text(
+                        '${txt.tt('welcome')} ${userModel.tg_first_name ?? userModel.name ?? ''}',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontSize: (baseFontSize + 4).clamp(18.0, 26.0),
+                            ),
+                      ),
+                      Text(
+                        userModel.email ?? '',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                              fontSize: baseFontSize.clamp(14.0, 20.0),
+                            ),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => LanguageSelectionScreen()),
-                    );
-                  },
-                  child: Text(
-                    txt.tt('change_lang_button'),
-                    style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
-                  ),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => FirstEnterScreen()),
-                    );
-                  },
-                  child: Text(
-                    txt.tt('information'),
-                    style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
-                  ),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => TapCodeScreen()),
-                    );
-                  },
-                  child: Text(txt.tt('tap_code_screen_button'), style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0))),
-                ),
-                if (userModel.isAdminForDiagnostics) ...[
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
+              ),
+              const SizedBox(height: 24),
+              _buildSectionTitle(context, 'Account Info', baseFontSize),
+              Card(
+                child: Column(
+                  children: [
+                    _buildInfoTile(context, txt.tt('api_id'), (userModel.apiId ?? '').toString(),
+                        Icons.vpn_key_outlined, baseFontSize),
+                    _buildInfoTile(
                         context,
-                        MaterialPageRoute(builder: (context) => const AdminLogScreen()),
-                      );
-                    },
-                    child: Text(
-                      'Admin logs',
-                      style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
+                        txt.tt('telegram_id'),
+                        (userModel.telegram_id ?? '').toString(),
+                        Icons.alternate_email,
+                        baseFontSize),
+                    _buildInfoTile(context, txt.tt('user_level'),
+                        (userModel.user_lvl ?? '').toString(), Icons.trending_up, baseFontSize),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              _buildSectionTitle(context, 'Settings', baseFontSize),
+              Card(
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.format_size),
+                      title: Text(txt.tt('adjust_font_size_button'),
+                          style: TextStyle(
+                              fontSize: baseFontSize.clamp(14.0, 20.0))),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FontSizeAdjustmentScreen(),
+                          ),
+                        );
+                      },
                     ),
-                  ),
-                ],
-                SizedBox(height: 30),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DeckIndexScreen(),
-                      ),
-                          (Route<dynamic> route) => false,
-                    );
-                    // Navigator.pushReplacement(
-                    //   context,
-                    //   MaterialPageRoute(builder: (context) => DeckIndexScreen()),
-                    // );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.lightGreen, // Задаем зелёный цвет фона кнопки
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Добавляем отступы
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8), // Скругляем углы кнопки
+                    const Divider(height: 1),
+                    ListTile(
+                      leading: const Icon(Icons.language),
+                      title: Text(txt.tt('change_lang_button'),
+                          style: TextStyle(
+                              fontSize: baseFontSize.clamp(14.0, 20.0))),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => LanguageSelectionScreen()),
+                        );
+                      },
                     ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      txt.tt('to_main'),
-                      style: TextStyle(
-                        fontSize: (baseFontSize + 3).clamp(12.0+3, 22.0+3),
-                        color: Colors.black87
-                      ),
+                    const Divider(height: 1),
+                    ListTile(
+                      leading: const Icon(Icons.info_outline),
+                      title: Text(txt.tt('information'),
+                          style: TextStyle(
+                              fontSize: baseFontSize.clamp(14.0, 20.0))),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => FirstEnterScreen()),
+                        );
+                      },
                     ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
+              FilledButton.icon(
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const DeckIndexScreen(),
+                    ),
+                    (Route<dynamic> route) => false,
+                  );
+                },
+                icon: const Icon(Icons.home_outlined),
+                label: Text(
+                  txt.tt('to_main'),
+                  style: TextStyle(
+                    fontSize: (baseFontSize + 2).clamp(16.0, 22.0),
                   ),
                 ),
-              ],
-            ),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(
+      BuildContext context, String title, double baseFontSize) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
+      child: Text(
+        title.toUpperCase(),
+        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+              fontSize: (baseFontSize - 2).clamp(12.0, 16.0),
+            ),
+      ),
+    );
+  }
+
+  Widget _buildInfoTile(BuildContext context, String label, String value,
+      IconData icon, double baseFontSize) {
+    return ListTile(
+      leading: Icon(icon, size: 20),
+      title: Text(label,
+          style: TextStyle(fontSize: (baseFontSize - 1).clamp(13.0, 18.0))),
+      trailing: Text(
+        value,
+        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w500,
+              fontSize: baseFontSize.clamp(14.0, 19.0),
+            ),
       ),
     );
   }

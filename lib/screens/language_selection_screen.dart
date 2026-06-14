@@ -30,32 +30,48 @@ class LanguageSelectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Select Language'),
+        title: const Text('Select Language'),
       ),
-      body: SizedBox(
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: Language.values.map((language) {
-            return ListTile(
-              leading: Container(
-                margin: EdgeInsets.only(left: 30),
-                width: 60, // Установленная ширина для флага
-                alignment: Alignment.center, // Центрирование флага по горизонтали и вертикали
-                child: Text(
-                  language.flag,
-                  style: TextStyle(fontSize: 22), // Уменьшение размера флага
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: Language.values.map((language) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: Card(
+                  clipBehavior: Clip.antiAlias,
+                  child: InkWell(
+                    onTap: () => _setLanguage(context, language),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 20.0, horizontal: 24.0),
+                      child: Row(
+                        children: [
+                          Text(
+                            language.flag,
+                            style: const TextStyle(fontSize: 32),
+                          ),
+                          const SizedBox(width: 24),
+                          Expanded(
+                            child: Text(
+                              language.name,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          const Icon(Icons.arrow_forward_ios, size: 16),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              title: Text(
-                language.name,
-                style: TextStyle(fontSize: 30), // Увеличение размера текста
-              ),
-              onTap: () {
-                _setLanguage(context, language);
-              },
-            );
-          }).toList(),
+              );
+            }).toList(),
+          ),
         ),
       ),
     );

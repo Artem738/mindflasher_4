@@ -27,13 +27,13 @@ class LeftSwipeCard extends StatelessWidget {
       child: FractionallySizedBox(
         widthFactor: stopThreshold,
         child: Card(
-          surfaceTintColor: Colors.blueAccent.withOpacity(0.05),
-          child: Container(
-            padding: const EdgeInsets.all(8.0),
+          color: Theme.of(context).colorScheme.surfaceVariant,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton(
+                IconButton.filled(
                   onPressed: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
@@ -43,21 +43,30 @@ class LeftSwipeCard extends StatelessWidget {
                         ),
                       ),
                     );
-                    // Provider.of<FlashcardProvider>(context, listen: false).updateCardWeight(token!, flashcard.id, WeightDelaysEnum.noDelay);
-                    // Provider.of<FlashcardProvider>(context, listen: false).updateCardWeight(token!, flashcard.id, WeightDelaysEnum.noDelay);
                   },
-                  style: ElevatedButton.styleFrom(
+                  icon: const Icon(Icons.edit_outlined),
+                  style: IconButton.styleFrom(
                     backgroundColor: Colors.blue,
-                    padding: EdgeInsets.zero,
-                  ),
-                  child: Center(
-                    child: Icon(Icons.edit_note, color: Colors.white),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
                 Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text("ID: ${flashcard.id} "),
-                    Text("Weight: ${flashcard.weight} "),
+                    Text(
+                      "ID: ${flashcard.id}",
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                    Text(
+                      "W: ${flashcard.weight}",
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
                   ],
                 ),
               ],

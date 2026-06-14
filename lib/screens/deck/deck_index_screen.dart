@@ -77,100 +77,114 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
         future: _fetchDecksFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error loading decks.'));
+            return const Center(child: Text('Error loading decks.'));
           } else {
-            return deckProvider.decks.isEmpty
-                ? Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(25.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const SizedBox(height: 170),
-                          Text(
-                            txt.tt('no_decks'),
-                            style: TextStyle(fontSize: (baseFontSize + 5).clamp(15.0 + 5, 20.0 + 5)),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            txt.tt('add_deck_prompt'),
-                            style: TextStyle(
-                              fontSize: (baseFontSize).clamp(15.0, 20.0),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 50),
-                          Text(
-                            txt.tt('description'),
-                            style: TextStyle(
-                              fontSize: (baseFontSize - 1).clamp(15.0, 20.0),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
+            if (deckProvider.decks.isEmpty) {
+              return Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(32.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.collections_bookmark_outlined,
+                        size: 80,
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
                       ),
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: deckProvider.decks.length,
-                    itemBuilder: (ctx, i) {
-                      return DeckCard(
-                        deck: deckProvider.decks[i],
-                        baseFontSize: context.watch<ProviderUserControl>().userModel.base_font_size,
-                      );
-                    },
-                  );
+                      const SizedBox(height: 24),
+                      Text(
+                        txt.tt('no_decks'),
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              fontSize: (baseFontSize + 5).clamp(20.0, 25.0),
+                            ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        txt.tt('add_deck_prompt'),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              fontSize: (baseFontSize).clamp(16.0, 20.0),
+                            ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 32),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          txt.tt('description'),
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                fontStyle: FontStyle.italic,
+                                fontSize: (baseFontSize - 1).clamp(14.0, 18.0),
+                              ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+            return ListView.builder(
+              padding: const EdgeInsets.only(top: 8, bottom: 80),
+              itemCount: deckProvider.decks.length,
+              itemBuilder: (ctx, i) {
+                return DeckCard(
+                  deck: deckProvider.decks[i],
+                  baseFontSize: context.watch<ProviderUserControl>().userModel.base_font_size,
+                );
+              },
+            );
           }
         },
       ),
-      floatingActionButton: Stack(
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              //mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                FloatingActionButton.extended(
-                  heroTag: 'add_own_deck',
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => DeckManagementScreen(),
-                      ),
-                    );
-                  },
-                  label: Text(
-                    txt.tt('add_own_deck'),
-                    style: TextStyle(
-                      fontSize: (baseFontSize).clamp(10.0, 25.0),
-                    ),
-                  ),
-                  icon: const Icon(Icons.add_to_photos_outlined),
+          FloatingActionButton.extended(
+            heroTag: 'add_template_deck',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const TemplateDeckIndexScreen(),
                 ),
-                SizedBox(height: 10),
-                FloatingActionButton.extended(
-                  heroTag: 'add_template_deck',
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => TemplateDeckIndexScreen(),
-                      ),
-                    );
-                  },
-                  label: Text(
-                    txt.tt('add_template_deck'),
-                    style: TextStyle(
-                      fontSize: (baseFontSize).clamp(10.0, 25.0),
-                    ),
-                  ),
-                  icon: const Icon(Icons.add),
-                ),
-              ],
+              );
+            },
+            label: Text(
+              txt.tt('add_template_deck'),
+              style: TextStyle(
+                fontSize: (baseFontSize).clamp(12.0, 18.0),
+              ),
             ),
+            icon: const Icon(Icons.auto_awesome),
+            backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+            foregroundColor: Theme.of(context).colorScheme.onSecondaryContainer,
+          ),
+          const SizedBox(height: 12),
+          FloatingActionButton.extended(
+            heroTag: 'add_own_deck',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const DeckManagementScreen(),
+                ),
+              );
+            },
+            label: Text(
+              txt.tt('add_own_deck'),
+              style: TextStyle(
+                fontSize: (baseFontSize).clamp(12.0, 18.0),
+              ),
+            ),
+            icon: const Icon(Icons.add),
           ),
         ],
       ),

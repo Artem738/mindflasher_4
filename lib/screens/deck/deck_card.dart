@@ -17,26 +17,58 @@ class DeckCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4, // Добавляет тень для визуального выделения
-      margin: EdgeInsets.symmetric(vertical: 4, horizontal: 16), // Отступы
-      child: ListTile(
-        title: Text(
-          deck.name,
-          style: TextStyle(fontSize: baseFontSize + 2),
-        ),
-        subtitle: Text(
-          deck.description,
-          style: TextStyle(fontSize: baseFontSize),
-        ),
-        onTap: () {
-          if (isClickOnCardWork) {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => FlashcardIndexScreen(deck: deck),
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: isClickOnCardWork
+            ? () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => FlashcardIndexScreen(deck: deck),
+                  ),
+                );
+              }
+            : null,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              CircleAvatar(
+                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                child: Icon(
+                  Icons.folder_open_outlined,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                ),
               ),
-            );
-          }
-        },
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      deck.name,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: baseFontSize + 2,
+                          ),
+                    ),
+                    if (deck.description.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        deck.description,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              fontSize: baseFontSize,
+                            ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right),
+            ],
+          ),
+        ),
       ),
     );
   }

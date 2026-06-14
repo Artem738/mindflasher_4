@@ -21,96 +21,82 @@ class RightAnswerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final baseFontSize = context.read<ProviderUserControl>().userModel.base_font_size;
+    final baseFontSize =
+        context.read<ProviderUserControl>().userModel.base_font_size;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Align(
       alignment: Alignment.centerRight,
       child: FractionallySizedBox(
         widthFactor: stopThreshold,
         child: Card(
-          surfaceTintColor: Colors.orangeAccent.withOpacity(0.05),
+          color: colorScheme.secondaryContainer.withOpacity(0.9),
           child: Stack(
             children: [
-              // Основное содержимое карточки
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Левая колонка с кнопкой
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(
-                          width: 45,
-                          height: 45,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Provider.of<FlashcardProvider>(context, listen: false)
-                                  .updateCardWeight(deck, flashcard.id, WeightDelaysEnum.badSmallDelay);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.redAccent,
-                              padding: EdgeInsets.zero,
-                            ),
-                            child: Center(
-                              child: Icon(Icons.timer_outlined, color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    // Текст
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0), // Уменьшение отступа
-                          child: Text(
-                            flashcard.answer.replaceAll('\\n', '\n'),
-                            style: TextStyle(color: Colors.black, fontSize: baseFontSize),
-                            textAlign: TextAlign.right,
-                          ),
+                    IconButton.filled(
+                      onPressed: () {
+                        Provider.of<FlashcardProvider>(context, listen: false)
+                            .updateCardWeight(deck, flashcard.id,
+                                WeightDelaysEnum.badSmallDelay);
+                      },
+                      icon: const Icon(Icons.history),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.redAccent,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                     ),
-                    // Правая колонка с кнопкой
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(
-                          width: 40,
-                          height: 40,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Provider.of<FlashcardProvider>(context, listen: false)
-                                  .updateCardWeight(deck, flashcard.id, WeightDelaysEnum.normMedDelay);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.yellow,
-                              padding: EdgeInsets.zero,
-                            ),
-                            child: Center(
-                              child: Icon(Icons.access_time_outlined),
-                            ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                        child: Text(
+                          flashcard.answer.replaceAll('\\n', '\n'),
+                          style: TextStyle(
+                            color: colorScheme.onSecondaryContainer,
+                            fontSize: baseFontSize,
+                            fontWeight: FontWeight.w500,
                           ),
+                          textAlign: TextAlign.right,
                         ),
-                        SizedBox(height: 8.0),
-                      ],
+                      ),
+                    ),
+                    IconButton.filled(
+                      onPressed: () {
+                        Provider.of<FlashcardProvider>(context, listen: false)
+                            .updateCardWeight(deck, flashcard.id,
+                                WeightDelaysEnum.normMedDelay);
+                      },
+                      icon: const Icon(Icons.schedule),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.amber,
+                        foregroundColor: Colors.black87,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
-              // Невидимая зона для обработки нажатий
               Positioned.fill(
-                left: 55, // Смещение области обработки нажатий вправо, чтобы не перекрывать текст
+                left: 64,
+                right: 64,
                 child: GestureDetector(
                   onTap: () {
                     Provider.of<FlashcardProvider>(context, listen: false)
-                    .updateCardWeight(deck, flashcard.id, WeightDelaysEnum.normMedDelay);
+                        .updateCardWeight(
+                            deck, flashcard.id, WeightDelaysEnum.normMedDelay);
                   },
                   child: Container(
-                    color: Colors.transparent, // Невидимая область
+                    color: Colors.transparent,
                   ),
                 ),
               ),

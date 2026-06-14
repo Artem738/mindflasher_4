@@ -26,6 +26,8 @@ enum Language {
 }
 
 class LanguageSelectionScreen extends StatelessWidget {
+  const LanguageSelectionScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,7 +90,7 @@ class LanguageSelectionScreen extends StatelessWidget {
     }
 
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => IndexScreen()),
+      MaterialPageRoute(builder: (context) => const IndexScreen()),
       (Route<dynamic> route) => false,
     );
   }

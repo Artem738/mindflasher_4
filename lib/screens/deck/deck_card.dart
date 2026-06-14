@@ -8,11 +8,11 @@ class DeckCard extends StatelessWidget {
   final bool isClickOnCardWork;
 
   const DeckCard({
-    Key? key,
+    super.key,
     required this.deck,
     required this.baseFontSize,
     this.isClickOnCardWork = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

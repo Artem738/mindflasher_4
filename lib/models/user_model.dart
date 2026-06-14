@@ -16,6 +16,7 @@ class UserModel extends ChangeNotifier {
   int? user_lvl;
   bool? isFirstEnter;
   double base_font_size = 16.00;
+  ThemeMode themeMode = ThemeMode.system;
 
   UserModel({
     this.apiId,
@@ -32,6 +33,7 @@ class UserModel extends ChangeNotifier {
     this.hash,
     this.user_lvl,
     this.isFirstEnter,
+    this.themeMode = ThemeMode.system,
   });
 
   void update({
@@ -50,6 +52,7 @@ class UserModel extends ChangeNotifier {
     int? user_lvl,
     bool? isFirstEnter,
     double? base_font_size ,
+    ThemeMode? themeMode,
   }) {
     this.apiId = apiId ?? this.apiId;
     this.telegram_id = telegram_id ?? this.telegram_id;
@@ -66,6 +69,7 @@ class UserModel extends ChangeNotifier {
     this.user_lvl = user_lvl ?? this.user_lvl;
     this.isFirstEnter = isFirstEnter ?? this.isFirstEnter;
     this.base_font_size = base_font_size ?? this.base_font_size;
+    this.themeMode = themeMode ?? this.themeMode;
     notifyListeners();
   }
 

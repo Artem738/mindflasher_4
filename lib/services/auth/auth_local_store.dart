@@ -10,6 +10,7 @@ class AuthLocalState {
     this.lastEmail,
     this.languageCode,
     this.lastPassword = '',
+    this.themeMode,
   });
 
   final bool isPreferencesAvailable;
@@ -17,6 +18,7 @@ class AuthLocalState {
   final String? lastEmail;
   final String? languageCode;
   final String lastPassword;
+  final String? themeMode;
 }
 
 abstract class AuthLocalStore {
@@ -31,6 +33,8 @@ abstract class AuthLocalStore {
   Future<void> clearLastEmail();
 
   Future<void> saveLastPassword(String value);
+
+  Future<void> saveThemeMode(String value);
 }
 
 class DeviceAuthLocalStore implements AuthLocalStore {
@@ -42,10 +46,11 @@ class DeviceAuthLocalStore implements AuthLocalStore {
         _secureStorage = secureStorage,
         _useSecureStorage = useSecureStorage ?? !kIsWeb;
 
-  static final String firstEnterKey = 'firstEnter_${EnvConfig.StorageAndSharedPreferencesKey}';
-  static final String lastEmailKey = 'lastEmail_${EnvConfig.StorageAndSharedPreferencesKey}';
-  static final String languageCodeKey = 'language_${EnvConfig.StorageAndSharedPreferencesKey}';
-  static final String lastPasswordKey = 'lastPass_${EnvConfig.StorageAndSharedPreferencesKey}';
+  static const String firstEnterKey = 'firstEnter_${EnvConfig.StorageAndSharedPreferencesKey}';
+  static const String lastEmailKey = 'lastEmail_${EnvConfig.StorageAndSharedPreferencesKey}';
+  static const String languageCodeKey = 'language_${EnvConfig.StorageAndSharedPreferencesKey}';
+  static const String lastPasswordKey = 'lastPass_${EnvConfig.StorageAndSharedPreferencesKey}';
+  static const String themeModeKey = 'themeMode_${EnvConfig.StorageAndSharedPreferencesKey}';
 
   SharedPreferences? _sharedPreferences;
   FlutterSecureStorage? _secureStorage;
@@ -87,6 +92,7 @@ class DeviceAuthLocalStore implements AuthLocalStore {
         lastEmail: preferences.getString(lastEmailKey),
         languageCode: preferences.getString(languageCodeKey),
         lastPassword: lastPassword,
+        themeMode: preferences.getString(themeModeKey),
       );
     } catch (_) {
       final secureStorage = await _getSecureStorage();
@@ -116,6 +122,15 @@ class DeviceAuthLocalStore implements AuthLocalStore {
     try {
       final preferences = await _getSharedPreferences();
       await preferences.setString(languageCodeKey, value);
+    } catch (_) {
+    }
+  }
+
+  @override
+  Future<void> saveThemeMode(String value) async {
+    try {
+      final preferences = await _getSharedPreferences();
+      await preferences.setString(themeModeKey, value);
     } catch (_) {
     }
   }

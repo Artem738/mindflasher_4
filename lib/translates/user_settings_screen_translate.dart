@@ -97,6 +97,16 @@ class UserSettingsScreenTranslate {
       'ru': 'На главную',
       'uk': 'На головну',
     },
+    'dark_mode': {
+      'en': 'Dark Mode',
+      'ru': 'Темная тема',
+      'uk': 'Темна тема',
+    },
+    'system_theme': {
+      'en': 'System Theme',
+      'ru': 'Системная тема',
+      'uk': 'Системна тема',
+    },
 
 
 

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mindflasher_4/models/deck_model.dart';
 import 'package:mindflasher_4/models/flashcard_model.dart';
 import 'package:mindflasher_4/providers/flashcard_provider.dart';
-import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/tech_data/weight_delays_enum.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
@@ -16,10 +15,10 @@ class SwipeableCard extends StatefulWidget {
   final DeckModel deck;
 
   const SwipeableCard({
-    Key? key,
+    super.key,
     required this.flashcard,
    required this.deck,
-  }) : super(key: key);
+  });
 
   @override
   SwipeableCardState createState() => SwipeableCardState();

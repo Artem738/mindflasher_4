@@ -5,11 +5,12 @@ import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/screens/font_size_adjustment_screen.dart';
 import 'package:mindflasher_4/screens/language_selection_screen.dart';
 import 'package:mindflasher_4/screens/test_info_screen.dart';
-import 'package:mindflasher_4/translates/font_size_adjustment_screen.dart';
 import 'package:mindflasher_4/translates/special_screen_translate.dart';
 import 'package:provider/provider.dart';
 
 class TapCodeScreen extends StatefulWidget {
+  const TapCodeScreen({super.key});
+
   @override
   _TapCodeScreenState createState() => _TapCodeScreenState();
 }
@@ -25,9 +26,9 @@ class _TapCodeScreenState extends State<TapCodeScreen> {
 
   // Добавляем словарь с ключами и соответствующими страницами
   final Map<String, Widget> _sequences = {
-    EnvConfig.ptnHlo: TestInfoScreen(), // Это оригинальная страница
-    EnvConfig.code2: LanguageSelectionScreen(), // Добавьте свой экран
-    EnvConfig.code3: FontSizeAdjustmentScreen(), // Добавьте свой экран
+    EnvConfig.ptnHlo: const TestInfoScreen(), // Это оригинальная страница
+    EnvConfig.code2: const LanguageSelectionScreen(), // Добавьте свой экран
+    EnvConfig.code3: const FontSizeAdjustmentScreen(), // Добавьте свой экран
   };
 
   void _processInput(BuildContext context, String signal) {
@@ -124,29 +125,29 @@ class _TapCodeScreenState extends State<TapCodeScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
 
-                SizedBox(height: 35),
+                const SizedBox(height: 35),
                 Text(
                   txt.tt('tap_or_hold'),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
                   txt.tt('wait_5_seconds'),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
                     fontStyle: FontStyle.italic,
                     color: Colors.black38,
                   ),
                 ),
-                SizedBox(height: 25),
+                const SizedBox(height: 25),
                 Text(
                   _inputSequence,
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                  style: const TextStyle(fontSize: 18, color: Colors.grey),
                 ),
-                SizedBox(height: 100),
+                const SizedBox(height: 100),
 
               ],
             ),

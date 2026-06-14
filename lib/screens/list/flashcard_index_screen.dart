@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mindflasher_4/models/deck_model.dart';
 import 'package:mindflasher_4/models/flashcard_model.dart';
 import 'package:mindflasher_4/models/user_model.dart';
-import 'package:mindflasher_4/providers/deck_provider.dart';
 import 'package:mindflasher_4/providers/flashcard_provider.dart';
 import 'package:mindflasher_4/providers/provider_user_login.dart';
-import 'package:mindflasher_4/screens/deck/deck_index_screen.dart';
 import 'package:mindflasher_4/screens/deck/deck_settings_screen.dart';
 import 'package:mindflasher_4/screens/flashcard_management_screen.dart';
 import 'package:mindflasher_4/translates/flashcard_index_screen_translate.dart';
@@ -15,7 +13,7 @@ import 'swipeable_card.dart';
 class FlashcardIndexScreen extends StatefulWidget {
   final DeckModel deck;
 
-  FlashcardIndexScreen({super.key, required this.deck});
+  const FlashcardIndexScreen({super.key, required this.deck});
 
   @override
   _FlashcardIndexScreenState createState() => _FlashcardIndexScreenState();
@@ -67,7 +65,7 @@ class _FlashcardIndexScreenState extends State<FlashcardIndexScreen> {
         title: Text(widget.deck.name),
         actions: [
           IconButton(
-            icon: Icon(Icons.edit_note), // Первая кнопка
+            icon: const Icon(Icons.edit_note), // Первая кнопка
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -85,7 +83,7 @@ class _FlashcardIndexScreenState extends State<FlashcardIndexScreen> {
         future: _flashcardsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('An error occurred: ${snapshot.error}'));
           } else {

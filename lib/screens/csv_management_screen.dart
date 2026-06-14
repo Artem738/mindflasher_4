@@ -11,10 +11,10 @@ class CsvManagementScreen extends StatefulWidget {
   final String? csvData;
 
   const CsvManagementScreen({
-    Key? key,
+    super.key,
     required this.deck,
     this.csvData,
-  }) : super(key: key);
+  });
 
   @override
   _CsvManagementScreenState createState() => _CsvManagementScreenState();
@@ -50,14 +50,14 @@ class _CsvManagementScreenState extends State<CsvManagementScreen> {
           children: [
             Text(
               txt.tt('enter_csv_data'),
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _csvController,
               maxLines: 20,
               decoration: InputDecoration(
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
                 hintText: txt.tt('csv_placeholder'),
               ),
             ),
@@ -73,7 +73,7 @@ class _CsvManagementScreenState extends State<CsvManagementScreen> {
                   Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => DeckIndexScreen(),
+                      builder: (context) => const DeckIndexScreen(),
                     ),
                     (Route<dynamic> route) => false,
                   );

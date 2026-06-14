@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 class DeckManagementScreen extends StatefulWidget {
   final DeckModel? deck;
 
-  const DeckManagementScreen({Key? key, this.deck}) : super(key: key);
+  const DeckManagementScreen({super.key, this.deck});
 
   @override
   _DeckManagementScreenState createState() => _DeckManagementScreenState();
@@ -46,7 +46,7 @@ class _DeckManagementScreenState extends State<DeckManagementScreen> {
         title: Text(title),
       ),
       body: Padding(
-        padding: EdgeInsets.all(30.0),
+        padding: const EdgeInsets.all(30.0),
         child: Column(
           children: [
             TextField(
@@ -57,7 +57,7 @@ class _DeckManagementScreenState extends State<DeckManagementScreen> {
               controller: _descriptionController,
               decoration: InputDecoration(labelText: txt.tt('description_label')),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
                 final deckProvider = context.read<DeckProvider>();
@@ -73,7 +73,7 @@ class _DeckManagementScreenState extends State<DeckManagementScreen> {
                     Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => DeckIndexScreen(),
+                        builder: (context) => const DeckIndexScreen(),
                       ),
                       (Route<dynamic> route) => false,
                     );

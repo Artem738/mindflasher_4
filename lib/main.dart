@@ -57,16 +57,20 @@ void main() {
           },
         ),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
+    final themeMode = context.watch<UserModel>().themeMode;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      themeMode: themeMode,
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
@@ -145,12 +149,14 @@ class MyApp extends StatelessWidget {
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         ),
       ),
-      home: AppBootstrapScreen(),
+      home: const AppBootstrapScreen(),
     );
   }
 }
 
 class AppBootstrapScreen extends StatelessWidget {
+  const AppBootstrapScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final userModel = Provider.of<UserModel>(context);
@@ -170,13 +176,13 @@ class AppBootstrapScreen extends StatelessWidget {
           ),
         );
       case AppBootstrapRoute.languageSelection:
-        return LanguageSelectionScreen();
+        return const LanguageSelectionScreen();
       case AppBootstrapRoute.login:
-        return LoginScreen();
+        return const LoginScreen();
       case AppBootstrapRoute.firstEnterSetup:
-        return FontSizeAdjustmentScreen();
+        return const FontSizeAdjustmentScreen();
       case AppBootstrapRoute.decks:
-        return DeckIndexScreen();
+        return const DeckIndexScreen();
     }
   }
 }

@@ -13,10 +13,10 @@ class CentralTopCard extends StatelessWidget {
   final DeckModel deck;
 
   const CentralTopCard({
-    Key? key,
+    super.key,
     required this.flashcard,
     required this.deck,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -4,7 +4,6 @@ import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/providers/provider_user_login.dart';
 import 'package:mindflasher_4/screens/deck/deck_management_screen.dart';
 import 'package:mindflasher_4/screens/first_enter_screen.dart';
-import 'package:mindflasher_4/screens/list/flashcard_index_screen.dart';
 import 'package:mindflasher_4/screens/template_deck_index_screen.dart';
 import 'package:mindflasher_4/screens/user_settings_screen.dart';
 
@@ -15,7 +14,7 @@ import '../../translates/deck_index_screen_translate.dart';
 import 'deck_card.dart';
 
 class DeckIndexScreen extends StatefulWidget {
-  const DeckIndexScreen({Key? key}) : super(key: key);
+  const DeckIndexScreen({super.key});
 
   @override
   _DeckIndexScreenState createState() => _DeckIndexScreenState();
@@ -44,7 +43,7 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
         title: Text(txt.tt('title')),
         actions: [
           IconButton(
-            icon: Icon(Icons.info_outline),
+            icon: const Icon(Icons.info_outline),
             onPressed: () {
               // Navigator.pushReplacement(
               //   context,
@@ -52,7 +51,7 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
               // );
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => FirstEnterScreen(),
+                  builder: (context) => const FirstEnterScreen(),
                 ),
               );
               // Navigator.of(context).pushAndRemoveUntil(
@@ -62,11 +61,11 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.person_outline_outlined),
+            icon: const Icon(Icons.person_outline_outlined),
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => UserSettingsScreen(),
+                  builder: (context) => const UserSettingsScreen(),
                 ),
               );
             },
@@ -115,7 +114,7 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                          color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(

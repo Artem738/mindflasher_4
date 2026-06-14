@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:mindflasher_4/providers/template_deck_provider.dart';
 import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/providers/template_flashcard_provider.dart';
-import 'package:mindflasher_4/screens/deck/deck_management_screen.dart';
 import 'package:mindflasher_4/screens/template_flashcard_index_screen.dart';
 import 'package:mindflasher_4/translates/template_deck_index_screen_translate.dart';
 import 'package:provider/provider.dart';
 
 class TemplateDeckIndexScreen extends StatelessWidget {
-  const TemplateDeckIndexScreen({Key? key}) : super(key: key);
+  const TemplateDeckIndexScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +22,7 @@ class TemplateDeckIndexScreen extends StatelessWidget {
         future: context.read<TemplateDeckProvider>().fetchDecks(),
         builder: (ctx, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text("${txt.tt('error_occurred')}: ${snapshot.error}"));
           } else {
@@ -66,7 +65,11 @@ class TemplateDeckIndexScreen extends StatelessWidget {
                           );
                         }
                       },
-                      child: Center(
+                      style: ElevatedButton.styleFrom(
+                        shape: const CircleBorder(), // Делаем кнопку круглой
+                        padding: const EdgeInsets.all(8), // Настраиваем отступы для круглой формы
+                      ),
+                      child: const Center(
                         child: Text(
                           '+',
                           style: TextStyle(
@@ -74,10 +77,6 @@ class TemplateDeckIndexScreen extends StatelessWidget {
                             height: 0.1, // Настройка высоты строки для выравнивания по центру
                           ),
                         ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        shape: CircleBorder(), // Делаем кнопку круглой
-                        padding: EdgeInsets.all(8), // Настраиваем отступы для круглой формы
                       ),
                     ),
                   ),

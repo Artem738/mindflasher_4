@@ -9,6 +9,8 @@ import '../providers/provider_user_control.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class FontSizeAdjustmentScreen extends StatelessWidget {
+  const FontSizeAdjustmentScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final userControl = context.watch<ProviderUserControl>();
@@ -39,7 +41,7 @@ class FontSizeAdjustmentScreen extends StatelessWidget {
               style: TextStyle(fontSize: (userModel.base_font_size + 3).clamp(18.0, 28.0)),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Expanded(
               child: ListView.builder(
                 itemCount: decks.length,
@@ -48,7 +50,7 @@ class FontSizeAdjustmentScreen extends StatelessWidget {
                 },
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               ("${txt.tt('current_font_size')} ${context.watch<ProviderUserControl>().userModel.base_font_size}"),
               style: TextStyle(
@@ -59,7 +61,7 @@ class FontSizeAdjustmentScreen extends StatelessWidget {
               //style: TextStyle(fontSize: userModel.base_font_size + 5),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -67,7 +69,7 @@ class FontSizeAdjustmentScreen extends StatelessWidget {
                   onPressed: () {
                     userControl.decreaseFontSize();
                   },
-                  child: Text('—', style: TextStyle(fontSize: 30)),
+                  child: const Text('—', style: TextStyle(fontSize: 30)),
                 ),
                 ///TODO make stable var...
                 if (!kIsWeb) ...[
@@ -75,24 +77,24 @@ class FontSizeAdjustmentScreen extends StatelessWidget {
                     onPressed: () {
                       userControl.decreaseFontSizeByTenth(); // Уменьшение на 0.1
                     },
-                    child: Text('—0.1', style: TextStyle(fontSize: 20)),
+                    child: const Text('—0.1', style: TextStyle(fontSize: 20)),
                   ),
                   ElevatedButton(
                     onPressed: () {
                       userControl.increaseFontSizeByTenth(); // Увеличение на 0.1
                     },
-                    child: Text('+0.1', style: TextStyle(fontSize: 20)),
+                    child: const Text('+0.1', style: TextStyle(fontSize: 20)),
                   ),
                 ],
                 ElevatedButton(
                   onPressed: () {
                     userControl.increaseFontSize();
                   },
-                  child: Text('+', style: TextStyle(fontSize: 30)),
+                  child: const Text('+', style: TextStyle(fontSize: 30)),
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Распределяем кнопки равномерно по горизонтали
@@ -102,7 +104,7 @@ class FontSizeAdjustmentScreen extends StatelessWidget {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => UserSettingsScreen(),
+                          builder: (context) => const UserSettingsScreen(),
                         ),
                       );
                     },
@@ -122,7 +124,7 @@ class FontSizeAdjustmentScreen extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => UserSettingsScreen(),
+                            builder: (context) => const UserSettingsScreen(),
                           ),
                         ); // Возвращаемся на предыдущий экран с сохранением
                       },
@@ -139,7 +141,7 @@ class FontSizeAdjustmentScreen extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => FirstEnterScreen(),
+                            builder: (context) => const FirstEnterScreen(),
                           ),
                         ); // Переход на другой экран
                       },

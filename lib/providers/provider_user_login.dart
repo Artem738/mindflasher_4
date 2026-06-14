@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/env_config.dart';
 import 'package:mindflasher_4/models/user_model.dart';
@@ -9,8 +8,7 @@ import 'package:mindflasher_4/services/auth/telegram_auth_bridge.dart';
 import 'package:mindflasher_4/services/logging/app_logger.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb; // Импортирует переменную kIsWeb которая используется для определения Web
-import 'devise_special_load/telegram_web_app_stub.dart' // Импортируется заглушка для Классов
-    if (dart.library.html) 'devise_special_load/telegram_web_app_web.dart'; // Если библиотека dart.library.html доступна (приложение выполняется в веб-браузере),// то импортируется реальная реализация для веб-платформ
+// Если библиотека dart.library.html доступна (приложение выполняется в веб-браузере),// то импортируется реальная реализация для веб-платформ
 
 class ProviderUserLogin extends ChangeNotifier {
   final UserModel _userModel;
@@ -93,13 +91,28 @@ class ProviderUserLogin extends ChangeNotifier {
     _lastPass = localState.lastPassword;
     _logger.info(
       'auth',
-      'Local auth state loaded: prefs=${localState.isPreferencesAvailable}, language=${localState.languageCode ?? 'none'}, firstEnter=${localState.isFirstEnter}',
+      'Local auth state loaded: prefs=${localState.isPreferencesAvailable}, language=${localState.languageCode ?? 'none'}, theme=${localState.themeMode ?? 'none'}, firstEnter=${localState.isFirstEnter}',
     );
+
+    ThemeMode themeMode = ThemeMode.system;
+    if (localState.themeMode == 'light') themeMode = ThemeMode.light;
+    if (localState.themeMode == 'dark') themeMode = ThemeMode.dark;
+
     _userModel.update(
       email: localState.lastEmail,
       language_code: localState.languageCode,
       isFirstEnter: localState.isFirstEnter,
+      themeMode: themeMode,
     );
+  }
+
+  Future<void> saveThemeMode(ThemeMode themeMode) async {
+    _userModel.update(themeMode: themeMode);
+    String themeString = 'system';
+    if (themeMode == ThemeMode.light) themeString = 'light';
+    if (themeMode == ThemeMode.dark) themeString = 'dark';
+    await _authLocalStore.saveThemeMode(themeString);
+    notifyListeners();
   }
 
   Future<void> setIsFirstEnter(bool setVal) async {

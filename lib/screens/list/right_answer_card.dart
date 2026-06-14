@@ -13,11 +13,11 @@ class RightAnswerCard extends StatelessWidget {
   final double stopThreshold;
 
   const RightAnswerCard({
-    Key? key,
+    super.key,
     required this.deck,
     required this.flashcard,
     required this.stopThreshold,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

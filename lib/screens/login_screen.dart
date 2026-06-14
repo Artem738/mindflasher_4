@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/main.dart';
 import 'package:mindflasher_4/models/user_model.dart';
-import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/providers/provider_user_login.dart';
-import 'package:mindflasher_4/screens/deck/deck_index_screen.dart';
-import 'package:mindflasher_4/screens/template_deck_index_screen.dart';
-import 'package:mindflasher_4/screens/user_settings_screen.dart';
 import 'package:mindflasher_4/screens/registration_screen.dart'; // Импортируем экран регистрации
 import 'package:mindflasher_4/services/api_logger.dart';
 import 'package:mindflasher_4/translates/login_screen_translate.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -86,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ApiLogger.apiPrint('Login screen redirect after successful email auth');
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => IndexScreen()),
+                      MaterialPageRoute(builder: (context) => const IndexScreen()),
                     );
                   } else {
                     if (mounted) {

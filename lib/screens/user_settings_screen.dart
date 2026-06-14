@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:mindflasher_4/screens/admin_log_screen.dart';
 import 'package:mindflasher_4/screens/deck/deck_index_screen.dart';
 import 'package:mindflasher_4/screens/first_enter_screen.dart';
 import 'package:mindflasher_4/screens/font_size_adjustment_screen.dart';
 import 'package:mindflasher_4/screens/language_selection_screen.dart';
-import 'package:mindflasher_4/screens/tap_code_screen.dart'; // Добавлен новый экран
-import 'package:mindflasher_4/translates/font_size_adjustment_screen.dart';
+// Добавлен новый экран
 import 'package:mindflasher_4/translates/user_settings_screen_translate.dart';
 import 'package:provider/provider.dart';
+import '../models/user_model.dart';
 import '../providers/provider_user_control.dart';
+import '../providers/provider_user_login.dart';
 
 class UserSettingsScreen extends StatelessWidget {
+  const UserSettingsScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
-    final userControl = context.watch<ProviderUserControl>();
-    final userModel = userControl.userModel;
+    final userModel = context.watch<UserModel>();
     final baseFontSize = userModel.base_font_size;
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -89,6 +90,32 @@ class UserSettingsScreen extends StatelessWidget {
               Card(
                 child: Column(
                   children: [
+                    SwitchListTile(
+                      secondary: const Icon(Icons.brightness_6_outlined),
+                      title: Text(txt.tt('dark_mode'),
+                          style: TextStyle(
+                              fontSize: baseFontSize.clamp(14.0, 20.0))),
+                      value: userModel.themeMode == ThemeMode.dark,
+                      onChanged: userModel.themeMode == ThemeMode.system
+                          ? null
+                          : (bool value) {
+                              context.read<ProviderUserLogin>().saveThemeMode(
+                                  value ? ThemeMode.dark : ThemeMode.light);
+                            },
+                    ),
+                    const Divider(height: 1),
+                    SwitchListTile(
+                      secondary: const Icon(Icons.settings_brightness_outlined),
+                      title: Text(txt.tt('system_theme'),
+                          style: TextStyle(
+                              fontSize: baseFontSize.clamp(14.0, 20.0))),
+                      value: userModel.themeMode == ThemeMode.system,
+                      onChanged: (bool value) {
+                        context.read<ProviderUserLogin>().saveThemeMode(
+                            value ? ThemeMode.system : ThemeMode.light);
+                      },
+                    ),
+                    const Divider(height: 1),
                     ListTile(
                       leading: const Icon(Icons.format_size),
                       title: Text(txt.tt('adjust_font_size_button'),
@@ -99,7 +126,7 @@ class UserSettingsScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => FontSizeAdjustmentScreen(),
+                            builder: (context) => const FontSizeAdjustmentScreen(),
                           ),
                         );
                       },
@@ -115,7 +142,7 @@ class UserSettingsScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => LanguageSelectionScreen()),
+                              builder: (context) => const LanguageSelectionScreen()),
                         );
                       },
                     ),
@@ -130,7 +157,7 @@ class UserSettingsScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => FirstEnterScreen()),
+                              builder: (context) => const FirstEnterScreen()),
                         );
                       },
                     ),

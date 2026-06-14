@@ -1,24 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/models/deck_model.dart';
-import 'package:mindflasher_4/providers/deck_provider.dart';
 import 'package:mindflasher_4/providers/flashcard_provider.dart';
 import 'package:mindflasher_4/providers/provider_user_control.dart';
-import 'package:mindflasher_4/screens/csv_management_screen.dart';
-import 'package:mindflasher_4/screens/deck/deck_index_screen.dart';
-import 'package:mindflasher_4/screens/deck/deck_management_screen.dart';
-import 'package:mindflasher_4/screens/first_enter_screen.dart';
-import 'package:mindflasher_4/screens/font_size_adjustment_screen.dart';
-import 'package:mindflasher_4/screens/language_selection_screen.dart';
-import 'package:mindflasher_4/screens/tap_code_screen.dart'; // Добавлен новый экран
+// Добавлен новый экран
 import 'package:mindflasher_4/translates/deck_settings_screen_translate.dart';
-import 'package:mindflasher_4/translates/font_size_adjustment_screen.dart';
-import 'package:mindflasher_4/translates/user_settings_screen_translate.dart';
 import 'package:provider/provider.dart';
 
 class ImportTableScreen extends StatelessWidget {
   final DeckModel deck;
 
-  ImportTableScreen({required this.deck});
+  const ImportTableScreen({super.key, required this.deck});
 
   @override
   Widget build(BuildContext context) {
@@ -47,12 +38,12 @@ class ImportTableScreen extends StatelessWidget {
                   deck.description,
                   style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Text(
                   '${txt.tt('deck_id')}: ${deck.id}',
                   style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Center(
                   child: ElevatedButton(
                     onPressed: () async {
@@ -63,7 +54,7 @@ class ImportTableScreen extends StatelessWidget {
                         SnackBar(
                           content: Text(
                             success ? 'Импорт прошел успешно!' : 'Ошибка при импорте данных.',
-                            style: TextStyle(fontSize: 16),
+                            style: const TextStyle(fontSize: 16),
                           ),
                           backgroundColor: success ? Colors.green : Colors.red,
                         ),
@@ -76,7 +67,7 @@ class ImportTableScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
               ],
             ),
           ),

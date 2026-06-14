@@ -7,6 +7,8 @@ import 'package:mindflasher_4/translates/first_enterScreen_translate.dart';
 import 'package:provider/provider.dart';
 
 class FirstEnterScreen extends StatelessWidget {
+  const FirstEnterScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     var txt = FirstEnterScreenTranslate(context.read<UserModel>().language_code ?? 'en');
@@ -40,33 +42,33 @@ class FirstEnterScreen extends StatelessWidget {
                   "First enter ${userModel.isFirstEnter.toString()}",
                   style: TextStyle(fontSize: (baseFontSize + 5).clamp(15.0 + 5, 20.0 + 5)),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
               ],
               Text(
                 txt.tt('leitner_method'),
                 style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text(
                 txt.tt('deck_instruction'),
                 style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Row(
                 children: [
                   ElevatedButton(
                     onPressed: () => _showSnackBar(context, txt.tt('green_snackbar_message'), Colors.green, Icons.more_time_rounded),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green, // Задаем цвет фона кнопки
-                      padding: EdgeInsets.all(12), // Добавляем отступы для создания круглой формы
-                      shape: CircleBorder(), // Делаем кнопку круглой
-                      minimumSize: Size(48, 48), // Минимальный размер кнопки для сохранения круглой формы
+                      padding: const EdgeInsets.all(12), // Добавляем отступы для создания круглой формы
+                      shape: const CircleBorder(), // Делаем кнопку круглой
+                      minimumSize: const Size(48, 48), // Минимальный размер кнопки для сохранения круглой формы
                     ),
-                    child: Center(
+                    child: const Center(
                       child: Icon(Icons.more_time_rounded),
                     ),
                   ),
-                  SizedBox(width: 8), // Добавляем немного пространства между кнопкой и текстом
+                  const SizedBox(width: 8), // Добавляем немного пространства между кнопкой и текстом
                   Expanded(
                     child: Text(
                       txt.tt('green_icon_explanation'),
@@ -77,27 +79,27 @@ class FirstEnterScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text(
                 txt.tt('yellow_red_buttons'),
                 style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Row(
                 children: [
                   ElevatedButton(
                     onPressed: () => _showSnackBar(context, txt.tt('yellow_snackbar_message'), Colors.yellow, Icons.access_time_outlined),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.yellow, // Задаем цвет фона кнопки
-                      padding: EdgeInsets.all(12), // Добавляем отступы для создания круглой формы
-                      shape: CircleBorder(), // Делаем кнопку круглой
-                      minimumSize: Size(48, 48), // Минимальный размер кнопки для сохранения круглой формы
+                      padding: const EdgeInsets.all(12), // Добавляем отступы для создания круглой формы
+                      shape: const CircleBorder(), // Делаем кнопку круглой
+                      minimumSize: const Size(48, 48), // Минимальный размер кнопки для сохранения круглой формы
                     ),
-                    child: Center(
+                    child: const Center(
                       child: Icon(Icons.access_time_outlined),
                     ),
                   ),
-                  SizedBox(width: 8), // Добавляем немного пространства между кнопкой и текстом
+                  const SizedBox(width: 8), // Добавляем немного пространства между кнопкой и текстом
                   Expanded(
                     child: Text(
                       txt.tt('yellow_button_explanation'),
@@ -108,27 +110,27 @@ class FirstEnterScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text(
                 txt.tt('wait_explanation'),
                 style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Row(
                 children: [
                   ElevatedButton(
                     onPressed: () => _showSnackBar(context, txt.tt('red_snackbar_message'), Colors.redAccent, Icons.timer_outlined),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.redAccent, // Задаем цвет фона кнопки
-                      padding: EdgeInsets.all(12), // Добавляем отступы для создания круглой формы
-                      shape: CircleBorder(), // Делаем кнопку круглой
-                      minimumSize: Size(48, 48), // Минимальный размер кнопки для сохранения круглой формы
+                      padding: const EdgeInsets.all(12), // Добавляем отступы для создания круглой формы
+                      shape: const CircleBorder(), // Делаем кнопку круглой
+                      minimumSize: const Size(48, 48), // Минимальный размер кнопки для сохранения круглой формы
                     ),
-                    child: Center(
+                    child: const Center(
                       child: Icon(Icons.timer_outlined),
                     ),
                   ),
-                  SizedBox(width: 8), // Добавляем немного пространства между кнопкой и текстом
+                  const SizedBox(width: 8), // Добавляем немного пространства между кнопкой и текстом
                   Expanded(
                     child: Text(
                       txt.tt('red_button_explanation'),
@@ -139,12 +141,12 @@ class FirstEnterScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text(
                 txt.tt('evaluation_reminder'),
                 style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               if (userModel.isFirstEnter == true) ...[
                 Center(
                   child: ElevatedButton(
@@ -152,7 +154,7 @@ class FirstEnterScreen extends StatelessWidget {
                       context.read<ProviderUserLogin>().setIsFirstEnter(false);
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => IndexScreen()),
+                        MaterialPageRoute(builder: (context) => const IndexScreen()),
                       );
                     },
                     child: Text(
@@ -168,7 +170,7 @@ class FirstEnterScreen extends StatelessWidget {
                       context.read<ProviderUserLogin>().setIsFirstEnter(false);
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => UserSettingsScreen()),
+                        MaterialPageRoute(builder: (context) => const UserSettingsScreen()),
                       );
                     },
                     child: Text(
@@ -177,7 +179,7 @@ class FirstEnterScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
               ],
             ],
           ),
@@ -196,16 +198,16 @@ class FirstEnterScreen extends StatelessWidget {
               onPressed: () {},
               style: ElevatedButton.styleFrom(
                 backgroundColor: buttonColor,
-                padding: EdgeInsets.all(12),
-                shape: CircleBorder(),
-                minimumSize: Size(24, 24),
+                padding: const EdgeInsets.all(12),
+                shape: const CircleBorder(),
+                minimumSize: const Size(24, 24),
               ),
               child: Icon(
                 buttonIcon,
                 size: 16,
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Expanded(
               child: Text(
                 message,

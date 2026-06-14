@@ -6,20 +6,15 @@ import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/screens/csv_management_screen.dart';
 import 'package:mindflasher_4/screens/deck/deck_index_screen.dart';
 import 'package:mindflasher_4/screens/deck/deck_management_screen.dart';
-import 'package:mindflasher_4/screens/first_enter_screen.dart';
-import 'package:mindflasher_4/screens/font_size_adjustment_screen.dart';
 import 'package:mindflasher_4/screens/import_table_screen.dart';
-import 'package:mindflasher_4/screens/language_selection_screen.dart';
-import 'package:mindflasher_4/screens/tap_code_screen.dart'; // Добавлен новый экран
+// Добавлен новый экран
 import 'package:mindflasher_4/translates/deck_settings_screen_translate.dart';
-import 'package:mindflasher_4/translates/font_size_adjustment_screen.dart';
-import 'package:mindflasher_4/translates/user_settings_screen_translate.dart';
 import 'package:provider/provider.dart';
 
 class DeckSettingsScreen extends StatelessWidget {
   final DeckModel deck;
 
-  DeckSettingsScreen({required this.deck});
+  const DeckSettingsScreen({super.key, required this.deck});
 
   @override
   Widget build(BuildContext context) {
@@ -36,18 +31,18 @@ class DeckSettingsScreen extends StatelessWidget {
             ? null // Если есть роут возврата, оставляем стандартный AppBar
             : IconButton(
                 // Если роута возврата нет, добавляем свою кнопку
-                icon: Icon(Icons.arrow_back),
+                icon: const Icon(Icons.arrow_back),
                 onPressed: () {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      builder: (context) => DeckIndexScreen(),
+                      builder: (context) => const DeckIndexScreen(),
                     ),
                   );
                 },
               ),
         actions: [
           IconButton(
-            icon: Icon(Icons.delete_outline),
+            icon: const Icon(Icons.delete_outline),
             color: Colors.redAccent,
             onPressed: () {
               showDialog(
@@ -56,7 +51,7 @@ class DeckSettingsScreen extends StatelessWidget {
                   return AlertDialog(
                     content: Text(
                       txt.tt('delete_confirmation') ,
-                      style: TextStyle(fontSize: 22),
+                      style: const TextStyle(fontSize: 22),
                       textAlign: TextAlign.center,
                     ),
                     actions: <Widget>[
@@ -67,26 +62,26 @@ class DeckSettingsScreen extends StatelessWidget {
                             onPressed: () {
                               context.read<DeckProvider>().deleteDeck(deck.id);
                               Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(builder: (context) => DeckIndexScreen()),
+                                MaterialPageRoute(builder: (context) => const DeckIndexScreen()),
                                 (Route<dynamic> route) => false,
                               );
                             },
                             child: Text(
                               txt.tt('delete_button'),
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.red,
                               ),
                             ),
                           ),
-                          SizedBox(width: 20), // Пробел между кнопками
+                          const SizedBox(width: 20), // Пробел между кнопками
                           TextButton(
                             onPressed: () {
                               Navigator.of(context).pop(); // Закрываем диалог
                             },
                             child: Text(
                               txt.tt('cancel_button'),
-                              style: TextStyle(fontSize: 21),
+                              style: const TextStyle(fontSize: 21),
                             ),
                           ),
                         ],
@@ -115,12 +110,12 @@ class DeckSettingsScreen extends StatelessWidget {
                   deck.description,
                   style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Text(
                   '${txt.tt('deck_id')}: ${deck.id}',
                   style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -137,7 +132,7 @@ class DeckSettingsScreen extends StatelessWidget {
                     style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -155,7 +150,7 @@ class DeckSettingsScreen extends StatelessWidget {
                     style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -171,8 +166,8 @@ class DeckSettingsScreen extends StatelessWidget {
                     style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
                   ),
                 ),
-                SizedBox(height: 20),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     // Получаем CSV
@@ -195,14 +190,14 @@ class DeckSettingsScreen extends StatelessWidget {
                     style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
                   ),
                 ),
-                SizedBox(height: 20),
-                SizedBox(height: 30),
+                const SizedBox(height: 20),
+                const SizedBox(height: 30),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => DeckIndexScreen(),
+                        builder: (context) => const DeckIndexScreen(),
                       ),
                       (Route<dynamic> route) => false,
                     );
@@ -213,7 +208,7 @@ class DeckSettingsScreen extends StatelessWidget {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.lightGreen, // Задаем зелёный цвет фона кнопки
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Добавляем отступы
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Добавляем отступы
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8), // Скругляем углы кнопки
                     ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/providers/provider_user_login.dart';
 import 'package:mindflasher_4/screens/deck/deck_index_screen.dart';
-import 'package:mindflasher_4/screens/template_deck_index_screen.dart';
 import 'package:provider/provider.dart';
 
 class RegistrationScreen extends StatelessWidget {
@@ -9,6 +8,8 @@ class RegistrationScreen extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
+
+  RegistrationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

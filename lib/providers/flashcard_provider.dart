@@ -6,16 +6,13 @@ import 'package:mindflasher_4/models/deck_model.dart';
 
 import 'package:mindflasher_4/models/flashcard_model.dart';
 import 'package:mindflasher_4/models/user_model.dart';
-import 'package:mindflasher_4/providers/deck_provider.dart';
 import 'package:mindflasher_4/screens/list/central_top_card.dart';
 import 'package:mindflasher_4/screens/list/left_swipe_card.dart';
 import 'package:mindflasher_4/screens/list/right_answer_card.dart';
 import 'package:mindflasher_4/screens/util/table_parser.dart';
 import 'package:mindflasher_4/services/api_logger.dart';
 import 'package:mindflasher_4/services/app_http_client.dart';
-import 'package:mindflasher_4/tech_data/words_translations.dart';
 
-import 'package:provider/provider.dart';
 
 import '../tech_data/weight_delays_enum.dart'; // Импортируем Provider для получения токена
 
@@ -121,7 +118,7 @@ class FlashcardProvider with ChangeNotifier {
     questionColumn = questionColumn > 0 ? questionColumn - 1 : 2;
     answerColumn = answerColumn > 0 ? answerColumn - 1 : 3;
     //final String url = "https://table.example.url";
-    final url = "https://docs.google.com/spreadsheets/d/1qFEm9AQ6tq0a5W_ITX7yVcoUBhVrNiCe8k_x1xxufUs/pubhtml?gid=464824386&single=true";
+    const url = "https://docs.google.com/spreadsheets/d/1qFEm9AQ6tq0a5W_ITX7yVcoUBhVrNiCe8k_x1xxufUs/pubhtml?gid=464824386&single=true";
 
     final response = await _httpClient.get(Uri.parse(url));
 
@@ -150,11 +147,6 @@ class FlashcardProvider with ChangeNotifier {
     return false;
   }
 
-  /**
-      aasd;rtyyy
-      333;3333
-      555;777
-   */
 
   Future<bool> csvInsert(int deckId, String csvData) async {
     final url = Uri.parse('${EnvConfig.mainApiUrl}/api/flashcards/csv-insert');
@@ -224,7 +216,7 @@ class FlashcardProvider with ChangeNotifier {
     );
 
     if (response.statusCode != 200) {
-      final err = 'updateCardWeightOnServer: Failed to update weight on server';
+      const err = 'updateCardWeightOnServer: Failed to update weight on server';
       ApiLogger.apiPrint(err);
       throw AppHttpException(err, statusCode: response.statusCode);
     }
@@ -242,7 +234,7 @@ class FlashcardProvider with ChangeNotifier {
       if (index != -1) {
         listKey.currentState?.removeItem(
           index,
-          (context, animation) => SizedBox.shrink(), // Удаляем виджет с анимацией
+          (context, animation) => const SizedBox.shrink(), // Удаляем виджет с анимацией
         );
         _flashcards.removeAt(index);
         notifyListeners();

@@ -10,7 +10,7 @@ class FlashcardManagementScreen extends StatefulWidget {
   final DeckModel deck; //
   final FlashcardModel? flashcard; // Если передана карточка, значит, выполняется редактирование
 
-  const FlashcardManagementScreen({Key? key, required this.deck, this.flashcard}) : super(key: key);
+  const FlashcardManagementScreen({super.key, required this.deck, this.flashcard});
 
   @override
   _FlashcardManagementScreenState createState() => _FlashcardManagementScreenState();

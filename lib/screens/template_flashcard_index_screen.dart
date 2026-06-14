@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:mindflasher_4/models/template_deck_model.dart';
 import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/providers/template_flashcard_provider.dart';
-import 'package:mindflasher_4/screens/template_deck_index_screen.dart';
 import 'package:mindflasher_4/translates/template_flashcard_index_screen_translate.dart';
 import 'package:provider/provider.dart';
 
 class TemplateFlashcardIndexScreen extends StatelessWidget {
   final TemplateDeckModel deck;
 
-  const TemplateFlashcardIndexScreen({Key? key, required this.deck}) : super(key: key);
+  const TemplateFlashcardIndexScreen({super.key, required this.deck});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +26,7 @@ class TemplateFlashcardIndexScreen extends StatelessWidget {
         future: context.read<TemplateFlashcardProvider>().fetchFlashcards(deck.id),
         builder: (ctx, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(
               child: Text(
@@ -85,7 +84,7 @@ class TemplateFlashcardIndexScreen extends StatelessWidget {
           txt.tt('make_your_own'),
           style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 25.0)),
         ),
-        icon: Icon(Icons.download_outlined),
+        icon: const Icon(Icons.download_outlined),
       ),
     );
   }

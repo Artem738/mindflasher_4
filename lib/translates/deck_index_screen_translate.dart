@@ -6,16 +6,21 @@ class DeckIndexScreenTranslate {
       'uk': 'Колоди',
     },
     'no_decks': {
-      'en': 'No decks available.',
-      'ru': 'Нет доступных колод.',
-      'uk': 'Немає доступних колод.',
+      'en': 'Welcome to MindFlasher, {name}! 👋',
+      'ru': 'Рады видеть вас в MindFlasher, {name}! 👋',
+      'uk': 'Раді бачити вас у MindFlasher, {name}! 👋',
     },
     'add_deck_prompt': {
-      'en': 'Please add a new deck to get started.',
-      'ru': 'Пожалуйста, добавьте новую колоду, чтобы начать.',
-      'uk': 'Будь ласка, додайте нову колоду, щоб розпочати.',
+      'en': 'It\'s empty here because you haven\'t added any decks yet. MindFlasher helps you memorize any information (words, definitions, formulas) using smart spaced repetition.',
+      'ru': 'Пока здесь пусто, так как вы еще не добавили ни одной колоды. MindFlasher помогает запоминать любую информацию (слова, термины, формулы) с помощью умных интервальных тренировок.',
+      'uk': 'Поки що тут порожньо, оскільки ви ще не додали жодної колоди. MindFlasher допомагає запам\'ятовувати будь-яку інформацію (слова, терміни, формули) за допомогою розумних інтервальних тренувань.',
     },
 
+    'add_deck_title': {
+      'en': 'Add Deck',
+      'ru': 'Добавить колоду',
+      'uk': 'Додати колоду',
+    },
 // txt.tt('add_own_deck')  ${txt.tt('add_own_deck')}
     'add_own_deck': {
       'en': 'Add Own Deck',
@@ -32,12 +37,9 @@ class DeckIndexScreenTranslate {
 
     // txt.tt('description')  ${txt.tt('description')}
     'description': {
-      'en':
-          'Press the button below. Choose a deck from the list, tap on it to view and add it using the button below, or just press add to use a ready-made deck.',
-      'ru':
-          'Нажмите кнопку снизу. Выберите колоду из списка, нажмите на неё, чтобы посмотреть и добавить кнопкой снизу, или просто нажмите добавить, чтобы использовать готовую колоду.',
-      'uk':
-          'Натисніть кнопку знизу. Оберіть колоду зі списку, натисніть на неї, щоб переглянути та додати кнопкою знизу, або просто натисніть додати, щоб використати готову колоду.',
+      'en': 'To get started, tap the \'+\' button at the bottom of the screen:\n\n• Choose a ready-made template (like English vocabulary) to start learning immediately.\n• Or create a fresh deck and add your own flashcards.',
+      'ru': 'Чтобы начать, нажмите кнопку «+» внизу экрана:\n\n• Выберите готовый шаблон (например, английские слова), чтобы сразу начать обучение.\n• Или создайте чистую колоду и добавьте свои собственные карточки.',
+      'uk': 'Щоб почати, натисніть кнопку «+» внизу екрана:\n\n• Оберіть готовий шаблон (наприклад, англійські слова), щоб одразу розпочати навчання.\n• Або створіть власну порожню колоду та додайте свої картки.',
     },
   };
 

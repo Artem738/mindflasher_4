@@ -21,12 +21,18 @@ class DeckSettingsScreen extends StatelessWidget {
     final userControl = context.watch<ProviderUserControl>();
     final userModel = userControl.userModel;
     final baseFontSize = userModel.base_font_size;
+    final colorScheme = Theme.of(context).colorScheme;
     var txt = DeckSettingsScreenTranslate (userModel.language_code ?? 'en');
-
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(txt.tt('deck_settings_title')),
+        title: Text(
+          txt.tt('deck_settings_title'),
+          style: TextStyle(
+            fontSize: (baseFontSize + 2).clamp(16.0, 22.0),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         leading: ModalRoute.of(context)?.canPop == true
             ? null // Если есть роут возврата, оставляем стандартный AppBar
             : IconButton(
@@ -51,7 +57,7 @@ class DeckSettingsScreen extends StatelessWidget {
                   return AlertDialog(
                     content: Text(
                       txt.tt('delete_confirmation') ,
-                      style: const TextStyle(fontSize: 22),
+                      style: TextStyle(fontSize: (baseFontSize + 4).clamp(16.0, 24.0)),
                       textAlign: TextAlign.center,
                     ),
                     actions: <Widget>[
@@ -68,8 +74,8 @@ class DeckSettingsScreen extends StatelessWidget {
                             },
                             child: Text(
                               txt.tt('delete_button'),
-                              style: const TextStyle(
-                                fontSize: 16,
+                              style: TextStyle(
+                                fontSize: baseFontSize.clamp(14.0, 19.0),
                                 color: Colors.red,
                               ),
                             ),
@@ -81,7 +87,7 @@ class DeckSettingsScreen extends StatelessWidget {
                             },
                             child: Text(
                               txt.tt('cancel_button'),
-                              style: const TextStyle(fontSize: 21),
+                              style: TextStyle(fontSize: (baseFontSize + 3).clamp(15.0, 22.0)),
                             ),
                           ),
                         ],
@@ -94,134 +100,230 @@ class DeckSettingsScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Container(
-            padding: const EdgeInsets.all(25),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${txt.tt('deck')} - ${deck.name}',
-                  style: TextStyle(fontWeight: FontWeight.normal, fontSize: (baseFontSize + 5).clamp(10.0 + 5, 22.0 + 5)),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Карточка с информацией о колоде
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                const SizedBox(height: 15),
-                Text(
-                  deck.description,
-                  style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  '${txt.tt('deck_id')}: ${deck.id}',
-                  style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DeckManagementScreen(
-                          deck: deck,
-                        ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: colorScheme.primaryContainer.withOpacity(0.2),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.collections_bookmark,
+                              size: 32,
+                              color: colorScheme.primary,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  deck.name,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: (baseFontSize + 3).clamp(16.0, 24.0),
+                                  ),
+                                ),
+                                if (deck.description.isNotEmpty) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    deck.description,
+                                    style: TextStyle(
+                                      color: colorScheme.onSurfaceVariant,
+                                      fontSize: (baseFontSize - 1).clamp(12.0, 18.0),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                  child: Text(
-                    txt.tt('edit_deck'),
-                    style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ImportTableScreen(
-                          //token: token!,
-                          deck: deck,
-                        ),
+                      const SizedBox(height: 16),
+                      const Divider(height: 1),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            txt.tt('deck_id'),
+                            style: TextStyle(
+                              color: colorScheme.onSurfaceVariant,
+                              fontSize: baseFontSize.clamp(14.0, 19.0),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              '#${deck.id}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.primary,
+                                fontSize: baseFontSize.clamp(13.0, 18.0),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                  child: Text(
-                    txt.tt('import_table'),
-                    style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => CsvManagementScreen(
-                                deck: deck,
-                              )),
-                    );
-                  },
-                  child: Text(
-                    txt.tt('csv_insert'),
-                    style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
-                  ),
+              ),
+              const SizedBox(height: 24),
+              
+              // Карточка с кнопками управления
+              Card(
+                elevation: 1,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                const SizedBox(height: 20),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    // Получаем CSV
-                    final flashcards = context.read<FlashcardProvider>().flashcards;
-                    final csvLines = flashcards.map((card) => '${card.question};${card.answer}').toList();
-                    final csvString = csvLines.join('\n');
-                    //print(csvString);
+                child: Column(
+                  children: [
+                    // Редактировать колоду
+                    ListTile(
+                      leading: const Icon(Icons.edit_outlined),
+                      title: Text(
+                        txt.tt('edit_deck'),
+                        style: TextStyle(fontSize: baseFontSize.clamp(14.0, 20.0)),
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DeckManagementScreen(
+                              deck: deck,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const Divider(height: 1),
+                    
+                    // Импортировать таблицу
+                    ListTile(
+                      leading: const Icon(Icons.import_contacts_outlined),
+                      title: Text(
+                        txt.tt('import_table'),
+                        style: TextStyle(fontSize: baseFontSize.clamp(14.0, 20.0)),
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ImportTableScreen(
+                              deck: deck,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const Divider(height: 1),
+                    
+                    // Вставить CSV
+                    ListTile(
+                      leading: const Icon(Icons.upload_file_outlined),
+                      title: Text(
+                        txt.tt('csv_insert'),
+                        style: TextStyle(fontSize: baseFontSize.clamp(14.0, 20.0)),
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CsvManagementScreen(
+                              deck: deck,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const Divider(height: 1),
+                    
+                    // Получить CSV
+                    ListTile(
+                      leading: const Icon(Icons.download_for_offline_outlined),
+                      title: Text(
+                        txt.tt('csv_get_data'),
+                        style: TextStyle(fontSize: baseFontSize.clamp(14.0, 20.0)),
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        final flashcards = context.read<FlashcardProvider>().flashcards;
+                        final csvLines = flashcards.map((card) => '${card.question};${card.answer}').toList();
+                        final csvString = csvLines.join('\n');
 
-                    Navigator.push(
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CsvManagementScreen(
+                              deck: deck,
+                              csvData: csvString,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
+              
+              // Кнопка На главную
+              FilledButton.icon(
+                onPressed: () {
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                  } else {
+                    Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => CsvManagementScreen(
-                                deck: deck,
-                                csvData: csvString,
-                              )),
+                      MaterialPageRoute(builder: (context) => const DeckIndexScreen()),
                     );
-                  },
-                  child: Text(
-                    txt.tt('csv_get_data'),
-                    style: TextStyle(fontSize: (baseFontSize).clamp(10.0, 22.0)),
+                  }
+                },
+                icon: const Icon(Icons.home_outlined),
+                label: Text(
+                  txt.tt('to_main'),
+                  style: TextStyle(
+                    fontSize: (baseFontSize + 2).clamp(16.0, 22.0),
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 20),
-                const SizedBox(height: 30),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DeckIndexScreen(),
-                      ),
-                      (Route<dynamic> route) => false,
-                    );
-                    // Navigator.pushReplacement(
-                    //   context,
-                    //   MaterialPageRoute(builder: (context) => DeckIndexScreen()),
-                    // );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.lightGreen, // Задаем зелёный цвет фона кнопки
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Добавляем отступы
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8), // Скругляем углы кнопки
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      txt.tt('to_main'),
-                      style: TextStyle(fontSize: (baseFontSize + 3).clamp(12.0 + 3, 22.0 + 3), color: Colors.black87),
-                    ),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.lightGreen,
+                  foregroundColor: Colors.black87,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

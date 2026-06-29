@@ -134,6 +134,7 @@ class ProviderUserLogin extends ChangeNotifier {
 
     try {
       await _telegramAuthBridge.ready();
+      _telegramAuthBridge.disableVerticalSwipes();
       _telegramUser = _telegramAuthBridge.user;
       isTelegramFeatureWorks = true;
       expandTelegram();
@@ -145,8 +146,15 @@ class ProviderUserLogin extends ChangeNotifier {
       }
 
       if ((_userModel.language_code ?? '').isEmpty) {
-        _logger.info('telegram', 'Waiting for language selection before Telegram auth');
-        return;
+        final tgLang = _telegramUser!.languageCode;
+        if (tgLang != null && tgLang.isNotEmpty) {
+          _logger.info('telegram', 'Auto-detecting language from Telegram user: $tgLang');
+          _userModel.update(language_code: tgLang);
+          await _authLocalStore.saveLanguageCode(tgLang);
+        } else {
+          _logger.info('telegram', 'Waiting for language selection before Telegram auth');
+          return;
+        }
       }
 
       await _loginWithTelegram();

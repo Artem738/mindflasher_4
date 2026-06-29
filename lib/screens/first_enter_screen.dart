@@ -168,10 +168,14 @@ class FirstEnterScreen extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {
                       context.read<ProviderUserLogin>().setIsFirstEnter(false);
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const UserSettingsScreen()),
-                      );
+                      if (Navigator.of(context).canPop()) {
+                        Navigator.of(context).pop();
+                      } else {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const UserSettingsScreen()),
+                        );
+                      }
                     },
                     child: Text(
                       txt.tt('back'),

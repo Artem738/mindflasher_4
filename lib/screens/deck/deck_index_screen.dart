@@ -34,32 +34,16 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
   Widget build(BuildContext context) {
     context.read<ProviderUserLogin>().expandTelegram();
 
-   // final userModel = context.read<UserModel>();
-    var txt = DeckIndexScreenTranslate(context.read<UserModel>().language_code ?? 'en');
+    final userModel = context.watch<UserModel>();
+    var txt = DeckIndexScreenTranslate(userModel.language_code ?? 'en');
     final deckProvider = context.watch<DeckProvider>();
-    var baseFontSize = context.watch<ProviderUserControl>().userModel.base_font_size;
+    final baseFontSize = userModel.base_font_size;
+    final userName = userModel.tg_first_name ?? userModel.name ?? '';
+
     return Scaffold(
       appBar: AppBar(
         title: Text(txt.tt('title')),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.info_outline),
-            onPressed: () {
-              // Navigator.pushReplacement(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => FirstEnterScreen()),
-              // );
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const FirstEnterScreen(),
-                ),
-              );
-              // Navigator.of(context).pushAndRemoveUntil(
-              //   MaterialPageRoute(builder: (context) => FirstEnterScreen()),
-              //   (Route<dynamic> route) => false,
-              // );
-            },
-          ),
           IconButton(
             icon: const Icon(Icons.person_outline_outlined),
             onPressed: () {
@@ -83,47 +67,51 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
             if (deckProvider.decks.isEmpty) {
               return Center(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(32.0),
+                  padding: const EdgeInsets.all(28.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
                         Icons.collections_bookmark_outlined,
-                        size: 80,
-                        color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                        size: 96,
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
                       ),
                       const SizedBox(height: 24),
                       Text(
-                        txt.tt('no_decks'),
+                        txt.tt('no_decks').replaceAll('{name}', userName),
                         style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                               fontWeight: FontWeight.bold,
-                              fontSize: (baseFontSize + 5).clamp(20.0, 25.0),
+                              fontSize: (baseFontSize + 5).clamp(20.0, 26.0),
                             ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 16),
                       Text(
                         txt.tt('add_deck_prompt'),
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              fontSize: (baseFontSize).clamp(16.0, 20.0),
+                              fontSize: baseFontSize.clamp(14.0, 18.0),
+                              height: 1.4,
                             ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 32),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
-                          borderRadius: BorderRadius.circular(12),
+                      Card(
+                        elevation: 0,
+                        color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                        child: Text(
-                          txt.tt('description'),
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontStyle: FontStyle.italic,
-                                fontSize: (baseFontSize - 1).clamp(14.0, 18.0),
-                              ),
-                          textAlign: TextAlign.center,
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Text(
+                            txt.tt('description'),
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  fontSize: (baseFontSize - 1).clamp(13.0, 17.0),
+                                  height: 1.5,
+                                ),
+                            textAlign: TextAlign.left,
+                          ),
                         ),
                       ),
                     ],
@@ -144,49 +132,116 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
           }
         },
       ),
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          FloatingActionButton.extended(
-            heroTag: 'add_template_deck',
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const TemplateDeckIndexScreen(),
-                ),
-              );
-            },
-            label: Text(
-              txt.tt('add_template_deck'),
-              style: TextStyle(
-                fontSize: (baseFontSize).clamp(12.0, 18.0),
-              ),
-            ),
-            icon: const Icon(Icons.auto_awesome),
-            backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-            foregroundColor: Theme.of(context).colorScheme.onSecondaryContainer,
-          ),
-          const SizedBox(height: 12),
-          FloatingActionButton.extended(
-            heroTag: 'add_own_deck',
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const DeckManagementScreen(),
-                ),
-              );
-            },
-            label: Text(
-              txt.tt('add_own_deck'),
-              style: TextStyle(
-                fontSize: (baseFontSize).clamp(12.0, 18.0),
-              ),
-            ),
-            icon: const Icon(Icons.add),
-          ),
-        ],
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddDeckBottomSheet(context, txt, baseFontSize),
+        child: const Icon(Icons.add),
       ),
+    );
+  }
+
+  void _showAddDeckBottomSheet(BuildContext context, DeckIndexScreenTranslate txt, double baseFontSize) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.0)),
+      ),
+      builder: (context) {
+        final colorScheme = Theme.of(context).colorScheme;
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Полоса-индикатор сверху шторки
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: colorScheme.onSurfaceVariant.withOpacity(0.4),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              
+              // Заголовок шторки
+              Text(
+                txt.tt('add_deck_title'),
+                style: TextStyle(
+                  fontSize: (baseFontSize + 3).clamp(16.0, 24.0),
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              
+              // Вариант 1: Добавить готовый шаблон
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: colorScheme.secondaryContainer,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.auto_awesome,
+                    color: colorScheme.onSecondaryContainer,
+                  ),
+                ),
+                title: Text(
+                  txt.tt('add_template_deck'),
+                  style: TextStyle(
+                    fontSize: baseFontSize.clamp(14.0, 20.0),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context); // Закрываем шторку
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const TemplateDeckIndexScreen(),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 12),
+              
+              // Вариант 2: Создать свою колоду
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.add,
+                    color: colorScheme.onPrimaryContainer,
+                  ),
+                ),
+                title: Text(
+                  txt.tt('add_own_deck'),
+                  style: TextStyle(
+                    fontSize: baseFontSize.clamp(14.0, 20.0),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context); // Закрываем шторку
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const DeckManagementScreen(),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      },
     );
   }
 }

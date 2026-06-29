@@ -89,9 +89,13 @@ class LanguageSelectionScreen extends StatelessWidget {
       await userControl.updateUserLanguageCode(language.code);
     }
 
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => const IndexScreen()),
-      (Route<dynamic> route) => false,
-    );
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    } else {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const IndexScreen()),
+        (Route<dynamic> route) => false,
+      );
+    }
   }
 }

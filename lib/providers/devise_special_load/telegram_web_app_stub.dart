@@ -30,6 +30,7 @@ class TelegramWebApp {
 
   Future<void> ready() async {}
   void expand() {}
+  void disableVerticalSwipes() {}
 
   // Заглушка для мобильных платформ
   TelegramUser? get telegramUser => initData?.user;

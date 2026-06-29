@@ -101,12 +101,16 @@ class FontSizeAdjustmentScreen extends StatelessWidget {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const UserSettingsScreen(),
-                        ),
-                      );
+                      if (Navigator.of(context).canPop()) {
+                        Navigator.of(context).pop();
+                      } else {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const UserSettingsScreen(),
+                          ),
+                        );
+                      }
                     },
                     child: Text(
                       'Отменить',
@@ -121,12 +125,16 @@ class FontSizeAdjustmentScreen extends StatelessWidget {
                       onPressed: () {
                         userControl.updateUserBaseFontSize(userModel.base_font_size);
 
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const UserSettingsScreen(),
-                          ),
-                        ); // Возвращаемся на предыдущий экран с сохранением
+                        if (Navigator.of(context).canPop()) {
+                          Navigator.of(context).pop();
+                        } else {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const UserSettingsScreen(),
+                            ),
+                          );
+                        } // Возвращаемся на предыдущий экран с сохранением
                       },
                       child: Text(
                         txt.tt('finish_button'),

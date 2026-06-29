@@ -25,6 +25,12 @@ class DeckSettingsScreenTranslate {
       'ru': 'Редактировать колоду',
       'uk': 'Редагувати колоду',
     },
+    // txt.tt('import_table')  ${txt.tt('import_table')}
+    'import_table': {
+      'en': 'Import Table',
+      'ru': 'Импортировать таблицу',
+      'uk': 'Імпортувати таблицю',
+    },
     // txt.tt('csv_insert')  ${txt.tt('csv_insert')}
     'csv_insert': {
       'en': 'Insert CSV',

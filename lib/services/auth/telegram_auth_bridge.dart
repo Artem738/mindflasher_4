@@ -14,6 +14,8 @@ abstract class TelegramAuthBridge {
   Future<void> ready();
 
   void expand();
+
+  void disableVerticalSwipes();
 }
 
 class TelegramWebAppBridge implements TelegramAuthBridge {
@@ -56,6 +58,14 @@ class TelegramWebAppBridge implements TelegramAuthBridge {
   void expand() {
     try {
       TelegramWebApp.instance.expand();
+    } catch (_) {
+    }
+  }
+
+  @override
+  void disableVerticalSwipes() {
+    try {
+      TelegramWebApp.instance.disableVerticalSwipes();
     } catch (_) {
     }
   }

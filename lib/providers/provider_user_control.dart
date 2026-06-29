@@ -86,4 +86,23 @@ class ProviderUserControl with ChangeNotifier {
       throw Exception('Failed to update language code on server');
     }
   }
+
+  Future<void> updateAutoCloseCards(bool autoClose) async {
+    final url = Uri.parse('${EnvConfig.mainApiUrl}/api/user/auto-close-cards');
+    final response = await http.put(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${_token()}',
+      },
+      body: json.encode({'auto_close_cards': autoClose}),
+    );
+
+    _userModel.update(auto_close_cards: autoClose);
+    notifyListeners();
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update auto-close setting on server');
+    }
+  }
 }

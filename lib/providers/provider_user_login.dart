@@ -7,7 +7,7 @@ import 'package:mindflasher_4/services/auth/auth_local_store.dart';
 import 'package:mindflasher_4/services/auth/telegram_auth_bridge.dart';
 import 'package:mindflasher_4/services/logging/app_logger.dart';
 
-import 'package:flutter/foundation.dart' show kIsWeb; // Импортирует переменную kIsWeb которая используется для определения Web
+import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode; // Импортирует переменные для определения среды Web/Debug
 // Если библиотека dart.library.html доступна (приложение выполняется в веб-браузере),// то импортируется реальная реализация для веб-платформ
 
 class ProviderUserLogin extends ChangeNotifier {
@@ -65,11 +65,22 @@ class ProviderUserLogin extends ChangeNotifier {
 
     try {
       if (kIsWeb) {
-        EnvConfig.mainApiUrl = EnvConfig.normalizeApiBaseUrl(EnvConfig.webApiUrl);
-        _logger.info('bootstrap', 'Running in web mode');
+        final host = Uri.base.host;
+        if (host == 'localhost' || host == '127.0.0.1') {
+          EnvConfig.mainApiUrl = EnvConfig.normalizeApiBaseUrl(EnvConfig.localApiUrl);
+          _logger.info('bootstrap', 'Running in web mode (localhost detected, using local API: ${EnvConfig.mainApiUrl})');
+        } else {
+          EnvConfig.mainApiUrl = EnvConfig.normalizeApiBaseUrl(EnvConfig.webApiUrl);
+          _logger.info('bootstrap', 'Running in web mode (using production API: ${EnvConfig.mainApiUrl})');
+        }
       } else {
-        EnvConfig.mainApiUrl = EnvConfig.normalizeApiBaseUrl(EnvConfig.localApiUrl);
-        _logger.info('bootstrap', 'Running in app mode');
+        if (kDebugMode) {
+          EnvConfig.mainApiUrl = EnvConfig.normalizeApiBaseUrl(EnvConfig.localApiUrl);
+          _logger.info('bootstrap', 'Running in app mode (debug mode, using local API: ${EnvConfig.mainApiUrl})');
+        } else {
+          EnvConfig.mainApiUrl = EnvConfig.normalizeApiBaseUrl(EnvConfig.webApiUrl);
+          _logger.info('bootstrap', 'Running in app mode (using production API: ${EnvConfig.mainApiUrl})');
+        }
       }
 
       await _loadLocalState();
@@ -283,6 +294,11 @@ class ProviderUserLogin extends ChangeNotifier {
   }) async {
     if (userData['base_font_size'] != null) {
       _userModel.update(base_font_size: userData['base_font_size'].toDouble());
+    }
+    if (userData['auto_close_cards'] != null) {
+      final val = userData['auto_close_cards'];
+      final bool autoClose = val is bool ? val : (val == 1 || val == '1');
+      _userModel.update(auto_close_cards: autoClose);
     }
 
     final resolvedEmail = userData['email'] ?? fallbackEmail;

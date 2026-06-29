@@ -1,0 +1,296 @@
+import 'package:flutter/material.dart';
+import 'package:mindflasher_4/models/deck_model.dart';
+import 'package:mindflasher_4/models/flashcard_model.dart';
+import 'package:mindflasher_4/providers/flashcard_provider.dart';
+import 'package:mindflasher_4/providers/provider_user_control.dart';
+import 'package:mindflasher_4/tech_data/weight_delays_enum.dart';
+import 'package:mindflasher_4/translates/flashcard_study_screen_translate.dart';
+import 'package:markdown_widget/markdown_widget.dart';
+import 'package:provider/provider.dart';
+
+class FlashcardStudyScreen extends StatefulWidget {
+  final FlashcardModel flashcard;
+  final DeckModel deck;
+  final bool startAnswerRevealed;
+
+  const FlashcardStudyScreen({
+    super.key,
+    required this.flashcard,
+    required this.deck,
+    this.startAnswerRevealed = false,
+  });
+
+  @override
+  State<FlashcardStudyScreen> createState() => _FlashcardStudyScreenState();
+}
+
+class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
+  late bool _showAnswer;
+
+  @override
+  void initState() {
+    super.initState();
+    _showAnswer = widget.startAnswerRevealed;
+  }
+
+  void _gradeCard(WeightDelaysEnum grade) {
+    Provider.of<FlashcardProvider>(context, listen: false).updateCardWeight(
+      widget.deck,
+      widget.flashcard.id,
+      grade,
+    );
+    Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final baseFontSize =
+        context.watch<ProviderUserControl>().userModel.base_font_size;
+    final userLanguage =
+        context.watch<ProviderUserControl>().userModel.language_code ?? 'en';
+    final txt = FlashcardStudyScreenTranslate(userLanguage);
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Build markdown configurations aligned with the current baseFontSize
+    final baseMarkdownConfig =
+        isDark ? MarkdownConfig.darkConfig : MarkdownConfig.defaultConfig;
+    final markdownConfig = baseMarkdownConfig.copy(
+      configs: [
+        PConfig(
+          textStyle: TextStyle(
+            fontSize: baseFontSize,
+            height: 1.5,
+          ),
+        ),
+        H1Config(
+          style: TextStyle(
+            fontSize: baseFontSize * 1.5,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        H2Config(
+          style: TextStyle(
+            fontSize: baseFontSize * 1.35,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        H3Config(
+          style: TextStyle(
+            fontSize: baseFontSize * 1.2,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(txt.tt('study_title')),
+        centerTitle: true,
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Question Card
+                    Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      color: colorScheme.surfaceContainerLow,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              txt.tt('question'),
+                              style: TextStyle(
+                                fontSize: baseFontSize * 0.85,
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.primary,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            MarkdownBlock(
+                              data: widget.flashcard.question,
+                              config: markdownConfig,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Show Answer Button
+                    if (!_showAnswer)
+                      Center(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeInOut,
+                          child: FilledButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                _showAnswer = true;
+                              });
+                            },
+                            icon: const Icon(Icons.wb_incandescent_outlined),
+                            label: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 10.0),
+                              child: Text(
+                                txt.tt('show_answer'),
+                                style: TextStyle(fontSize: baseFontSize * 1.1),
+                              ),
+                            ),
+                            style: FilledButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              padding: EdgeInsets.zero,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                    // Answer Section (Faded in when revealed)
+                    if (_showAnswer)
+                      AnimatedOpacity(
+                        opacity: _showAnswer ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 300),
+                        child: Card(
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          color: colorScheme.secondaryContainer.withOpacity(0.4),
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  txt.tt('answer'),
+                                  style: TextStyle(
+                                    fontSize: baseFontSize * 0.85,
+                                    fontWeight: FontWeight.bold,
+                                    color: colorScheme.secondary,
+                                    letterSpacing: 1.2,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                MarkdownBlock(
+                                  data: widget.flashcard.answer.replaceAll('\\n', '\n'),
+                                  config: markdownConfig,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Grade Action Buttons at Bottom
+            if (_showAnswer)
+              SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      // Red Button
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: ElevatedButton.icon(
+                            onPressed: () => _gradeCard(WeightDelaysEnum.badSmallDelay),
+                            icon: const Icon(Icons.history),
+                            label: Text(
+                              txt.tt('grade_bad'),
+                              style: TextStyle(
+                                fontSize: (baseFontSize * 0.85).clamp(10, 16),
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.redAccent,
+                              foregroundColor: Colors.white,
+                              elevation: 2,
+                              padding: const EdgeInsets.symmetric(vertical: 12.0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Yellow Button
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: ElevatedButton.icon(
+                            onPressed: () => _gradeCard(WeightDelaysEnum.normMedDelay),
+                            icon: const Icon(Icons.schedule),
+                            label: Text(
+                              txt.tt('grade_medium'),
+                              style: TextStyle(
+                                fontSize: (baseFontSize * 0.85).clamp(10, 16),
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.amber,
+                              foregroundColor: Colors.black87,
+                              elevation: 2,
+                              padding: const EdgeInsets.symmetric(vertical: 12.0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Green Button
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: ElevatedButton.icon(
+                            onPressed: () => _gradeCard(WeightDelaysEnum.goodLongDelay),
+                            icon: const Icon(Icons.check_circle_outline),
+                            label: Text(
+                              txt.tt('grade_good'),
+                              style: TextStyle(
+                                fontSize: (baseFontSize * 0.85).clamp(10, 16),
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                              elevation: 2,
+                              padding: const EdgeInsets.symmetric(vertical: 12.0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}

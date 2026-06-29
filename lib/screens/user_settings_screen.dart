@@ -116,6 +116,17 @@ class UserSettingsScreen extends StatelessWidget {
                       },
                     ),
                     const Divider(height: 1),
+                    SwitchListTile(
+                      secondary: const Icon(Icons.swipe_vertical_outlined),
+                      title: Text(txt.tt('auto_close_cards'),
+                          style: TextStyle(
+                              fontSize: baseFontSize.clamp(14.0, 20.0))),
+                      value: userModel.auto_close_cards,
+                      onChanged: (bool value) {
+                        context.read<ProviderUserControl>().updateAutoCloseCards(value);
+                      },
+                    ),
+                    const Divider(height: 1),
                     ListTile(
                       leading: const Icon(Icons.format_size),
                       title: Text(txt.tt('adjust_font_size_button'),

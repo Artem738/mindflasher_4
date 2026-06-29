@@ -49,7 +49,7 @@ class TelegramWebAppBridge implements TelegramAuthBridge {
   @override
   Future<void> ready() async {
     try {
-      await TelegramWebApp.instance.ready();
+      TelegramWebApp.instance.ready();
     } catch (_) {
     }
   }

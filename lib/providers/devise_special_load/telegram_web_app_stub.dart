@@ -28,7 +28,7 @@ class TelegramWebApp {
   dynamic get themeParams => null;
   InitData? get initData => InitData();
 
-  Future<void> ready() async {}
+  void ready() {}
   void expand() {}
   void disableVerticalSwipes() {}
 

@@ -25,8 +25,17 @@ class FlashcardProvider with ChangeNotifier {
   final AppHttpClient _httpClient;
   final List<FlashcardModel> _flashcards = [];
   final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
+  int? _currentlySwipedCardId;
 
   List<FlashcardModel> get flashcards => _flashcards;
+  int? get currentlySwipedCardId => _currentlySwipedCardId;
+
+  void setCurrentlySwipedCardId(int? id) {
+    if (_currentlySwipedCardId != id) {
+      _currentlySwipedCardId = id;
+      notifyListeners();
+    }
+  }
 
   void updateUserModel(UserModel userModel) {
     _userModel = userModel;

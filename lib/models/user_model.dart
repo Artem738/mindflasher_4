@@ -17,6 +17,7 @@ class UserModel extends ChangeNotifier {
   bool? isFirstEnter;
   double base_font_size = 16.00;
   ThemeMode themeMode = ThemeMode.system;
+  bool auto_close_cards = true;
 
   UserModel({
     this.apiId,
@@ -34,6 +35,7 @@ class UserModel extends ChangeNotifier {
     this.user_lvl,
     this.isFirstEnter,
     this.themeMode = ThemeMode.system,
+    this.auto_close_cards = true,
   });
 
   void update({
@@ -53,6 +55,7 @@ class UserModel extends ChangeNotifier {
     bool? isFirstEnter,
     double? base_font_size ,
     ThemeMode? themeMode,
+    bool? auto_close_cards,
   }) {
     this.apiId = apiId ?? this.apiId;
     this.telegram_id = telegram_id ?? this.telegram_id;
@@ -70,6 +73,7 @@ class UserModel extends ChangeNotifier {
     this.isFirstEnter = isFirstEnter ?? this.isFirstEnter;
     this.base_font_size = base_font_size ?? this.base_font_size;
     this.themeMode = themeMode ?? this.themeMode;
+    this.auto_close_cards = auto_close_cards ?? this.auto_close_cards;
     notifyListeners();
   }
 
@@ -85,7 +89,7 @@ class UserModel extends ChangeNotifier {
         'tg_language_code: ${tg_language_code ?? 'null'}, language_code: ${language_code ?? 'null'}, '
         'email: ${email ?? 'null'}, token: ${token ?? 'null'}, authDate: ${authDate ?? 'null'}, '
         'hash: ${hash ?? 'null'}, user_lvl: ${user_lvl ?? 'null'}, '
-        'isFirstEnter: ${isFirstEnter ?? 'null'}, base_font_size: $base_font_size';
+        'isFirstEnter: ${isFirstEnter ?? 'null'}, base_font_size: $base_font_size, auto_close_cards: $auto_close_cards';
   }
 
   String requireToken() {

@@ -3,6 +3,7 @@ import 'package:mindflasher_4/models/deck_model.dart';
 import 'package:mindflasher_4/models/flashcard_model.dart';
 import 'package:mindflasher_4/providers/flashcard_provider.dart';
 import 'package:mindflasher_4/tech_data/weight_delays_enum.dart';
+import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
 
@@ -42,16 +43,28 @@ class SwipeableCardState extends State<SwipeableCard> with SingleTickerProviderS
     _animationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: _afterMainTapOpenSwipeTimeMs),
-    );
-    _animation = Tween<double>(begin: 0, end: 0).animate(_animationController)
-      ..addListener(() {
-        setState(() {
-          _dragExtent = _animation.value;
-        });
+    )..addListener(() {
+        if (mounted) {
+          setState(() {
+            _dragExtent = _animation.value;
+          });
+        }
       });
+    _animation = Tween<double>(begin: 0, end: 0).animate(_animationController);
+  }
+
+  void _closeCard() {
+    _timer?.cancel();
+    _animationController.duration = const Duration(milliseconds: 350); // Медленное закрытие
+    _animation = Tween<double>(begin: _dragExtent, end: 0.0).animate(_animationController);
+    _animationController.forward(from: 0.0);
   }
 
   void _handleDragUpdate(DragUpdateDetails details, BuildContext context) {
+    if (_dragExtent == 0.0 && details.primaryDelta != 0.0) {
+      Provider.of<FlashcardProvider>(context, listen: false)
+          .setCurrentlySwipedCardId(widget.flashcard.id);
+    }
     setState(() {
       _dragExtent += details.primaryDelta!;
       final screenWidth = MediaQuery.of(context).size.width;
@@ -83,18 +96,22 @@ class SwipeableCardState extends State<SwipeableCard> with SingleTickerProviderS
         _dragExtent = 0.0;
       }
     });
+
+    final currentlySwipedId = Provider.of<FlashcardProvider>(context, listen: false).currentlySwipedCardId;
+    if (_dragExtent == 0.0 && currentlySwipedId == widget.flashcard.id) {
+      Provider.of<FlashcardProvider>(context, listen: false)
+          .setCurrentlySwipedCardId(null);
+    }
   }
 
   void triggerLeftSwipeAndStartTimer() {
+    Provider.of<FlashcardProvider>(context, listen: false)
+        .setCurrentlySwipedCardId(widget.flashcard.id);
     final screenWidth = MediaQuery.of(context).size.width;
-    _animation = Tween<double>(begin: _dragExtent, end: -screenWidth * _stopThresholdRight).animate(_animationController)
-      ..addListener(() {
-        setState(() {
-          _dragExtent = _animation.value;
-        });
-      });
+    _animationController.duration = Duration(milliseconds: _afterMainTapOpenSwipeTimeMs); // Быстрое открытие
+    _animation = Tween<double>(begin: _dragExtent, end: -screenWidth * _stopThresholdRight).animate(_animationController);
 
-    _animationController.forward().then((_) {
+    _animationController.forward(from: 0.0).then((_) {
       // print("Card swiped left!");
 
       _timer?.cancel(); // Отменяем предыдущий таймер, если он был
@@ -104,14 +121,7 @@ class SwipeableCardState extends State<SwipeableCard> with SingleTickerProviderS
         Provider.of<FlashcardProvider>(context, listen: false)
             .updateCardWeight(widget.deck, widget.flashcard.id, WeightDelaysEnum.badSmallDelay);
 
-        // Возвращаем карточку в начальное положение
-        _animation = Tween<double>(begin: _dragExtent, end: 0.0).animate(_animationController)
-          ..addListener(() {
-            setState(() {
-              _dragExtent = _animation.value;
-            });
-          });
-        _animationController.forward(from: 0.0);
+        _closeCard();
       });
     });
   }
@@ -125,22 +135,45 @@ class SwipeableCardState extends State<SwipeableCard> with SingleTickerProviderS
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    final currentlySwipedId = context.watch<FlashcardProvider>().currentlySwipedCardId;
+    final autoCloseEnabled = context.watch<ProviderUserControl>().userModel.auto_close_cards;
+
+    if (autoCloseEnabled && currentlySwipedId != null && currentlySwipedId != widget.flashcard.id && _dragExtent != 0.0 && !_animationController.isAnimating) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _dragExtent != 0.0 && !_animationController.isAnimating) {
+          _closeCard();
+        }
+      });
+    }
+
     return GestureDetector(
       onHorizontalDragUpdate: (details) => _handleDragUpdate(details, context),
       onHorizontalDragEnd: (details) => _handleDragEnd(details, context),
       child: Stack(
         children: [
           if (_dragExtent > 0)
-            LeftSwipeCard(
-              deck: widget.deck,
-              flashcard: widget.flashcard,
-              stopThreshold: _stopThresholdLeft,
+            Positioned(
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: screenWidth * _stopThresholdLeft,
+              child: LeftSwipeCard(
+                deck: widget.deck,
+                flashcard: widget.flashcard,
+              ),
             )
           else if (_dragExtent < 0)
-            RightAnswerCard(
-              flashcard: widget.flashcard,
-              stopThreshold: _stopThresholdRight,
-              deck: widget.deck,
+            Positioned(
+              right: 0,
+              top: 0,
+              bottom: 0,
+              width: screenWidth * _stopThresholdRight,
+              child: RightAnswerCard(
+                deck: widget.deck,
+                flashcard: widget.flashcard,
+              ),
             ),
           Transform.translate(
             offset: Offset(_dragExtent, 0),

@@ -107,6 +107,11 @@ class UserSettingsScreenTranslate {
       'ru': 'Системная тема',
       'uk': 'Системна тема',
     },
+    'auto_close_cards': {
+      'en': 'Auto-close other cards',
+      'ru': 'Автозакрытие других карточек',
+      'uk': 'Автозакриття інших карток',
+    },
 
 
 

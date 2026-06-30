@@ -21,17 +21,18 @@ class FlashcardIndexScreen extends StatefulWidget {
 
 class _FlashcardIndexScreenState extends State<FlashcardIndexScreen> {
   late Future<void> _flashcardsFuture;
+  String _selectedMode = 'srs';
 
   @override
   void initState() {
     super.initState();
-    _flashcardsFuture = Provider.of<FlashcardProvider>(context, listen: false).fetchAndPopulateFlashcards(widget.deck.id);
+    _flashcardsFuture = Provider.of<FlashcardProvider>(context, listen: false).fetchAndPopulateFlashcards(widget.deck.id, mode: _selectedMode);
     context.read<ProviderUserLogin>().expandTelegram();
   }
 
   void _reloadFlashcards() {
     setState(() {
-      _flashcardsFuture = Provider.of<FlashcardProvider>(context, listen: false).fetchAndPopulateFlashcards(widget.deck.id);
+      _flashcardsFuture = Provider.of<FlashcardProvider>(context, listen: false).fetchAndPopulateFlashcards(widget.deck.id, mode: _selectedMode);
     });
   }
 
@@ -41,17 +42,6 @@ class _FlashcardIndexScreenState extends State<FlashcardIndexScreen> {
       child: SwipeableCard(
         flashcard: card,
         deck: widget.deck,
-
-        ///TODO: DO NOT DELETE THIS COMMENT !!!!!
-        // onRemove: () {
-        //  // context.read<FlashcardProvider>().updateCardWeight(card.id, 1);
-        // },
-        // onSwipe: (increment) {
-        //  // context.read<FlashcardProvider>().updateCardWeight(card.id, increment);
-        // },
-        // onIncrease: (increment) {
-        //   context.read<FlashcardProvider>().updateCardWeight(card.id, increment);
-        // },
       ),
     );
   }
@@ -65,7 +55,7 @@ class _FlashcardIndexScreenState extends State<FlashcardIndexScreen> {
         title: Text(widget.deck.name),
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit_note), // Первая кнопка
+            icon: const Icon(Icons.edit_note),
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -74,33 +64,78 @@ class _FlashcardIndexScreenState extends State<FlashcardIndexScreen> {
                   ),
                 ),
               );
-              // Перезагрузка после возврата
             },
           ),
         ],
       ),
-      body: FutureBuilder(
-        future: _flashcardsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('An error occurred: ${snapshot.error}'));
-          } else {
-            return Consumer<FlashcardProvider>(
-              builder: (context, flashcardProvider, child) {
-                return AnimatedList(
-                  key: flashcardProvider.listKey,
-                  initialItemCount: flashcardProvider.flashcards.length,
-                  itemBuilder: (context, index, animation) {
-                    final flashcard = flashcardProvider.flashcards[index];
-                    return _buildCardItem(context, flashcard, animation);
-                  },
-                );
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: SegmentedButton<String>(
+              segments: [
+                ButtonSegment<String>(
+                  value: 'srs',
+                  label: Text(txt.tt('study_mode_srs')),
+                  icon: const Icon(Icons.school_outlined),
+                ),
+                ButtonSegment<String>(
+                  value: 'all',
+                  label: Text(txt.tt('study_mode_all')),
+                  icon: const Icon(Icons.menu_book_outlined),
+                ),
+              ],
+              selected: {_selectedMode},
+              onSelectionChanged: (Set<String> newSelection) {
+                setState(() {
+                  _selectedMode = newSelection.first;
+                  _flashcardsFuture = Provider.of<FlashcardProvider>(context, listen: false)
+                      .fetchAndPopulateFlashcards(widget.deck.id, mode: _selectedMode);
+                });
               },
-            );
-          }
-        },
+            ),
+          ),
+          Expanded(
+            child: FutureBuilder(
+              future: _flashcardsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('An error occurred: ${snapshot.error}'));
+                } else {
+                  return Consumer<FlashcardProvider>(
+                    builder: (context, flashcardProvider, child) {
+                      if (flashcardProvider.flashcards.isEmpty) {
+                        return SrsCongratsWidget(
+                          title: txt.tt('srs_done_title'),
+                          subtitle: txt.tt('srs_done_subtitle'),
+                          buttonLabel: txt.tt('study_mode_all'),
+                          showButton: _selectedMode == 'srs',
+                          onButtonPressed: () {
+                            setState(() {
+                              _selectedMode = 'all';
+                              _flashcardsFuture = Provider.of<FlashcardProvider>(context, listen: false)
+                                  .fetchAndPopulateFlashcards(widget.deck.id, mode: _selectedMode);
+                            });
+                          },
+                        );
+                      }
+                      return AnimatedList(
+                        key: flashcardProvider.listKey,
+                        initialItemCount: flashcardProvider.flashcards.length,
+                        itemBuilder: (context, index, animation) {
+                          final flashcard = flashcardProvider.flashcards[index];
+                          return _buildCardItem(context, flashcard, animation);
+                        },
+                      );
+                    },
+                  );
+                }
+              },
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'add_own_deck',
@@ -119,11 +154,156 @@ class _FlashcardIndexScreenState extends State<FlashcardIndexScreen> {
         },
         label: Text(
           txt.tt('add_flashcard'),
-          // style: TextStyle(
-          //   fontSize: (baseFontSize).clamp(10.0, 25.0),
-          // ),
         ),
         icon: const Icon(Icons.add_box_outlined),
+      ),
+    );
+  }
+}
+
+class SrsCongratsWidget extends StatefulWidget {
+  final String title;
+  final String subtitle;
+  final String buttonLabel;
+  final VoidCallback onButtonPressed;
+  final bool showButton;
+
+  const SrsCongratsWidget({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.buttonLabel,
+    required this.onButtonPressed,
+    this.showButton = true,
+  });
+
+  @override
+  State<SrsCongratsWidget> createState() => _SrsCongratsWidgetState();
+}
+
+class _SrsCongratsWidgetState extends State<SrsCongratsWidget> with TickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _scaleAnimation;
+  late final Animation<double> _fadeAnimation;
+  late final AnimationController _pulseController;
+  late final Animation<double> _pulseAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    _scaleAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.elasticOut,
+    );
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeIn,
+    );
+
+    _pulseController = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.10).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _pulseController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(32.0),
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ScaleTransition(
+                scale: _pulseAnimation,
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: colorScheme.primaryContainer.withOpacity(0.2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: colorScheme.primary.withOpacity(0.15),
+                        blurRadius: 30,
+                        spreadRadius: 10,
+                      )
+                    ],
+                  ),
+                  child: ScaleTransition(
+                    scale: _scaleAnimation,
+                    child: Icon(
+                      Icons.stars,
+                      size: 80,
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 32),
+              Text(
+                widget.title,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                widget.subtitle,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                      height: 1.4,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+              if (widget.showButton) ...[
+                const SizedBox(height: 36),
+                ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: FilledButton.icon(
+                    onPressed: widget.onButtonPressed,
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      elevation: 3,
+                    ),
+                    icon: const Icon(Icons.menu_book_outlined),
+                    label: Text(
+                      widget.buttonLabel,
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ]
+            ],
+          ),
+        ),
       ),
     );
   }

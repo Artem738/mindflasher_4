@@ -19,6 +19,26 @@ class FlashcardIndexScreenTranslate {
       'ru': 'Добавить флеш-карточку',
       'uk': 'Додати флеш-картку',
     },
+    'study_mode_srs': {
+      'en': 'Study (SRS)',
+      'ru': 'Учеба (SRS)',
+      'uk': 'Навчання (SRS)',
+    },
+    'study_mode_all': {
+      'en': 'All Cards',
+      'ru': 'Все карточки',
+      'uk': 'Всі картки',
+    },
+    'srs_done_title': {
+      'en': 'All caught up!',
+      'ru': 'На сегодня всё повторено!',
+      'uk': 'На сьогодні все повторено!',
+    },
+    'srs_done_subtitle': {
+      'en': 'Great job! Come back tomorrow or switch to "All Cards" tab to review early.',
+      'ru': 'Отличная работа! Возвращайтесь завтра или перейдите во вкладку "Все карточки" для внеочередного повторения.',
+      'uk': 'Чудова робота! Повертайтеся завтра або перейдіть у вкладку "Всі картки" для позачергового повторення.',
+    },
   };
 
   final String languageCode;

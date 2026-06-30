@@ -26,9 +26,11 @@ class FlashcardProvider with ChangeNotifier {
   final List<FlashcardModel> _flashcards = [];
   final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
   int? _currentlySwipedCardId;
+  String _currentMode = 'srs';
 
   List<FlashcardModel> get flashcards => _flashcards;
   int? get currentlySwipedCardId => _currentlySwipedCardId;
+  String get currentMode => _currentMode;
 
   void setCurrentlySwipedCardId(int? id) {
     if (_currentlySwipedCardId != id) {
@@ -47,8 +49,9 @@ class FlashcardProvider with ChangeNotifier {
     return _httpClient.jsonHeaders(bearerToken: _token());
   }
 
-  Future<void> fetchAndPopulateFlashcards(int deckId) async {
-    final apiUrl = '${EnvConfig.mainApiUrl}/api/decks/$deckId/flashcards';
+  Future<void> fetchAndPopulateFlashcards(int deckId, {String mode = 'srs'}) async {
+    _currentMode = mode;
+    final apiUrl = '${EnvConfig.mainApiUrl}/api/decks/$deckId/flashcards?mode=$mode';
     final response = await _httpClient.get(
       Uri.parse(apiUrl),
       headers: _headers(),
@@ -199,23 +202,55 @@ class FlashcardProvider with ChangeNotifier {
       );
 
       _flashcards.removeAt(index);
-      Future.delayed(const Duration(milliseconds: 10), () {
-        _flashcards.add(updatedCard);
-        _sortFlashcardsByWeight();
-        final newIndex = _flashcards.indexOf(updatedCard);
-        listKey.currentState?.insertItem(
-          newIndex,
-          duration: Duration(milliseconds: tileOpenTime),
-        );
-        notifyListeners();
-      });
 
-      // Обновление веса карточки на сервере
-      await updateCardWeightOnServer(id, weightDelayEnum);
+      // Карточка удаляется насовсем из сессии только в режиме SRS при оценке Хорошо (зеленый).
+      // В режиме ALL или при оценках Средне/Плохо она всегда переносится в конец списка.
+      final bool shouldRemovePermanently = _currentMode == 'srs' && 
+          weightDelayEnum == WeightDelaysEnum.goodLongDelay;
+
+      if (!shouldRemovePermanently) {
+        Future.delayed(const Duration(milliseconds: 10), () {
+          _flashcards.add(updatedCard);
+          _sortFlashcardsByWeight();
+          final newIndex = _flashcards.indexOf(updatedCard);
+          listKey.currentState?.insertItem(
+            newIndex,
+            duration: Duration(milliseconds: tileOpenTime),
+          );
+          notifyListeners();
+        });
+      } else {
+        notifyListeners();
+      }
+
+      try {
+        // Обновление веса карточки на сервере
+        final progressData = await updateCardWeightOnServer(id, weightDelayEnum);
+        if (progressData != null) {
+          // Если карточка была добавлена обратно (оценка Плохо) или асинхронно обновляется,
+          // находим её по id и прописываем точные данные
+          final cardIndex = _flashcards.indexWhere((card) => card.id == id);
+          if (cardIndex != -1) {
+            _flashcards[cardIndex] = _flashcards[cardIndex].copyWith(
+              weight: progressData['weight'] ?? _flashcards[cardIndex].weight,
+              lastAnswerWeight: progressData['last_answer_weight'],
+              easeFactor: progressData['ease_factor'] != null 
+                  ? double.parse(progressData['ease_factor'].toString()) 
+                  : _flashcards[cardIndex].easeFactor,
+              intervalDays: progressData['interval_days'] ?? _flashcards[cardIndex].intervalDays,
+              nextReviewAt: progressData['next_review_at'],
+              lastReviewedAt: progressData['last_reviewed_at'],
+            );
+            notifyListeners();
+          }
+        }
+      } catch (e) {
+        debugPrint('Error updating weight on server: $e');
+      }
     }
   }
 
-  Future<void> updateCardWeightOnServer(int id, WeightDelaysEnum weightDelayEnum) async {
+  Future<Map<String, dynamic>?> updateCardWeightOnServer(int id, WeightDelaysEnum weightDelayEnum) async {
     ///flashcards/{flashcardId}/progress/weight'
     final url = Uri.parse('${EnvConfig.mainApiUrl}/api/flashcards/$id/progress/weight');
     final response = await _httpClient.post(
@@ -224,7 +259,10 @@ class FlashcardProvider with ChangeNotifier {
       body: json.encode({'weight': weightDelayEnum.value, 'last_answer_weight': weightDelayEnum.value}),
     );
 
-    if (response.statusCode != 200) {
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data['progress'] as Map<String, dynamic>?;
+    } else {
       const err = 'updateCardWeightOnServer: Failed to update weight on server';
       ApiLogger.apiPrint(err);
       throw AppHttpException(err, statusCode: response.statusCode);

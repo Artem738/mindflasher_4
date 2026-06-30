@@ -6,6 +6,9 @@ class FlashcardModel  {
   final int? deckId;
   final String? lastReviewedAt;
   final int? lastAnswerWeight;
+  final double easeFactor;
+  final int intervalDays;
+  final String? nextReviewAt;
 
   FlashcardModel ({
     required this.id,
@@ -15,6 +18,9 @@ class FlashcardModel  {
     this.deckId,
     this.lastReviewedAt,
     this.lastAnswerWeight,
+    this.easeFactor = 2.50,
+    this.intervalDays = 0,
+    this.nextReviewAt,
   });
 
   factory FlashcardModel.fromJson(Map<String, dynamic> json) {
@@ -26,6 +32,11 @@ class FlashcardModel  {
       deckId: json['deck_id'],
       lastReviewedAt: json['last_reviewed_at'],
       lastAnswerWeight: json['last_answer_weight'],
+      easeFactor: json['ease_factor'] != null 
+          ? double.parse(json['ease_factor'].toString()) 
+          : 2.50,
+      intervalDays: json['interval_days'] ?? 0,
+      nextReviewAt: json['next_review_at'],
     );
   }
 
@@ -37,6 +48,9 @@ class FlashcardModel  {
     int? deckId,
     String? lastReviewedAt,
     int? lastAnswerWeight,
+    double? easeFactor,
+    int? intervalDays,
+    String? nextReviewAt,
   }) {
     return FlashcardModel (
       id: id ?? this.id,
@@ -46,6 +60,9 @@ class FlashcardModel  {
       deckId: deckId ?? this.deckId,
       lastReviewedAt: lastReviewedAt ?? this.lastReviewedAt,
       lastAnswerWeight: lastAnswerWeight ?? this.lastAnswerWeight,
+      easeFactor: easeFactor ?? this.easeFactor,
+      intervalDays: intervalDays ?? this.intervalDays,
+      nextReviewAt: nextReviewAt ?? this.nextReviewAt,
     );
   }
 }

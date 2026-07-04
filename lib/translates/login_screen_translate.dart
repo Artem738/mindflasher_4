@@ -26,6 +26,11 @@ class LoginScreenTranslate {
       'ru': 'Пароль',
       'uk': 'Пароль',
     },
+    'email': {
+      'en': 'Email',
+      'ru': 'Email',
+      'uk': 'Email',
+    },
   };
 
 

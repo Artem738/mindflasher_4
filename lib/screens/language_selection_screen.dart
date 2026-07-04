@@ -3,19 +3,19 @@ import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/providers/provider_user_login.dart';
 import 'package:provider/provider.dart';
 import 'package:mindflasher_4/models/user_model.dart';
+import 'package:mindflasher_4/translates/language_selection_screen_translate.dart';
 
 import '../main.dart';
 
 enum Language {
-  english('en', 'English', '🇬🇧'),
-  ukrainian('uk', 'Українська', '🇺🇦'),
-  russian('ru', 'Русский', '🇭🇳');
+  english('en', 'English'),
+  ukrainian('uk', 'Українська'),
+  russian('ru', 'Русский');
 
   final String code;
   final String name;
-  final String flag;
 
-  const Language(this.code, this.name, this.flag);
+  const Language(this.code, this.name);
 
   static Language fromCode(String? code) {
     return Language.values.firstWhere(
@@ -30,9 +30,13 @@ class LanguageSelectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userModel = Provider.of<UserModel>(context);
+    final userLang = userModel.language_code ?? userModel.tg_language_code ?? 'en';
+    final txt = LanguageSelectionScreenTranslate(userLang);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Select Language'),
+        title: Text(txt.tt('title')),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -51,11 +55,6 @@ class LanguageSelectionScreen extends StatelessWidget {
                           vertical: 20.0, horizontal: 24.0),
                       child: Row(
                         children: [
-                          Text(
-                            language.flag,
-                            style: const TextStyle(fontSize: 32),
-                          ),
-                          const SizedBox(width: 24),
                           Expanded(
                             child: Text(
                               language.name,

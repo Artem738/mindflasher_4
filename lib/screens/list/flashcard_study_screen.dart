@@ -5,6 +5,7 @@ import 'package:mindflasher_4/providers/flashcard_provider.dart';
 import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/tech_data/weight_delays_enum.dart';
 import 'package:mindflasher_4/translates/flashcard_study_screen_translate.dart';
+import 'package:mindflasher_4/screens/flashcard_management_screen.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -88,6 +89,24 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
       appBar: AppBar(
         title: Text(txt.tt('study_title')),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () async {
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => FlashcardManagementScreen(
+                    deck: widget.deck,
+                    flashcard: widget.flashcard,
+                  ),
+                ),
+              );
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         child: Column(

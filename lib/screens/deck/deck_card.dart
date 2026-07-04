@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/models/deck_model.dart';
 import 'package:mindflasher_4/screens/list/flashcard_index_screen.dart';
+import 'package:mindflasher_4/screens/deck/deck_progress_chart.dart';
+import 'package:provider/provider.dart';
+import 'package:mindflasher_4/providers/deck_provider.dart';
 
 class DeckCard extends StatelessWidget {
   final DeckModel deck;
@@ -21,24 +24,27 @@ class DeckCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: isClickOnCardWork
-            ? () {
-                Navigator.of(context).push(
+            ? () async {
+                await Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => FlashcardIndexScreen(deck: deck),
                   ),
                 );
+                if (context.mounted) {
+                  context.read<DeckProvider>().fetchDecks();
+                }
               }
             : null,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: [
-              CircleAvatar(
-                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                child: Icon(
-                  Icons.folder_open_outlined,
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                ),
+              DeckProgressChart(
+                totalCards: deck.totalCards,
+                grayCards: deck.grayCards,
+                redCards: deck.redCards,
+                yellowCards: deck.yellowCards,
+                greenCards: deck.greenCards,
               ),
               const SizedBox(width: 16),
               Expanded(

@@ -33,6 +33,60 @@ class TemplateDeckIndexScreenTranslate {
       'ru': 'Добавить',
       'uk': 'Додати',
     },
+
+    'categories': {
+      'en': 'Categories',
+      'ru': 'Категории',
+      'uk': 'Категорії',
+    },
+
+    'subcategories': {
+      'en': 'Subcategories',
+      'ru': 'Подкатегории',
+      'uk': 'Підкатегорії',
+    },
+
+    'decks_count': {
+      'en': 'Decks',
+      'ru': 'Колоды',
+      'uk': 'Колоди',
+    },
+
+    'search_hint': {
+      'en': 'Search decks...',
+      'ru': 'Поиск колод...',
+      'uk': 'Пошук колод...',
+    },
+
+    'my_language_only': {
+      'en': 'My language',
+      'ru': 'Мой язык',
+      'uk': 'Моя мова',
+    },
+
+    'all_languages': {
+      'en': 'All languages',
+      'ru': 'Все языки',
+      'uk': 'Всі мови',
+    },
+
+    'no_results': {
+      'en': 'No decks found',
+      'ru': 'Колоды не найдены',
+      'uk': 'Колод не знайдено',
+    },
+
+    'no_templates': {
+      'en': 'No template decks available for your language',
+      'ru': 'Нет доступных шаблонных колод для вашего языка',
+      'uk': 'Немає доступних шаблонних колод для вашої мови',
+    },
+
+    'cards_count': {
+      'en': 'cards',
+      'ru': 'карточек',
+      'uk': 'карток',
+    },
   };
 
   final String languageCode;

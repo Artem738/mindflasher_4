@@ -114,6 +114,23 @@ class _DeckIndexScreenState extends State<DeckIndexScreen> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 32),
+                      FilledButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const FirstEnterScreen()),
+                          );
+                        },
+                        icon: const Icon(Icons.info_outline),
+                        label: Text(
+                          txt.tt('how_to_use'),
+                          style: TextStyle(fontSize: baseFontSize.clamp(14.0, 20.0)),
+                        ),
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                        ),
+                      ),
                     ],
                   ),
                 ),

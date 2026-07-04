@@ -5,6 +5,7 @@ class TemplateDeckModel {
   final String? deck_lang;
   final String? question_lang;
   final String? answer_lang;
+  final int? flashcardsCount;
 
   TemplateDeckModel({
     required this.id,
@@ -13,6 +14,7 @@ class TemplateDeckModel {
     this.deck_lang,
     this.question_lang,
     this.answer_lang,
+    this.flashcardsCount,
   });
 
   factory TemplateDeckModel.fromJson(Map<String, dynamic> json) {
@@ -23,10 +25,11 @@ class TemplateDeckModel {
       deck_lang: json['deck_lang'],
       question_lang: json['question_lang'],
       answer_lang: json['answer_lang'],
+      flashcardsCount: json['flashcards_count'],
     );
   }
 
   String log() {
-    return 'DeckModel - id: $id, name: $name, description: $description, deck_lang: $deck_lang, question_lang: $question_lang, answer_lang: $answer_lang';
+    return 'DeckModel - id: $id, name: $name, description: $description, deck_lang: $deck_lang, question_lang: $question_lang, answer_lang: $answer_lang, flashcardsCount: $flashcardsCount';
   }
 }

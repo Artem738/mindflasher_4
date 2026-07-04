@@ -61,6 +61,24 @@ class FlashcardManagementScreenTranslate {
       'ru': 'Не удалось удалить карточку',
       'uk': 'Не вдалося видалити картку',
     },
+    // txt.tt('delete_confirmation_title')  ${txt.tt('delete_confirmation_title')}
+    'delete_confirmation_title': {
+      'en': 'Delete flashcard?',
+      'ru': 'Удалить карточку?',
+      'uk': 'Видалити картку?',
+    },
+    // txt.tt('delete_confirmation_content')  ${txt.tt('delete_confirmation_content')}
+    'delete_confirmation_content': {
+      'en': 'Are you sure you want to delete this flashcard?',
+      'ru': 'Вы уверены, что хотите удалить эту карточку?',
+      'uk': 'Ви впевнені, що хочете видалити цю картку?',
+    },
+    // txt.tt('cancel_button')  ${txt.tt('cancel_button')}
+    'cancel_button': {
+      'en': 'Cancel',
+      'ru': 'Отмена',
+      'uk': 'Скасувати',
+    },
   };
 
   final String languageCode;

@@ -31,6 +31,36 @@ class CsvManagementScreenTranslate {
       'ru': 'Не удалось вставить данные CSV',
       'uk': 'Не вдалося вставити дані CSV',
     },
+    'export_csv_title': {
+      'en': 'Export CSV',
+      'ru': 'Экспорт CSV',
+      'uk': 'Експорт CSV',
+    },
+    'import_csv_title': {
+      'en': 'Import CSV',
+      'ru': 'Импорт CSV',
+      'uk': 'Імпорт CSV',
+    },
+    'delimiter_label': {
+      'en': 'Delimiter:',
+      'ru': 'Разделитель:',
+      'uk': 'Розділювач:',
+    },
+    'copy_button': {
+      'en': 'Copy',
+      'ru': 'Скопировать',
+      'uk': 'Скопіювати',
+    },
+    'copied_message': {
+      'en': 'Copied to clipboard',
+      'ru': 'Скопировано в буфер обмена',
+      'uk': 'Скопійовано в буфер обміну',
+    },
+    'generate_csv_data': {
+      'en': 'Export CSV Data:',
+      'ru': 'Данные для экспорта:',
+      'uk': 'Дані для експорту:',
+    },
   };
 
   final String languageCode;

@@ -25,6 +25,24 @@ class TemplateFlashcardIndexScreenTranslate {
       'ru': 'Сделать собственной',
       'uk': 'Зробити власною',
     },
+    // txt.tt('go_to_study')  ${txt.tt('go_to_study')}
+    'go_to_study': {
+      'en': 'Go to Study',
+      'ru': 'Перейти к изучению',
+      'uk': 'Перейти до вивчення',
+    },
+    // txt.tt('question')  ${txt.tt('question')}
+    'question': {
+      'en': 'Question',
+      'ru': 'Вопрос',
+      'uk': 'Запитання',
+    },
+    // txt.tt('answer')  ${txt.tt('answer')}
+    'answer': {
+      'en': 'Answer',
+      'ru': 'Ответ',
+      'uk': 'Відповідь',
+    },
   };
 
   final String languageCode;

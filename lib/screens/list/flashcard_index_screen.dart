@@ -55,6 +55,23 @@ class _FlashcardIndexScreenState extends State<FlashcardIndexScreen> {
         title: Text(widget.deck.name),
         actions: [
           IconButton(
+            icon: const Icon(Icons.add),
+            tooltip: txt.tt('add_flashcard'),
+            onPressed: () {
+              Navigator.of(context)
+                  .push(
+                    MaterialPageRoute(
+                      builder: (context) => FlashcardManagementScreen(
+                        deck: widget.deck,
+                      ),
+                    ),
+                  )
+                  .then(
+                    (_) => _reloadFlashcards(),
+                  );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.edit_note),
             onPressed: () {
               Navigator.of(context).push(
@@ -63,6 +80,8 @@ class _FlashcardIndexScreenState extends State<FlashcardIndexScreen> {
                     deck: widget.deck,
                   ),
                 ),
+              ).then(
+                (_) => _reloadFlashcards(),
               );
             },
           ),
@@ -136,26 +155,6 @@ class _FlashcardIndexScreenState extends State<FlashcardIndexScreen> {
             ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'add_own_deck',
-        onPressed: () {
-          Navigator.of(context)
-              .push(
-                MaterialPageRoute(
-                  builder: (context) => FlashcardManagementScreen(
-                    deck: widget.deck,
-                  ),
-                ),
-              )
-              .then(
-                (_) => _reloadFlashcards(),
-              );
-        },
-        label: Text(
-          txt.tt('add_flashcard'),
-        ),
-        icon: const Icon(Icons.add_box_outlined),
       ),
     );
   }

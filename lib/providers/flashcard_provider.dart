@@ -69,6 +69,22 @@ class FlashcardProvider with ChangeNotifier {
     }
   }
 
+  Future<List<FlashcardModel>> fetchAllFlashcardsForExport(int deckId) async {
+    final apiUrl = '${EnvConfig.mainApiUrl}/api/decks/$deckId/flashcards?mode=all';
+    final response = await _httpClient.get(
+      Uri.parse(apiUrl),
+      headers: _headers(),
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((item) => FlashcardModel.fromJson(item)).toList();
+    } else {
+      throw AppHttpException('Failed to load flashcards for export', statusCode: response.statusCode);
+    }
+  }
+
+
   Future<bool> updateFlashcard(int deckId, int cardId, String question, String answer) async {
     final url = Uri.parse('${EnvConfig.mainApiUrl}/api/flashcards/$cardId');
     final response = await _httpClient.put(
@@ -160,7 +176,7 @@ class FlashcardProvider with ChangeNotifier {
   }
 
 
-  Future<bool> csvInsert(int deckId, String csvData) async {
+  Future<bool> csvInsert(int deckId, String csvData, {String delimiter = ';'}) async {
     final url = Uri.parse('${EnvConfig.mainApiUrl}/api/flashcards/csv-insert');
 
     final response = await _httpClient.post(
@@ -169,6 +185,7 @@ class FlashcardProvider with ChangeNotifier {
       body: json.encode({
         'deck_id': deckId,
         'csv_data': csvData,
+        'delimiter': delimiter,
       }),
     );
 

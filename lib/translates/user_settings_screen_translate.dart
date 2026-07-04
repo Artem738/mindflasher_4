@@ -112,9 +112,11 @@ class UserSettingsScreenTranslate {
       'ru': 'Автозакрытие других карточек',
       'uk': 'Автозакриття інших карток',
     },
-
-
-
+    'instruction': {
+      'en': 'Instructions',
+      'ru': 'Инструкция',
+      'uk': 'Інструкція',
+    },
   };
 
   final String languageCode;

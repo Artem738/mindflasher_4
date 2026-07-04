@@ -49,20 +49,15 @@ class RightAnswerCard extends StatelessWidget {
         : strippedText;
 
     void handleMiddleTap() {
-      if (isLong) {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => FlashcardStudyScreen(
-              flashcard: flashcard,
-              deck: deck,
-              startAnswerRevealed: true,
-            ),
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => FlashcardStudyScreen(
+            flashcard: flashcard,
+            deck: deck,
+            startAnswerRevealed: true,
           ),
-        );
-      } else {
-        Provider.of<FlashcardProvider>(context, listen: false)
-            .updateCardWeight(deck, flashcard.id, WeightDelaysEnum.normMedDelay);
-      }
+        ),
+      );
     }
 
     return Card(

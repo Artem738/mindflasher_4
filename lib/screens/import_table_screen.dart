@@ -53,7 +53,7 @@ class ImportTableScreen extends StatelessWidget {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                            success ? 'Импорт прошел успешно!' : 'Ошибка при импорте данных.',
+                            success ? txt.tt('import_success') : txt.tt('import_failed'),
                             style: const TextStyle(fontSize: 16),
                           ),
                           backgroundColor: success ? Colors.green : Colors.red,

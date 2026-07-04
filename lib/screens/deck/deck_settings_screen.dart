@@ -7,6 +7,7 @@ import 'package:mindflasher_4/screens/csv_management_screen.dart';
 import 'package:mindflasher_4/screens/deck/deck_index_screen.dart';
 import 'package:mindflasher_4/screens/deck/deck_management_screen.dart';
 import 'package:mindflasher_4/screens/import_table_screen.dart';
+import 'package:mindflasher_4/screens/flashcard_management_screen.dart';
 // Добавлен новый экран
 import 'package:mindflasher_4/translates/deck_settings_screen_translate.dart';
 import 'package:provider/provider.dart';
@@ -75,8 +76,8 @@ class DeckSettingsScreen extends StatelessWidget {
                             child: Text(
                               txt.tt('delete_button'),
                               style: TextStyle(
-                                fontSize: baseFontSize.clamp(14.0, 19.0),
-                                color: Colors.red,
+                                  fontSize: baseFontSize.clamp(14.0, 19.0),
+                                  color: Colors.red,
                               ),
                             ),
                           ),
@@ -202,6 +203,27 @@ class DeckSettingsScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
+                    // Добавить флеш-карточку
+                    ListTile(
+                      leading: const Icon(Icons.add_box_outlined),
+                      title: Text(
+                        txt.tt('add_flashcard'),
+                        style: TextStyle(fontSize: baseFontSize.clamp(14.0, 20.0)),
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FlashcardManagementScreen(
+                              deck: deck,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const Divider(height: 1),
+
                     // Редактировать колоду
                     ListTile(
                       leading: const Icon(Icons.edit_outlined),
@@ -273,20 +295,28 @@ class DeckSettingsScreen extends StatelessWidget {
                         style: TextStyle(fontSize: baseFontSize.clamp(14.0, 20.0)),
                       ),
                       trailing: const Icon(Icons.chevron_right),
-                      onTap: () {
-                        final flashcards = context.read<FlashcardProvider>().flashcards;
-                        final csvLines = flashcards.map((card) => '${card.question};${card.answer}').toList();
-                        final csvString = csvLines.join('\n');
-
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CsvManagementScreen(
-                              deck: deck,
-                              csvData: csvString,
-                            ),
-                          ),
-                        );
+                      onTap: () async {
+                        final flashcardProvider = context.read<FlashcardProvider>();
+                        try {
+                          final allFlashcards = await flashcardProvider.fetchAllFlashcardsForExport(deck.id);
+                          if (context.mounted) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CsvManagementScreen(
+                                  deck: deck,
+                                  exportFlashcards: allFlashcards,
+                                ),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Failed to load flashcards for export')),
+                            );
+                          }
+                        }
                       },
                     ),
                   ],

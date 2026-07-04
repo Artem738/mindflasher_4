@@ -38,10 +38,6 @@ class FirstEnterScreen extends StatelessWidget {
                   txt.tt('alternative_welcome'),
                   style: TextStyle(fontSize: (baseFontSize + 5).clamp(15.0 + 5, 20.0 + 5)),
                 ),
-                Text(
-                  "First enter ${userModel.isFirstEnter.toString()}",
-                  style: TextStyle(fontSize: (baseFontSize + 5).clamp(15.0 + 5, 20.0 + 5)),
-                ),
                 const SizedBox(height: 20),
               ],
               Text(
@@ -147,44 +143,26 @@ class FirstEnterScreen extends StatelessWidget {
                 style: TextStyle(fontSize: (baseFontSize).clamp(15.0, 20.0)),
               ),
               const SizedBox(height: 20),
-              if (userModel.isFirstEnter == true) ...[
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      context.read<ProviderUserLogin>().setIsFirstEnter(false);
+              const SizedBox(height: 20),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (Navigator.of(context).canPop()) {
+                      Navigator.of(context).pop();
+                    } else {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => const IndexScreen()),
+                        MaterialPageRoute(builder: (context) => const UserSettingsScreen()),
                       );
-                    },
-                    child: Text(
-                      txt.tt('start'),
-                      style: TextStyle(fontSize: (baseFontSize + 5).clamp(15.0 + 5, 20.0 + 5)),
-                    ),
+                    }
+                  },
+                  child: Text(
+                    txt.tt('back'),
+                    style: TextStyle(fontSize: (baseFontSize + 5).clamp(15.0 + 5, 20.0 + 5)),
                   ),
                 ),
-              ] else ...[
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      context.read<ProviderUserLogin>().setIsFirstEnter(false);
-                      if (Navigator.of(context).canPop()) {
-                        Navigator.of(context).pop();
-                      } else {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => const UserSettingsScreen()),
-                        );
-                      }
-                    },
-                    child: Text(
-                      txt.tt('back'),
-                      style: TextStyle(fontSize: (baseFontSize + 5).clamp(15.0 + 5, 20.0 + 5)),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 30),
-              ],
+              ),
+              const SizedBox(height: 30),
             ],
           ),
         ),

@@ -165,7 +165,6 @@ class AppBootstrapScreen extends StatelessWidget {
       isLoading: userLogin.isLoading,
       languageCode: userModel.language_code,
       token: userModel.token,
-      isFirstEnter: userModel.isFirstEnter == true,
     );
 
     switch (route) {
@@ -179,8 +178,6 @@ class AppBootstrapScreen extends StatelessWidget {
         return const LanguageSelectionScreen();
       case AppBootstrapRoute.login:
         return const LoginScreen();
-      case AppBootstrapRoute.firstEnterSetup:
-        return const FontSizeAdjustmentScreen();
       case AppBootstrapRoute.decks:
         return const DeckIndexScreen();
     }

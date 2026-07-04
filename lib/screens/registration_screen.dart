@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mindflasher_4/models/user_model.dart';
 import 'package:mindflasher_4/providers/provider_user_login.dart';
 import 'package:mindflasher_4/screens/deck/deck_index_screen.dart';
+import 'package:mindflasher_4/translates/registration_screen_translate.dart';
 import 'package:provider/provider.dart';
 
 class RegistrationScreen extends StatelessWidget {
@@ -13,9 +15,12 @@ class RegistrationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userModel = context.watch<UserModel>();
+    final txt = RegistrationScreenTranslate(userModel.language_code ?? 'en');
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Register'),
+        title: Text(txt.tt('title')),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -26,35 +31,35 @@ class RegistrationScreen extends StatelessWidget {
             children: [
               TextField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Name',
-                  prefixIcon: Icon(Icons.person_outline),
+                decoration: InputDecoration(
+                  labelText: txt.tt('name'),
+                  prefixIcon: const Icon(Icons.person_outline),
                 ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  prefixIcon: Icon(Icons.email_outlined),
+                decoration: InputDecoration(
+                  labelText: txt.tt('email'),
+                  prefixIcon: const Icon(Icons.email_outlined),
                 ),
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _passwordController,
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                  prefixIcon: Icon(Icons.lock_outline),
+                decoration: InputDecoration(
+                  labelText: txt.tt('password'),
+                  prefixIcon: const Icon(Icons.lock_outline),
                 ),
                 obscureText: true,
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _confirmPasswordController,
-                decoration: const InputDecoration(
-                  labelText: 'Confirm Password',
-                  prefixIcon: Icon(Icons.lock_reset_outlined),
+                decoration: InputDecoration(
+                  labelText: txt.tt('confirm_password'),
+                  prefixIcon: const Icon(Icons.lock_reset_outlined),
                 ),
                 obscureText: true,
               ),
@@ -75,8 +80,8 @@ class RegistrationScreen extends StatelessWidget {
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Registration failed'),
+                      SnackBar(
+                        content: Text(txt.tt('registration_failed')),
                         behavior: SnackBarBehavior.floating,
                       ),
                     );
@@ -88,9 +93,9 @@ class RegistrationScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  'Register',
-                  style: TextStyle(fontSize: 18),
+                child: Text(
+                  txt.tt('register_button'),
+                  style: const TextStyle(fontSize: 18),
                 ),
               ),
             ],

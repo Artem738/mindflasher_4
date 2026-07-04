@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/env_config.dart';
-import 'package:mindflasher_4/models/template_deck_model.dart';
+import 'package:mindflasher_4/models/template_category_model.dart';
 import 'package:mindflasher_4/models/user_model.dart';
 import 'package:mindflasher_4/services/app_http_client.dart';
 
@@ -13,9 +13,9 @@ class TemplateDeckProvider extends ChangeNotifier {
 
   UserModel _userModel;
   final AppHttpClient _httpClient;
-  final List<TemplateDeckModel> _templateDecks = [];
+  final List<TemplateCategoryModel> _categories = [];
 
-  List<TemplateDeckModel> get decks => _templateDecks;
+  List<TemplateCategoryModel> get categories => _categories;
 
   void updateUserModel(UserModel userModel) {
     _userModel = userModel;
@@ -39,9 +39,9 @@ class TemplateDeckProvider extends ChangeNotifier {
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
-      _templateDecks.clear();
+      _categories.clear();
 
-      _templateDecks.addAll(data.map((item) => TemplateDeckModel.fromJson(item)));
+      _categories.addAll(data.map((item) => TemplateCategoryModel.fromJson(item)));
       notifyListeners();
     } else {
       throw AppHttpException('Failed to load template decks', statusCode: response.statusCode);

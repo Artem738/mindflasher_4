@@ -21,19 +21,19 @@ class FlashcardStudyScreenTranslate {
       'uk': 'Показати відповідь',
     },
     'grade_bad': {
-      'en': 'Repeat (1d)',
-      'ru': 'Повторить (1д)',
-      'uk': 'Повторити (1д)',
+      'en': 'Bad',
+      'ru': 'Плохо',
+      'uk': 'Погано',
     },
     'grade_medium': {
-      'en': 'Soon (7d)',
-      'ru': 'Скоро (7д)',
-      'uk': 'Скоро (7д)',
+      'en': 'Medium',
+      'ru': 'Средне',
+      'uk': 'Середньо',
     },
     'grade_good': {
-      'en': 'Know (30d)',
-      'ru': 'Знаю (30д)',
-      'uk': 'Знаю (30д)',
+      'en': 'Know',
+      'ru': 'Знаю',
+      'uk': 'Знаю',
     },
     'view_full_answer': {
       'en': 'View full answer',

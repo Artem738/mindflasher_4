@@ -63,41 +63,63 @@ class FontSizeAdjustmentScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
                   onPressed: () {
                     userControl.decreaseFontSize();
                   },
-                  child: const Text('—', style: TextStyle(fontSize: 30)),
+                  style: ElevatedButton.styleFrom(
+                    shape: const CircleBorder(),
+                    padding: const EdgeInsets.all(12),
+                  ),
+                  child: const Icon(Icons.remove),
                 ),
-                ///TODO make stable var...
-                if (!kIsWeb) ...[
-                  ElevatedButton(
-                    onPressed: () {
-                      userControl.decreaseFontSizeByTenth(); // Уменьшение на 0.1
+                const SizedBox(width: 8),
+                Expanded(
+                  child: SegmentedButton<double>(
+                    segments: [
+                      ButtonSegment<double>(
+                        value: 14.0,
+                        label: Text(txt.tt('small'), style: const TextStyle(fontSize: 12)),
+                      ),
+                      ButtonSegment<double>(
+                        value: 18.0,
+                        label: Text(txt.tt('medium'), style: const TextStyle(fontSize: 14)),
+                      ),
+                      ButtonSegment<double>(
+                        value: 24.0,
+                        label: Text(txt.tt('large'), style: const TextStyle(fontSize: 16)),
+                      ),
+                    ],
+                    selected: {
+                      if (userModel.base_font_size <= 15) 14.0
+                      else if (userModel.base_font_size <= 20) 18.0
+                      else 24.0
                     },
-                    child: const Text('—0.1', style: TextStyle(fontSize: 20)),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      userControl.increaseFontSizeByTenth(); // Увеличение на 0.1
+                    onSelectionChanged: (Set<double> newSelection) {
+                      userControl.updateUserBaseFontSize(newSelection.first);
                     },
-                    child: const Text('+0.1', style: TextStyle(fontSize: 20)),
+                    showSelectedIcon: false,
                   ),
-                ],
+                ),
+                const SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: () {
                     userControl.increaseFontSize();
                   },
-                  child: const Text('+', style: TextStyle(fontSize: 30)),
+                  style: ElevatedButton.styleFrom(
+                    shape: const CircleBorder(),
+                    padding: const EdgeInsets.all(12),
+                  ),
+                  child: const Icon(Icons.add),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             Center(
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Распределяем кнопки равномерно по горизонтали
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
                     onPressed: () {
@@ -113,54 +135,34 @@ class FontSizeAdjustmentScreen extends StatelessWidget {
                       }
                     },
                     child: Text(
-                      'Отменить',
+                      txt.tt('cancel_button'),
                       style: TextStyle(
                         fontSize: (userModel.base_font_size).clamp(15.0, 20.0),
                         color: Colors.redAccent,
                       ),
                     ),
                   ),
-                  if (userModel.isFirstEnter != true) ...[
-                    ElevatedButton(
-                      onPressed: () {
-                        userControl.updateUserBaseFontSize(userModel.base_font_size);
-
-                        if (Navigator.of(context).canPop()) {
-                          Navigator.of(context).pop();
-                        } else {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const UserSettingsScreen(),
-                            ),
-                          );
-                        } // Возвращаемся на предыдущий экран с сохранением
-                      },
-                      child: Text(
-                        txt.tt('finish_button'),
-                        style: TextStyle(
-                          fontSize: (userModel.base_font_size + 5).clamp(15.0 + 5, 20.0 + 5),
-                        ),
-                      ),
-                    ),
-                  ] else ...[
-                    ElevatedButton(
-                      onPressed: () {
+                  ElevatedButton(
+                    onPressed: () {
+                      userControl.updateUserBaseFontSize(userModel.base_font_size);
+                      if (Navigator.of(context).canPop()) {
+                        Navigator.of(context).pop();
+                      } else {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const FirstEnterScreen(),
+                            builder: (context) => const UserSettingsScreen(),
                           ),
-                        ); // Переход на другой экран
-                      },
-                      child: Text(
-                        txt.tt('continue_button'),
-                        style: TextStyle(
-                          fontSize: (userModel.base_font_size + 5).clamp(15.0 + 5, 20.0 + 5),
-                        ),
+                        );
+                      }
+                    },
+                    child: Text(
+                      txt.tt('finish_button'),
+                      style: TextStyle(
+                        fontSize: (userModel.base_font_size + 5).clamp(15.0 + 5, 20.0 + 5),
                       ),
                     ),
-                  ],
+                  ),
                 ],
               ),
             ),

@@ -67,6 +67,32 @@ class DeckSettingsScreenTranslate {
       'ru': 'Отмена',
       'uk': 'Скасувати',
     },
+    // txt.tt('add_flashcard')  ${txt.tt('add_flashcard')}
+    'add_flashcard': {
+      'en': 'Add Flashcard',
+      'ru': 'Добавить флеш-карточку',
+      'uk': 'Додати флеш-картку',
+    },
+    'deck_import_title': {
+      'en': 'Import Deck',
+      'ru': 'Импорт колоды',
+      'uk': 'Імпорт колоди',
+    },
+    'import_in': {
+      'en': 'Import into',
+      'ru': 'Импорт в',
+      'uk': 'Імпорт в',
+    },
+    'import_success': {
+      'en': 'Import completed successfully!',
+      'ru': 'Импорт прошел успешно!',
+      'uk': 'Імпорт пройшов успішно!',
+    },
+    'import_failed': {
+      'en': 'Error importing data.',
+      'ru': 'Ошибка при импорте данных.',
+      'uk': 'Помилка при імпорті даних.',
+    },
   };
 
   final String languageCode;

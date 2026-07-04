@@ -41,6 +41,26 @@ class FontSizeAdjustmentScreenTranslate {
       'ru': 'Продолжить',
       'uk': 'Продовжити',
     },
+    'small': {
+      'en': 'Small',
+      'ru': 'Мелкий',
+      'uk': 'Дрібний',
+    },
+    'medium': {
+      'en': 'Medium',
+      'ru': 'Средний',
+      'uk': 'Середній',
+    },
+    'large': {
+      'en': 'Large',
+      'ru': 'Крупный',
+      'uk': 'Великий',
+    },
+    'cancel_button': {
+      'en': 'Cancel',
+      'ru': 'Отменить',
+      'uk': 'Скасувати',
+    },
 
     // ARRAY
 

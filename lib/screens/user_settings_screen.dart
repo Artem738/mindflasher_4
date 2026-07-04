@@ -160,7 +160,7 @@ class UserSettingsScreen extends StatelessWidget {
                     const Divider(height: 1),
                     ListTile(
                       leading: const Icon(Icons.info_outline),
-                      title: Text(txt.tt('information'),
+                      title: Text(txt.tt('instruction'),
                           style: TextStyle(
                               fontSize: baseFontSize.clamp(14.0, 20.0))),
                       trailing: const Icon(Icons.chevron_right),

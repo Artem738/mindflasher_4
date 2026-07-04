@@ -45,6 +45,54 @@ class _FlashcardManagementScreenState extends State<FlashcardManagementScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
+        actions: [
+          if (isEditing)
+            IconButton(
+              icon: const Icon(Icons.delete_outline),
+              color: Theme.of(context).colorScheme.error,
+              onPressed: () async {
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: Text(txt.tt('delete_confirmation_title')),
+                    content: Text(txt.tt('delete_confirmation_content')),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(ctx).pop(false),
+                        child: Text(txt.tt('cancel_button')),
+                      ),
+                      FilledButton(
+                        onPressed: () => Navigator.of(ctx).pop(true),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.error,
+                        ),
+                        child: Text(txt.tt('delete_button')),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirm == true) {
+                  final flashcardProvider = context.read<FlashcardProvider>();
+                  bool success = await flashcardProvider.deleteFlashcard(widget.flashcard!.id);
+                  if (success) {
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                    }
+                  } else {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(txt.tt('failed_to_delete_flashcard')),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    }
+                  }
+                }
+              },
+            ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -57,8 +105,7 @@ class _FlashcardManagementScreenState extends State<FlashcardManagementScreen> {
                 labelText: txt.tt('question_label'),
                 alignLabelWithHint: true,
               ),
-              maxLines: 3,
-              minLines: 1,
+              maxLines: 1,
             ),
             const SizedBox(height: 16),
             TextField(
@@ -67,8 +114,8 @@ class _FlashcardManagementScreenState extends State<FlashcardManagementScreen> {
                 labelText: txt.tt('answer_label'),
                 alignLabelWithHint: true,
               ),
-              maxLines: 5,
-              minLines: 1,
+              maxLines: 20,
+              minLines: 5,
             ),
             const SizedBox(height: 32),
             FilledButton(
@@ -120,32 +167,7 @@ class _FlashcardManagementScreenState extends State<FlashcardManagementScreen> {
                 style: const TextStyle(fontSize: 16),
               ),
             ),
-            if (isEditing) ...[
-              const SizedBox(height: 12),
-              OutlinedButton.icon(
-                onPressed: () async {
-                  final flashcardProvider = context.read<FlashcardProvider>();
-                  bool success = await flashcardProvider.deleteFlashcard(widget.flashcard!.id);
-                  if (success) {
-                    Navigator.pop(context);
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(txt.tt('failed_to_update_flashcard')),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  }
-                },
-                icon: const Icon(Icons.delete_outline),
-                label: Text(txt.tt('delete_button')),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Theme.of(context).colorScheme.error,
-                  side: BorderSide(color: Theme.of(context).colorScheme.error),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-              ),
-            ],
+
           ],
         ),
       ),

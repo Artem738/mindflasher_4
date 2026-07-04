@@ -28,9 +28,14 @@ class FlashcardProvider with ChangeNotifier {
   int? _currentlySwipedCardId;
   String _currentMode = 'srs';
 
+  final List<Map<String, dynamic>> _offlineSyncQueue = [];
+  bool _isOfflineSyncPending = false;
+  bool _isProcessingQueue = false;
+
   List<FlashcardModel> get flashcards => _flashcards;
   int? get currentlySwipedCardId => _currentlySwipedCardId;
   String get currentMode => _currentMode;
+  bool get isOfflineSyncPending => _isOfflineSyncPending;
 
   void setCurrentlySwipedCardId(int? id) {
     if (_currentlySwipedCardId != id) {
@@ -263,7 +268,57 @@ class FlashcardProvider with ChangeNotifier {
         }
       } catch (e) {
         debugPrint('Error updating weight on server: $e');
+        _enqueueOfflineProgress(id, weightDelayEnum);
       }
+    }
+  }
+
+  void _enqueueOfflineProgress(int id, WeightDelaysEnum weightDelayEnum) {
+    _offlineSyncQueue.add({'id': id, 'weight': weightDelayEnum});
+    if (!_isOfflineSyncPending) {
+      _isOfflineSyncPending = true;
+      notifyListeners();
+    }
+    _processOfflineQueue();
+  }
+
+  Future<void> _processOfflineQueue() async {
+    if (_isProcessingQueue) return;
+    _isProcessingQueue = true;
+
+    while (_offlineSyncQueue.isNotEmpty) {
+      if (_userModel.token == null || _userModel.token!.isEmpty) {
+        // User logged out. Clear the queue to prevent infinite exception loops.
+        _offlineSyncQueue.clear();
+        break;
+      }
+
+      final item = _offlineSyncQueue.first;
+      try {
+        await updateCardWeightOnServer(item['id'], item['weight']);
+        _offlineSyncQueue.removeAt(0); // success, remove from queue
+      } catch (e) {
+        bool shouldRetry = true;
+        if (e is AppHttpException) {
+          final code = e.statusCode;
+          // Retrying won't help for 400, 403, 404, 422. Keep 401 (auth) and 429 (rate limit).
+          if (code != null && code >= 400 && code < 500 && code != 401 && code != 429) {
+            shouldRetry = false;
+          }
+        }
+        
+        if (shouldRetry) {
+          await Future.delayed(const Duration(seconds: 3));
+        } else {
+          _offlineSyncQueue.removeAt(0); // Drop unrecoverable request
+        }
+      }
+    }
+
+    _isProcessingQueue = false;
+    if (_isOfflineSyncPending) {
+      _isOfflineSyncPending = false;
+      notifyListeners();
     }
   }
 

@@ -12,9 +12,14 @@ import 'providers/provider_user_control.dart';
 import 'providers/provider_user_login.dart';
 import 'screens/login_screen.dart';
 import 'models/user_model.dart';
+import 'package:mindflasher_4/services/app_http_client.dart';
 
 void main() {
   final userModel = UserModel();
+
+  AppHttpClient.onUnauthorized = () {
+    userModel.logout();
+  };
 
   runApp(
     MultiProvider(

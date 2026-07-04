@@ -4,6 +4,7 @@ import 'package:mindflasher_4/models/flashcard_model.dart';
 import 'package:mindflasher_4/providers/flashcard_provider.dart';
 import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/screens/list/swipeable_card.dart';
+import 'package:flutter/services.dart';
 import 'flashcard_study_screen.dart';
 import 'package:mindflasher_4/tech_data/weight_delays_enum.dart';
 
@@ -43,6 +44,7 @@ class CentralTopCard extends StatelessWidget {
                   children: [
                     IconButton.filled(
                       onPressed: () {
+                        HapticFeedback.lightImpact();
                         Provider.of<FlashcardProvider>(context, listen: false)
                             .updateCardWeight(
                                 deck, flashcard.id, WeightDelaysEnum.goodLongDelay);
@@ -58,13 +60,32 @@ class CentralTopCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 12.0),
                     Expanded(
-                      child: Text(
-                        flashcard.question,
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              fontSize: baseFontSize,
-                              fontWeight: FontWeight.w500,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            flashcard.question,
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                  fontSize: baseFontSize,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                            textAlign: TextAlign.center,
+                          ),
+                          if (flashcard.nextReviewAt != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: Text(
+                                () {
+                                  final date = DateTime.parse(flashcard.nextReviewAt!).toLocal();
+                                  return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
+                                }(),
+                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                      color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+                                      fontSize: (baseFontSize - 4).clamp(10.0, 12.0),
+                                    ),
+                              ),
                             ),
-                        textAlign: TextAlign.center,
+                        ],
                       ),
                     ),
                     const SizedBox(width: 40), // Space for the bulb and padding

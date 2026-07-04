@@ -79,6 +79,12 @@ class FlashcardManagementScreenTranslate {
       'ru': 'Отмена',
       'uk': 'Скасувати',
     },
+    // txt.tt('limit_reached')  ${txt.tt('limit_reached')}
+    'limit_reached': {
+      'en': 'Limit reached: A deck cannot contain more than 1000 flashcards.',
+      'ru': 'Достигнут лимит: Колода не может содержать более 1000 карточек.',
+      'uk': 'Досягнуто ліміту: Колода не може містити більше 1000 карток.',
+    },
   };
 
   final String languageCode;

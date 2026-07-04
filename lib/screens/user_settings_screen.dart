@@ -68,7 +68,7 @@ class UserSettingsScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              _buildSectionTitle(context, 'Account Info', baseFontSize),
+              _buildSectionTitle(context, txt.tt('account_info'), baseFontSize),
               Card(
                 child: Column(
                   children: [
@@ -86,7 +86,7 @@ class UserSettingsScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              _buildSectionTitle(context, 'Settings', baseFontSize),
+              _buildSectionTitle(context, txt.tt('settings_section'), baseFontSize),
               Card(
                 child: Column(
                   children: [

@@ -114,6 +114,28 @@ class _FlashcardIndexScreenState extends State<FlashcardIndexScreen> {
               },
             ),
           ),
+          Consumer<FlashcardProvider>(
+            builder: (context, provider, child) {
+              if (!provider.isOfflineSyncPending) return const SizedBox.shrink();
+              return Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                color: Theme.of(context).colorScheme.errorContainer,
+                child: Row(
+                  children: [
+                    Icon(Icons.wifi_off, color: Theme.of(context).colorScheme.onErrorContainer, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        txt.tt('offline_sync_warning'),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onErrorContainer, fontSize: 13),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
           Expanded(
             child: FutureBuilder(
               future: _flashcardsFuture,

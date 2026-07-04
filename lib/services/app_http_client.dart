@@ -16,6 +16,8 @@ class AppHttpException implements Exception {
 }
 
 class AppHttpClient {
+  static void Function()? onUnauthorized;
+
   AppHttpClient({http.Client? client, Duration? timeout, AppLogger? logger})
       : _client = client ?? http.Client(),
         timeout = timeout ?? const Duration(seconds: 30),
@@ -57,6 +59,10 @@ class AppHttpClient {
     _logger.debug('http', '$method ${url.path} started');
     try {
       final response = await request().timeout(timeout);
+      if (response.statusCode == 401) {
+        _logger.warning('http', '$method ${url.path} returned 401 Unauthorized');
+        onUnauthorized?.call();
+      }
       _logger.info('http', '$method ${url.path} -> ${response.statusCode}');
       return response;
     } on TimeoutException catch (e) {

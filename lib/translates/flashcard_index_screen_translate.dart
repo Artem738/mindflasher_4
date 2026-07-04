@@ -39,6 +39,12 @@ class FlashcardIndexScreenTranslate {
       'ru': 'Отличная работа! Возвращайтесь завтра или перейдите во вкладку "Все карточки" для внеочередного повторения.',
       'uk': 'Чудова робота! Повертайтеся завтра або перейдіть у вкладку "Всі картки" для позачергового повторення.',
     },
+    // txt.tt('offline_sync_warning')  ${txt.tt('offline_sync_warning')}
+    'offline_sync_warning': {
+      'en': 'Network error. Progress is saved locally. Do not close the app.',
+      'ru': 'Ошибка сети. Прогресс сохраняется локально. Не закрывайте приложение.',
+      'uk': 'Помилка мережі. Прогрес зберігається локально. Не закривайте програму.',
+    },
   };
 
   final String languageCode;

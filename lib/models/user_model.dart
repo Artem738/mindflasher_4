@@ -102,4 +102,13 @@ class UserModel extends ChangeNotifier {
   }
 
   bool get isAdminForDiagnostics => (user_lvl ?? 0) >= 10;
+
+  void logout() {
+    token = null;
+    email = null;
+    apiId = null;
+    telegram_id = null;
+    hash = null;
+    notifyListeners();
+  }
 }

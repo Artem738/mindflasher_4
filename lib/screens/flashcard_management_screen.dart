@@ -141,6 +141,16 @@ class _FlashcardManagementScreenState extends State<FlashcardManagementScreen> {
                     );
                   }
                 } else {
+                  if (flashcardProvider.flashcards.length >= 1000) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(txt.tt('limit_reached')),
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Theme.of(context).colorScheme.error,
+                      ),
+                    );
+                    return;
+                  }
                   // Добавление новой карточки
                   bool success = await flashcardProvider.createFlashcard(
                     widget.deck.id,

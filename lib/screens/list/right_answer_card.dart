@@ -5,6 +5,7 @@ import 'package:mindflasher_4/providers/flashcard_provider.dart';
 import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/tech_data/weight_delays_enum.dart';
 import 'package:mindflasher_4/translates/flashcard_study_screen_translate.dart';
+import 'package:flutter/services.dart';
 import 'flashcard_study_screen.dart';
 
 import 'package:provider/provider.dart';
@@ -75,6 +76,7 @@ class RightAnswerCard extends StatelessWidget {
                 children: [
                   IconButton.filled(
                     onPressed: () {
+                      HapticFeedback.lightImpact();
                       Provider.of<FlashcardProvider>(context, listen: false)
                           .updateCardWeight(deck, flashcard.id,
                               WeightDelaysEnum.badSmallDelay);
@@ -107,6 +109,7 @@ class RightAnswerCard extends StatelessWidget {
                   ),
                   IconButton.filled(
                     onPressed: () {
+                      HapticFeedback.lightImpact();
                       Provider.of<FlashcardProvider>(context, listen: false)
                           .updateCardWeight(deck, flashcard.id,
                               WeightDelaysEnum.normMedDelay);

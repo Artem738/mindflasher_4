@@ -117,6 +117,16 @@ class UserSettingsScreenTranslate {
       'ru': 'Инструкция',
       'uk': 'Інструкція',
     },
+    'account_info': {
+      'en': 'Account Info',
+      'ru': 'Данные аккаунта',
+      'uk': 'Дані акаунта',
+    },
+    'settings_section': {
+      'en': 'Settings',
+      'ru': 'Настройки',
+      'uk': 'Налаштування',
+    },
   };
 
   final String languageCode;

@@ -4,7 +4,6 @@
 ios/
 macos/
 windows/
-web/
 
 
 # Except for the 'lib' directory and its contents
@@ -15,6 +14,13 @@ web/
 # Explicitly ignore env_config.dart files
 lib/env_config.dart
 
+# Except for the 'test' directory and its contents
+!test/
+!test/**
+
+# Except for the 'web' directory and its contents
+!web/
+!web/**
 
 # Except for the 'AndroidManifest.xml' file
 !android/
@@ -23,9 +29,12 @@ lib/env_config.dart
 !android/app/src/main/
 !android/app/src/main/AndroidManifest.xml
 
-# Except for .gitignore, pubspec.yaml, README.md, LICENSE in the root directory
+# Except for .gitignore, pubspec.yaml, pubspec.lock, analysis_options.yaml, README.md, LICENSE in the root directory
 !.gitignore
 !pubspec.yaml
+!pubspec.lock
+!analysis_options.yaml
 !README.md
 !LICENSE
+
 

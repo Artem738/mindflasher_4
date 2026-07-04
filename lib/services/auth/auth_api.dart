@@ -38,7 +38,19 @@ class LaravelAuthApi implements AuthApi {
     );
 
     if (response.statusCode != 200) {
-      throw AppHttpException('Login failed', statusCode: response.statusCode);
+      String errorMessage = 'Login failed';
+      try {
+        final decoded = jsonDecode(response.body);
+        if (decoded['errors'] != null) {
+          final errors = decoded['errors'] as Map<String, dynamic>;
+          if (errors.isNotEmpty) {
+            errorMessage = (errors.values.first as List).first.toString();
+          }
+        } else if (decoded['message'] != null) {
+          errorMessage = decoded['message'];
+        }
+      } catch (_) {}
+      throw AppHttpException(errorMessage, statusCode: response.statusCode);
     }
 
     final responseData = jsonDecode(response.body) as Map<String, dynamic>;
@@ -69,7 +81,19 @@ class LaravelAuthApi implements AuthApi {
     );
 
     if (response.statusCode != 201) {
-      throw AppHttpException('Registration failed', statusCode: response.statusCode);
+      String errorMessage = 'Registration failed';
+      try {
+        final decoded = jsonDecode(response.body);
+        if (decoded['errors'] != null) {
+          final errors = decoded['errors'] as Map<String, dynamic>;
+          if (errors.isNotEmpty) {
+            errorMessage = (errors.values.first as List).first.toString();
+          }
+        } else if (decoded['message'] != null) {
+          errorMessage = decoded['message'];
+        }
+      } catch (_) {}
+      throw AppHttpException(errorMessage, statusCode: response.statusCode);
     }
   }
 

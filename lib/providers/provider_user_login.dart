@@ -6,6 +6,7 @@ import 'package:mindflasher_4/services/auth/auth_api.dart';
 import 'package:mindflasher_4/services/auth/auth_local_store.dart';
 import 'package:mindflasher_4/services/auth/telegram_auth_bridge.dart';
 import 'package:mindflasher_4/services/logging/app_logger.dart';
+import 'package:mindflasher_4/services/app_http_client.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode; // Импортирует переменные для определения среды Web/Debug
 // Если библиотека dart.library.html доступна (приложение выполняется в веб-браузере),// то импортируется реальная реализация для веб-платформ
@@ -226,9 +227,14 @@ class ProviderUserLogin extends ChangeNotifier {
       await _authLocalStore.saveLastPassword(password);
       _logger.info('auth', 'Email login succeeded');
       ApiLogger.apiPrint('Login with email succeeded');
+    } on AppHttpException catch (e) {
+      _hasError = true;
+      _errorMessage = e.message;
+      _logger.error('auth', 'Login error: $_errorMessage');
+      ApiLogger.apiPrint('Login error: $_errorMessage');
     } catch (e) {
       _hasError = true;
-      _errorMessage = 'loginWithEmail Network error: $e';
+      _errorMessage = 'Network error: $e';
       _logger.error('auth', _errorMessage);
       ApiLogger.apiPrint(_errorMessage);
     } finally {
@@ -257,9 +263,14 @@ class ProviderUserLogin extends ChangeNotifier {
         _logger.info('auth', 'Email registration succeeded');
         ApiLogger.apiPrint('Register with email succeeded');
       }
+    } on AppHttpException catch (e) {
+      _hasError = true;
+      _errorMessage = e.message;
+      _logger.error('auth', 'Registration error: $_errorMessage');
+      ApiLogger.apiPrint('Registration error: $_errorMessage');
     } catch (e) {
       _hasError = true;
-      _errorMessage = 'registerWithEmail Network error: $e';
+      _errorMessage = 'Network error: $e';
       _logger.error('auth', _errorMessage);
       ApiLogger.apiPrint(_errorMessage);
     } finally {

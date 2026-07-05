@@ -26,12 +26,10 @@ class AudioPlayerService {
     }
 
     try {
-      print('AudioPlayerService: Loading direct stream URL -> $fullUrl');
       // Adding a 15-second timeout. If the server doesn't respond or returns a 404 that hangs the player, this will throw and stop the spinner.
       await _player!.setUrl(fullUrl).timeout(const Duration(seconds: 15));
       await _player!.play();
     } catch (e) {
-      print('AudioPlayerService Error: $e');
       throw Exception('Failed to play audio stream: $e');
     }
   }

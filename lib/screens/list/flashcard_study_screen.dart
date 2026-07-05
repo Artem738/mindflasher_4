@@ -8,6 +8,9 @@ import 'package:mindflasher_4/translates/flashcard_study_screen_translate.dart';
 import 'package:mindflasher_4/screens/flashcard_management_screen.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:mindflasher_4/services/audio_player_service.dart';
+import 'package:mindflasher_4/services/app_http_client.dart';
+import 'package:mindflasher_4/env_config.dart';
 
 class FlashcardStudyScreen extends StatefulWidget {
   final FlashcardModel flashcard;
@@ -27,11 +30,50 @@ class FlashcardStudyScreen extends StatefulWidget {
 
 class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
   late bool _showAnswer;
+  AudioPlayerService? _audioPlayerService;
+  bool _isAudioLoading = false;
 
   @override
   void initState() {
     super.initState();
     _showAnswer = widget.startAnswerRevealed;
+  }
+
+  @override
+  void dispose() {
+    _audioPlayerService?.dispose();
+    super.dispose();
+  }
+
+  Future<void> _playAudio(String userLanguage) async {
+    if (_audioPlayerService == null) {
+      final userModel = context.read<ProviderUserControl>().userModel;
+      _audioPlayerService = AudioPlayerService(
+        AppHttpClient(),
+        EnvConfig.mainApiUrl,
+        userModel.token,
+      );
+    }
+
+    setState(() {
+      _isAudioLoading = true;
+    });
+
+    try {
+      await _audioPlayerService!.playFlashcardAudio(widget.flashcard.id, userLanguage);
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error playing audio: $e')),
+        );
+      }
+    } finally {
+      if (context.mounted) {
+        setState(() {
+          _isAudioLoading = false;
+        });
+      }
+    }
   }
 
   void _gradeCard(WeightDelaysEnum grade) {
@@ -84,6 +126,12 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
         ),
       ],
     );
+
+    final bool hasAudio = widget.flashcard.answer.contains('[v]') && widget.flashcard.answer.contains('[/v]');
+    final String displayAnswer = widget.flashcard.answer
+        .replaceAll('[v]', '')
+        .replaceAll('[/v]', '')
+        .replaceAll('\\n', '\n');
 
     return Scaffold(
       appBar: AppBar(
@@ -191,27 +239,50 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                             borderRadius: BorderRadius.circular(16),
                           ),
                           color: colorScheme.secondaryContainer.withOpacity(0.4),
-                          child: Padding(
-                            padding: const EdgeInsets.all(20.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  txt.tt('answer'),
-                                  style: TextStyle(
-                                    fontSize: baseFontSize * 0.85,
-                                    fontWeight: FontWeight.bold,
-                                    color: colorScheme.secondary,
-                                    letterSpacing: 1.2,
-                                  ),
+                          child: Stack(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      txt.tt('answer'),
+                                      style: TextStyle(
+                                        fontSize: baseFontSize * 0.85,
+                                        fontWeight: FontWeight.bold,
+                                        color: colorScheme.secondary,
+                                        letterSpacing: 1.2,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    MarkdownBlock(
+                                      data: displayAnswer,
+                                      config: markdownConfig,
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 12),
-                                MarkdownBlock(
-                                  data: widget.flashcard.answer.replaceAll('\\n', '\n'),
-                                  config: markdownConfig,
+                              ),
+                              if (hasAudio)
+                                Positioned(
+                                  top: 8,
+                                  right: 8,
+                                  child: _isAudioLoading
+                                      ? const Padding(
+                                          padding: EdgeInsets.all(12.0),
+                                          child: SizedBox(
+                                            width: 24,
+                                            height: 24,
+                                            child: CircularProgressIndicator(strokeWidth: 2),
+                                          ),
+                                        )
+                                      : IconButton(
+                                          icon: const Icon(Icons.volume_up),
+                                          color: colorScheme.primary,
+                                          onPressed: () => _playAudio(userLanguage),
+                                        ),
                                 ),
-                              ],
-                            ),
+                            ],
                           ),
                         ),
                       ),

@@ -12,6 +12,8 @@ import 'package:provider/provider.dart';
 
 String _stripMarkdown(String markdown) {
   String txt = markdown.replaceAll('\n', ' ');
+  txt = txt.replaceAll('[v]', '');
+  txt = txt.replaceAll('[/v]', '');
   txt = txt.replaceAll(RegExp(r'^#+\s+', multiLine: true), '');
   txt = txt.replaceAll(RegExp(r'\*\*|__|\*|_'), '');
   txt = txt.replaceAll(RegExp(r'```[a-zA-Z]*\n?'), '');

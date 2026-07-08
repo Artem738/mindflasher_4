@@ -4,6 +4,7 @@ import 'package:mindflasher_4/models/flashcard_model.dart';
 import 'package:mindflasher_4/providers/flashcard_provider.dart';
 import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/screens/list/swipeable_card.dart';
+import 'package:mindflasher_4/services/app_haptics.dart';
 import 'package:flutter/services.dart';
 import 'flashcard_study_screen.dart';
 import 'package:mindflasher_4/tech_data/weight_delays_enum.dart';
@@ -44,7 +45,7 @@ class CentralTopCard extends StatelessWidget {
                   children: [
                     IconButton.filled(
                       onPressed: () {
-                        HapticFeedback.lightImpact();
+                        AppHaptics.lightImpact();
                         Provider.of<FlashcardProvider>(context, listen: false)
                             .updateCardWeight(
                                 deck, flashcard.id, WeightDelaysEnum.goodLongDelay);

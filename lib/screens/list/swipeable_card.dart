@@ -3,6 +3,7 @@ import 'package:mindflasher_4/models/deck_model.dart';
 import 'package:mindflasher_4/models/flashcard_model.dart';
 import 'package:mindflasher_4/providers/flashcard_provider.dart';
 import 'package:mindflasher_4/tech_data/weight_delays_enum.dart';
+import 'package:mindflasher_4/services/app_haptics.dart';
 import 'package:flutter/services.dart';
 import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:provider/provider.dart';
@@ -113,7 +114,7 @@ class SwipeableCardState extends State<SwipeableCard> with SingleTickerProviderS
     _animation = Tween<double>(begin: _dragExtent, end: -screenWidth * _stopThresholdRight).animate(_animationController);
 
     _animationController.forward(from: 0.0).then((_) {
-      HapticFeedback.lightImpact();
+      AppHaptics.lightImpact();
       // print("Card swiped left!");
 
       _timer?.cancel(); // Отменяем предыдущий таймер, если он был

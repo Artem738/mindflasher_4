@@ -11,7 +11,7 @@ class AudioPlayerService {
   AudioPlayerService(this._httpClient, this._baseUrl, this._bearerToken);
 
   /// Fetches the audio URL from the backend and plays it.
-  Future<void> playFlashcardAudio(int flashcardId, String lang) async {
+  Future<void> playFlashcardAudio(int flashcardId, String lang, {String? text}) async {
     // Lazy initialization to ensure AudioContext is created synchronously with the user gesture.
     _player ??= AudioPlayer();
 
@@ -23,6 +23,10 @@ class AudioPlayerService {
     if (_bearerToken != null && _bearerToken!.isNotEmpty) {
       final encodedToken = Uri.encodeComponent(_bearerToken!);
       fullUrl += '&token=$encodedToken';
+    }
+    if (text != null && text.isNotEmpty) {
+      final encodedText = Uri.encodeComponent(text);
+      fullUrl += '&text=$encodedText';
     }
 
     try {

@@ -31,7 +31,7 @@ class DeckProvider extends ChangeNotifier {
   }
 
   // Метод для создания новой колоды
-  Future<bool> createDeck(String name, String description, {int? templateDeckId}) async {
+  Future<bool> createDeck(String name, String description, {int? templateDeckId, String? questionLang, String? answerLang}) async {
     final apiUrl = '${EnvConfig.mainApiUrl}/api/decks';
     final response = await _httpClient.post(
       Uri.parse(apiUrl),
@@ -39,7 +39,9 @@ class DeckProvider extends ChangeNotifier {
       body: jsonEncode({
         'name': name,
         'description': description,
-        'template_deck_id': templateDeckId,
+        if (templateDeckId != null) 'template_deck_id': templateDeckId,
+        if (questionLang != null && questionLang.isNotEmpty) 'question_lang': questionLang,
+        if (answerLang != null && answerLang.isNotEmpty) 'answer_lang': answerLang,
       }),
     );
 
@@ -52,7 +54,7 @@ class DeckProvider extends ChangeNotifier {
   }
 
   // Метод для обновления существующей колоды
-  Future<bool> updateDeck(int deckId, String name, String description) async {
+  Future<bool> updateDeck(int deckId, String name, String description, {String? questionLang, String? answerLang}) async {
     final apiUrl = '${EnvConfig.mainApiUrl}/api/decks/$deckId';
     final response = await _httpClient.put(
       Uri.parse(apiUrl),
@@ -60,6 +62,8 @@ class DeckProvider extends ChangeNotifier {
       body: jsonEncode({
         'name': name,
         'description': description,
+        if (questionLang != null && questionLang.isNotEmpty) 'question_lang': questionLang,
+        if (answerLang != null && answerLang.isNotEmpty) 'answer_lang': answerLang,
       }),
     );
 

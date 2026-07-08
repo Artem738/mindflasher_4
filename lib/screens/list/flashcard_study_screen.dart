@@ -45,7 +45,7 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
     super.dispose();
   }
 
-  Future<void> _playAudio(String userLanguage) async {
+  Future<void> _playAudio(String userLanguage, {String? textToPlay}) async {
     if (_audioPlayerService == null) {
       final userModel = context.read<ProviderUserControl>().userModel;
       _audioPlayerService = AudioPlayerService(
@@ -60,7 +60,7 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
     });
 
     try {
-      await _audioPlayerService!.playFlashcardAudio(widget.flashcard.id, userLanguage);
+      await _audioPlayerService!.playFlashcardAudio(widget.flashcard.id, userLanguage, text: textToPlay);
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -124,13 +124,26 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        LinkConfig(
+          style: TextStyle(
+            color: colorScheme.primary,
+            decoration: TextDecoration.underline,
+          ),
+          onTap: (url) {
+            if (url.startsWith('tts://')) {
+              final textToPlay = Uri.decodeComponent(url.replaceFirst('tts://', ''));
+              _playAudio(userLanguage, textToPlay: textToPlay);
+            }
+          },
+        ),
       ],
     );
 
-    final bool hasAudio = widget.flashcard.answer.contains('[v]') && widget.flashcard.answer.contains('[/v]');
     final String displayAnswer = widget.flashcard.answer
-        .replaceAll('[v]', '')
-        .replaceAll('[/v]', '')
+        .replaceAllMapped(RegExp(r'\[v\](.*?)\[/v\]'), (match) {
+          final word = match.group(1);
+          return '[$word 🔊](tts://$word)';
+        })
         .replaceAll('\\n', '\n');
 
     return Scaffold(
@@ -239,50 +252,27 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                             borderRadius: BorderRadius.circular(16),
                           ),
                           color: colorScheme.secondaryContainer.withOpacity(0.4),
-                          child: Stack(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(20.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      txt.tt('answer'),
-                                      style: TextStyle(
-                                        fontSize: baseFontSize * 0.85,
-                                        fontWeight: FontWeight.bold,
-                                        color: colorScheme.secondary,
-                                        letterSpacing: 1.2,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    MarkdownBlock(
-                                      data: displayAnswer,
-                                      config: markdownConfig,
-                                    ),
-                                  ],
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  txt.tt('answer'),
+                                  style: TextStyle(
+                                    fontSize: baseFontSize * 0.85,
+                                    fontWeight: FontWeight.bold,
+                                    color: colorScheme.secondary,
+                                    letterSpacing: 1.2,
+                                  ),
                                 ),
-                              ),
-                              if (hasAudio)
-                                Positioned(
-                                  top: 8,
-                                  right: 8,
-                                  child: _isAudioLoading
-                                      ? const Padding(
-                                          padding: EdgeInsets.all(12.0),
-                                          child: SizedBox(
-                                            width: 24,
-                                            height: 24,
-                                            child: CircularProgressIndicator(strokeWidth: 2),
-                                          ),
-                                        )
-                                      : IconButton(
-                                          icon: const Icon(Icons.volume_up),
-                                          color: colorScheme.primary,
-                                          onPressed: () => _playAudio(userLanguage),
-                                        ),
+                                const SizedBox(height: 12),
+                                MarkdownBlock(
+                                  data: displayAnswer,
+                                  config: markdownConfig,
                                 ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),

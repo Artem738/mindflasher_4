@@ -28,6 +28,31 @@ class _FlashcardManagementScreenState extends State<FlashcardManagementScreen> {
     _answerController = TextEditingController(text: widget.flashcard?.answer ?? '');
   }
 
+  void _wrapWithVoiceTag(TextEditingController controller) {
+    final text = controller.text;
+    final selection = controller.selection;
+
+    if (selection.isValid) {
+      if (!selection.isCollapsed) {
+        final selectedText = text.substring(selection.start, selection.end);
+        final newText = text.replaceRange(selection.start, selection.end, '[v]$selectedText[/v]');
+        controller.value = TextEditingValue(
+          text: newText,
+          selection: TextSelection.collapsed(offset: selection.start + 3 + selectedText.length + 4),
+        );
+      } else {
+        final newText = text.replaceRange(selection.start, selection.end, '[v][/v]');
+        controller.value = TextEditingValue(
+          text: newText,
+          selection: TextSelection.collapsed(offset: selection.start + 3),
+        );
+      }
+    } else {
+      controller.text = '$text[v][/v]';
+      controller.selection = TextSelection.collapsed(offset: controller.text.length - 4);
+    }
+  }
+
   @override
   void dispose() {
     _questionController.dispose();
@@ -107,7 +132,17 @@ class _FlashcardManagementScreenState extends State<FlashcardManagementScreen> {
               ),
               maxLines: 1,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.volume_up, size: 24),
+                  tooltip: '[v] [/v]',
+                  onPressed: () => _wrapWithVoiceTag(_answerController),
+                ),
+              ],
+            ),
             TextField(
               controller: _answerController,
               decoration: InputDecoration(

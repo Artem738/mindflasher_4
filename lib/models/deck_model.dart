@@ -3,6 +3,8 @@ class DeckModel {
   final String name;
   final String description;
   final int? templateDeckId;
+  final String? questionLang;
+  final String? answerLang;
   final int totalCards;
   final int grayCards;
   final int redCards;
@@ -14,6 +16,8 @@ class DeckModel {
     required this.name,
     required this.description,
     this.templateDeckId,
+    this.questionLang,
+    this.answerLang,
     this.totalCards = 0,
     this.grayCards = 0,
     this.redCards = 0,
@@ -27,6 +31,8 @@ class DeckModel {
       name: json['name'],
       description: json['description'] ?? '',
       templateDeckId: json['template_deck_id'],
+      questionLang: json['question_lang'],
+      answerLang: json['answer_lang'],
       totalCards: json['total_cards'] ?? 0,
       grayCards: json['gray_cards'] ?? 0,
       redCards: json['red_cards'] ?? 0,

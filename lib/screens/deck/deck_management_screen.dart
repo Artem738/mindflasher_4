@@ -3,6 +3,7 @@ import 'package:mindflasher_4/models/deck_model.dart';
 import 'package:mindflasher_4/models/user_model.dart';
 import 'package:mindflasher_4/providers/deck_provider.dart';
 import 'package:mindflasher_4/translates/deck_management_screen_translate.dart';
+import 'package:mindflasher_4/tech_data/app_languages.dart';
 import 'package:provider/provider.dart';
 
 class DeckManagementScreen extends StatefulWidget {
@@ -17,6 +18,8 @@ class DeckManagementScreen extends StatefulWidget {
 class _DeckManagementScreenState extends State<DeckManagementScreen> {
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;
+  String? _selectedQuestionLang;
+  String? _selectedAnswerLang;
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -25,6 +28,8 @@ class _DeckManagementScreenState extends State<DeckManagementScreen> {
     // Если редактирование, инициализируем контроллеры значениями из переданной колоды
     _nameController = TextEditingController(text: widget.deck?.name ?? '');
     _descriptionController = TextEditingController(text: widget.deck?.description ?? '');
+    _selectedQuestionLang = widget.deck?.questionLang ?? 'ru';
+    _selectedAnswerLang = widget.deck?.answerLang ?? 'en';
   }
 
   @override
@@ -122,6 +127,48 @@ class _DeckManagementScreenState extends State<DeckManagementScreen> {
                             alignLabelWithHint: true,
                           ),
                         ),
+                        const SizedBox(height: 20),
+                        
+                        // Поле выбора языка вопроса
+                        DropdownButtonFormField<String>(
+                          value: _selectedQuestionLang,
+                          decoration: InputDecoration(
+                            labelText: 'Question Language',
+                            prefixIcon: const Icon(Icons.language_outlined),
+                          ),
+                          items: AppLanguages.supportedTTSLanguages.map((lang) {
+                            return DropdownMenuItem<String>(
+                              value: lang['code'],
+                              child: Text(lang['name']!),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedQuestionLang = value;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        
+                        // Поле выбора языка ответа
+                        DropdownButtonFormField<String>(
+                          value: _selectedAnswerLang,
+                          decoration: InputDecoration(
+                            labelText: 'Answer Language', // Ideally translate this too
+                            prefixIcon: const Icon(Icons.language_outlined),
+                          ),
+                          items: AppLanguages.supportedTTSLanguages.map((lang) {
+                            return DropdownMenuItem<String>(
+                              value: lang['code'],
+                              child: Text(lang['name']!),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedAnswerLang = value;
+                            });
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -143,6 +190,8 @@ class _DeckManagementScreenState extends State<DeckManagementScreen> {
                         widget.deck!.id,
                         _nameController.text.trim(),
                         _descriptionController.text.trim(),
+                        questionLang: _selectedQuestionLang,
+                        answerLang: _selectedAnswerLang,
                       );
                       if (success) {
                         Navigator.pop(context);
@@ -159,6 +208,8 @@ class _DeckManagementScreenState extends State<DeckManagementScreen> {
                       bool success = await deckProvider.createDeck(
                         _nameController.text.trim(),
                         _descriptionController.text.trim(),
+                        questionLang: _selectedQuestionLang,
+                        answerLang: _selectedAnswerLang,
                       );
                       if (success) {
                         Navigator.pop(context);

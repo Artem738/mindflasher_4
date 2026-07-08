@@ -40,6 +40,11 @@ class FlashcardStudyScreenTranslate {
       'ru': 'Посмотреть полный ответ',
       'uk': 'Переглянути повну відповідь',
     },
+    'audio_cache_cleared': {
+      'en': 'Audio cache cleared',
+      'ru': 'Кэш аудио сброшен',
+      'uk': 'Кеш аудіо скинуто',
+    },
   };
 
   final String languageCode;

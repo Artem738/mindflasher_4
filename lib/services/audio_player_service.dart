@@ -10,8 +10,10 @@ class AudioPlayerService {
 
   AudioPlayerService(this._httpClient, this._baseUrl, this._bearerToken);
 
+  static int _cacheBuster = 0;
+
   /// Fetches the audio URL from the backend and plays it.
-  Future<void> playFlashcardAudio(int flashcardId, String lang, {String? text}) async {
+  Future<void> playFlashcardAudio(int flashcardId, String lang, {String? text, double speed = 1.0}) async {
     // Lazy initialization to ensure AudioContext is created synchronously with the user gesture.
     _player ??= AudioPlayer();
 
@@ -28,14 +30,34 @@ class AudioPlayerService {
       final encodedText = Uri.encodeComponent(text);
       fullUrl += '&text=$encodedText';
     }
+    
+    // Add cache buster to force the browser/player to fetch a fresh file if cache was cleared
+    fullUrl += '&cb=$_cacheBuster';
 
     try {
+      await _player!.setSpeed(speed);
       // Adding a 15-second timeout. If the server doesn't respond or returns a 404 that hangs the player, this will throw and stop the spinner.
       await _player!.setUrl(fullUrl).timeout(const Duration(seconds: 15));
       await _player!.play();
     } catch (e) {
       throw Exception('Failed to play audio stream: $e');
     }
+  }
+
+  Future<void> clearFlashcardAudioCache(int flashcardId, String lang) async {
+    String fullUrl = '$_baseUrl/api/flashcards/$flashcardId/audio/cache?lang=$lang';
+    final Map<String, String> headers = {};
+    if (_bearerToken != null && _bearerToken!.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $_bearerToken';
+    }
+
+    final response = await _httpClient.delete(Uri.parse(fullUrl), headers: headers);
+    if (response.statusCode != 200) {
+      throw Exception('Failed to clear audio cache: ${response.statusCode}');
+    }
+    
+    // Increment cache buster to force fresh fetch on next play
+    _cacheBuster++;
   }
 
   void dispose() {

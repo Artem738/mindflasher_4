@@ -33,6 +33,9 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
   AudioPlayerService? _audioPlayerService;
   bool _isAudioLoading = false;
 
+  String? _lastPlayedText;
+  bool _isSlowMode = false;
+
   @override
   void initState() {
     super.initState();
@@ -45,7 +48,7 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
     super.dispose();
   }
 
-  Future<void> _playAudio(String userLanguage, {String? textToPlay}) async {
+  Future<void> _playAudio(String userLanguage, {String? textToPlay, double speed = 1.0}) async {
     if (_audioPlayerService == null) {
       final userModel = context.read<ProviderUserControl>().userModel;
       _audioPlayerService = AudioPlayerService(
@@ -60,7 +63,7 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
     });
 
     try {
-      await _audioPlayerService!.playFlashcardAudio(widget.flashcard.id, userLanguage, text: textToPlay);
+      await _audioPlayerService!.playFlashcardAudio(widget.flashcard.id, userLanguage, text: textToPlay, speed: speed);
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -72,6 +75,33 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
         setState(() {
           _isAudioLoading = false;
         });
+      }
+    }
+  }
+
+  Future<void> _clearAudioCache(String userLanguage) async {
+    if (_audioPlayerService == null) {
+      final userModel = context.read<ProviderUserControl>().userModel;
+      _audioPlayerService = AudioPlayerService(
+        AppHttpClient(),
+        EnvConfig.mainApiUrl,
+        userModel.token,
+      );
+    }
+
+    try {
+      await _audioPlayerService!.clearFlashcardAudioCache(widget.flashcard.id, userLanguage);
+      if (context.mounted) {
+        final txt = FlashcardStudyScreenTranslate(userLanguage);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(txt.tt('audio_cache_cleared'))),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error clearing cache: $e')),
+        );
       }
     }
   }
@@ -132,7 +162,19 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
           onTap: (url) {
             if (url.startsWith('tts://')) {
               final textToPlay = Uri.decodeComponent(url.replaceFirst('tts://', ''));
-              _playAudio(userLanguage, textToPlay: textToPlay);
+              
+              if (_lastPlayedText == textToPlay) {
+                _isSlowMode = !_isSlowMode;
+              } else {
+                _lastPlayedText = textToPlay;
+                _isSlowMode = false;
+              }
+
+              _playAudio(
+                userLanguage, 
+                textToPlay: textToPlay,
+                speed: _isSlowMode ? 0.5 : 1.0,
+              );
             }
           },
         ),
@@ -142,7 +184,8 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
     final String displayAnswer = widget.flashcard.answer
         .replaceAllMapped(RegExp(r'\[v\](.*?)\[/v\]'), (match) {
           final word = match.group(1);
-          return '[$word 🔊](tts://$word)';
+          final encodedWord = Uri.encodeComponent(word ?? '');
+          return '[$word 🔊](tts://$encodedWord)';
         })
         .replaceAll('\\n', '\n');
 
@@ -213,30 +256,30 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                     // Show Answer Button
                     if (!_showAnswer)
                       Center(
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 250),
-                          curve: Curves.easeInOut,
-                          child: FilledButton.icon(
-                            onPressed: () {
-                              setState(() {
-                                _showAnswer = true;
-                              });
-                            },
-                            icon: const Icon(Icons.wb_incandescent_outlined),
-                            label: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16.0, vertical: 10.0),
-                              child: Text(
-                                txt.tt('show_answer'),
-                                style: TextStyle(fontSize: baseFontSize * 1.1),
-                              ),
+                        child: FilledButton.icon(
+                          onPressed: () {
+                            setState(() {
+                              _showAnswer = true;
+                            });
+                          },
+                          icon: const Icon(Icons.wb_incandescent_outlined),
+                          label: Text(
+                            txt.tt('show_answer'),
+                            style: TextStyle(
+                              fontSize: baseFontSize * 1.1,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
                             ),
-                            style: FilledButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              padding: EdgeInsets.zero,
+                          ),
+                          style: FilledButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
                             ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 32.0,
+                              vertical: 16.0,
+                            ),
+                            elevation: 2,
                           ),
                         ),
                       ),
@@ -246,25 +289,43 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                       AnimatedOpacity(
                         opacity: _showAnswer ? 1.0 : 0.0,
                         duration: const Duration(milliseconds: 300),
-                        child: Card(
-                          elevation: 2,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          color: colorScheme.secondaryContainer.withOpacity(0.4),
+                        child: GestureDetector(
+                          onLongPress: () => _clearAudioCache(userLanguage),
+                          child: Card(
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            color: colorScheme.secondaryContainer.withOpacity(0.4),
                           child: Padding(
                             padding: const EdgeInsets.all(20.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  txt.tt('answer'),
-                                  style: TextStyle(
-                                    fontSize: baseFontSize * 0.85,
-                                    fontWeight: FontWeight.bold,
-                                    color: colorScheme.secondary,
-                                    letterSpacing: 1.2,
-                                  ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      txt.tt('answer'),
+                                      style: TextStyle(
+                                        fontSize: baseFontSize * 0.85,
+                                        fontWeight: FontWeight.bold,
+                                        color: colorScheme.secondary,
+                                        letterSpacing: 1.2,
+                                      ),
+                                    ),
+                                    if (_isAudioLoading)
+                                      SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: colorScheme.primary,
+                                        ),
+                                      )
+                                    else
+                                      const SizedBox(width: 20, height: 20), // Prevent layout shift
+                                  ],
                                 ),
                                 const SizedBox(height: 12),
                                 MarkdownBlock(
@@ -274,6 +335,7 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                               ],
                             ),
                           ),
+                        ),
                         ),
                       ),
                   ],

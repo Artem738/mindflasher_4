@@ -13,7 +13,7 @@ class AudioPlayerService {
   static int _cacheBuster = 0;
 
   /// Fetches the audio URL from the backend and plays it.
-  Future<void> playFlashcardAudio(int flashcardId, String lang, {String? text, double speed = 1.0}) async {
+  Future<void> playFlashcardAudio(int flashcardId, String lang, {String? text, double speed = 1.0, String? voiceId}) async {
     // Lazy initialization to ensure AudioContext is created synchronously with the user gesture.
     _player ??= AudioPlayer();
 
@@ -29,6 +29,10 @@ class AudioPlayerService {
     if (text != null && text.isNotEmpty) {
       final encodedText = Uri.encodeComponent(text);
       fullUrl += '&text=$encodedText';
+    }
+    if (voiceId != null && voiceId.isNotEmpty) {
+      final encodedVoiceId = Uri.encodeComponent(voiceId);
+      fullUrl += '&voice_id=$encodedVoiceId';
     }
     
     // Add cache buster to force the browser/player to fetch a fresh file if cache was cleared

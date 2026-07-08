@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:mindflasher_4/services/audio_player_service.dart';
 import 'package:mindflasher_4/services/app_http_client.dart';
 import 'package:mindflasher_4/env_config.dart';
+import 'package:mindflasher_4/tech_data/tts_voices.dart';
 
 class FlashcardStudyScreen extends StatefulWidget {
   final FlashcardModel flashcard;
@@ -33,8 +34,7 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
   AudioPlayerService? _audioPlayerService;
   bool _isAudioLoading = false;
 
-  String? _lastPlayedText;
-  bool _isSlowMode = false;
+  final Map<String, int> _wordClickCounts = {};
 
   @override
   void initState() {
@@ -48,7 +48,7 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
     super.dispose();
   }
 
-  Future<void> _playAudio(String userLanguage, {String? textToPlay, double speed = 1.0}) async {
+  Future<void> _playAudio(String userLanguage, {String? textToPlay, double speed = 1.0, String? voiceId}) async {
     if (_audioPlayerService == null) {
       final userModel = context.read<ProviderUserControl>().userModel;
       _audioPlayerService = AudioPlayerService(
@@ -63,7 +63,7 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
     });
 
     try {
-      await _audioPlayerService!.playFlashcardAudio(widget.flashcard.id, userLanguage, text: textToPlay, speed: speed);
+      await _audioPlayerService!.playFlashcardAudio(widget.flashcard.id, userLanguage, text: textToPlay, speed: speed, voiceId: voiceId);
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -163,17 +163,37 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
             if (url.startsWith('tts://')) {
               final textToPlay = Uri.decodeComponent(url.replaceFirst('tts://', ''));
               
-              if (_lastPlayedText == textToPlay) {
-                _isSlowMode = !_isSlowMode;
+              int clicks = _wordClickCounts[textToPlay] ?? 0;
+              int cycle = clicks % 4;
+              
+              final answerLang = widget.deck.answerLang ?? 'en';
+              String femaleVoice = TtsVoices.getFemaleVoice(answerLang);
+              String maleVoice = TtsVoices.getMaleVoice(answerLang);
+              
+              String voiceId;
+              double speed;
+              
+              if (cycle == 0) {
+                voiceId = femaleVoice;
+                speed = 1.0;
+              } else if (cycle == 1) {
+                voiceId = femaleVoice;
+                speed = 0.5;
+              } else if (cycle == 2) {
+                voiceId = maleVoice;
+                speed = 1.0;
               } else {
-                _lastPlayedText = textToPlay;
-                _isSlowMode = false;
+                voiceId = maleVoice;
+                speed = 0.5;
               }
+              
+              _wordClickCounts[textToPlay] = clicks + 1;
 
               _playAudio(
                 userLanguage, 
                 textToPlay: textToPlay,
-                speed: _isSlowMode ? 0.5 : 1.0,
+                speed: speed,
+                voiceId: voiceId,
               );
             }
           },

@@ -14,6 +14,7 @@ class UserModel extends ChangeNotifier {
   int? authDate;
   String? hash;
   int? user_lvl;
+  int? ai_credits;
   bool? isFirstEnter;
   double base_font_size = 16.00;
   ThemeMode themeMode = ThemeMode.system;
@@ -33,6 +34,7 @@ class UserModel extends ChangeNotifier {
     this.authDate,
     this.hash,
     this.user_lvl,
+    this.ai_credits,
     this.isFirstEnter,
     this.themeMode = ThemeMode.system,
     this.auto_close_cards = true,
@@ -52,6 +54,7 @@ class UserModel extends ChangeNotifier {
     int? authDate,
     String? hash,
     int? user_lvl,
+    int? ai_credits,
     bool? isFirstEnter,
     double? base_font_size ,
     ThemeMode? themeMode,
@@ -70,6 +73,7 @@ class UserModel extends ChangeNotifier {
     this.authDate = authDate ?? this.authDate;
     this.hash = hash ?? this.hash;
     this.user_lvl = user_lvl ?? this.user_lvl;
+    this.ai_credits = ai_credits ?? this.ai_credits;
     this.isFirstEnter = isFirstEnter ?? this.isFirstEnter;
     this.base_font_size = base_font_size ?? this.base_font_size;
     this.themeMode = themeMode ?? this.themeMode;
@@ -88,7 +92,7 @@ class UserModel extends ChangeNotifier {
         'tg_first_name: ${tg_first_name ?? 'null'}, tg_last_name: ${tg_last_name ?? 'null'}, '
         'tg_language_code: ${tg_language_code ?? 'null'}, language_code: ${language_code ?? 'null'}, '
         'email: ${email ?? 'null'}, token: ${token ?? 'null'}, authDate: ${authDate ?? 'null'}, '
-        'hash: ${hash ?? 'null'}, user_lvl: ${user_lvl ?? 'null'}, '
+        'hash: ${hash ?? 'null'}, user_lvl: ${user_lvl ?? 'null'}, ai_credits: ${ai_credits ?? 'null'}, '
         'isFirstEnter: ${isFirstEnter ?? 'null'}, base_font_size: $base_font_size, auto_close_cards: $auto_close_cards';
   }
 
@@ -109,6 +113,7 @@ class UserModel extends ChangeNotifier {
     apiId = null;
     telegram_id = null;
     hash = null;
+    ai_credits = null;
     notifyListeners();
   }
 }

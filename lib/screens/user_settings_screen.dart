@@ -82,6 +82,8 @@ class UserSettingsScreen extends StatelessWidget {
                         baseFontSize),
                     _buildInfoTile(context, txt.tt('user_level'),
                         (userModel.user_lvl ?? '').toString(), Icons.trending_up, baseFontSize),
+                    _buildInfoTile(context, txt.tt('ai_credits'),
+                        (userModel.ai_credits ?? 0).toString(), Icons.stars_outlined, baseFontSize),
                   ],
                 ),
               ),

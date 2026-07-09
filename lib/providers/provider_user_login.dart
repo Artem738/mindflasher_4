@@ -326,6 +326,7 @@ class ProviderUserLogin extends ChangeNotifier {
       token: token,
       authDate: userData['auth_date'],
       user_lvl: userData['user_lvl'],
+      ai_credits: userData['ai_credits'],
     );
 
     if (resolvedEmail != null && resolvedEmail.isNotEmpty) {

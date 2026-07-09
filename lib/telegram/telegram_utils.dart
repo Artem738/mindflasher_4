@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:telegram_web_app/telegram_web_app.dart';
+import '../providers/devise_special_load/telegram_web_app_stub.dart'
+    if (dart.library.html) '../providers/devise_special_load/telegram_web_app_web.dart';
 import 'package:mindflasher_4/screens/util/snackbar_extension.dart';
 
 class TelegramUtil {

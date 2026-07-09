@@ -34,4 +34,21 @@ class TelegramWebApp {
 
   // Заглушка для мобильных платформ
   TelegramUser? get telegramUser => initData?.user;
+
+  // Методы для алертов
+  void showAlert(String message, Function() callback) {}
+  void showConfirm(String message, Function(bool) callback) {}
+  void showScanQrPopup(String message, Function(String) callback) {}
+  void readTextFromClipboard(Function(String) callback) {}
+
+  // Заглушка для HapticFeedback
+  final _HapticFeedback hapticFeedback = _HapticFeedback();
+}
+
+class _HapticFeedback {
+  void notificationOccurred(String type) {}
+}
+
+class HapticFeedbackNotificationType {
+  static const String success = 'success';
 }

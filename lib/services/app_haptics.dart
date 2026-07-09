@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
-import 'package:telegram_web_app/telegram_web_app.dart' as tg;
+import '../providers/devise_special_load/telegram_web_app_stub.dart'
+    if (dart.library.html) '../providers/devise_special_load/telegram_web_app_web.dart' as tg;
 
 class AppHaptics {
   static void lightImpact() {

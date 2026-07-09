@@ -67,6 +67,11 @@ class UserSettingsScreenTranslate {
       'ru': 'Уровень',
       'uk': 'Рівень',
     },
+    'ai_credits': {
+      'en': 'AI Credits',
+      'ru': 'ИИ Кредиты',
+      'uk': 'ШІ Кредити',
+    },
     // txt.tt('font_size')  ${txt.tt('font_size')}
     'font_size': {
       'en': 'Font Size',

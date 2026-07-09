@@ -4,6 +4,7 @@ import 'package:mindflasher_4/screens/list/flashcard_index_screen.dart';
 import 'package:mindflasher_4/screens/deck/deck_progress_chart.dart';
 import 'package:provider/provider.dart';
 import 'package:mindflasher_4/providers/deck_provider.dart';
+import 'package:mindflasher_4/screens/deck/voice_lesson_screen.dart';
 
 class DeckCard extends StatelessWidget {
   final DeckModel deck;
@@ -33,6 +34,20 @@ class DeckCard extends StatelessWidget {
                 if (context.mounted) {
                   context.read<DeckProvider>().fetchDecks();
                 }
+              }
+            : null,
+        onLongPress: isClickOnCardWork
+            ? () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => VoiceLessonScreen(
+                      deckId: deck.id,
+                      deckName: deck.name,
+                      questionLang: deck.questionLang ?? 'en',
+                      answerLang: deck.answerLang ?? 'en',
+                    ),
+                  ),
+                );
               }
             : null,
         child: Padding(

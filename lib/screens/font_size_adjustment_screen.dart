@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mindflasher_4/screens/deck/deck_card.dart';
-import 'package:mindflasher_4/screens/first_enter_screen.dart';
 import 'package:mindflasher_4/screens/user_settings_screen.dart';
 import 'package:mindflasher_4/translates/font_size_adjustment_screen.dart';
 import 'package:provider/provider.dart';
 import '../models/deck_model.dart';
 import '../providers/provider_user_control.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 class FontSizeAdjustmentScreen extends StatelessWidget {
   const FontSizeAdjustmentScreen({super.key});

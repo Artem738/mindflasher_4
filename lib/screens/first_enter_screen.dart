@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mindflasher_4/main.dart';
 import 'package:mindflasher_4/models/user_model.dart';
-import 'package:mindflasher_4/providers/provider_user_login.dart';
 import 'package:mindflasher_4/screens/user_settings_screen.dart';
 import 'package:mindflasher_4/translates/first_enterScreen_translate.dart';
 import 'package:provider/provider.dart';

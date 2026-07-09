@@ -4,9 +4,7 @@ import 'package:mindflasher_4/models/flashcard_model.dart';
 import 'package:mindflasher_4/providers/flashcard_provider.dart';
 import 'package:mindflasher_4/providers/provider_user_control.dart';
 import 'package:mindflasher_4/tech_data/weight_delays_enum.dart';
-import 'package:mindflasher_4/translates/flashcard_study_screen_translate.dart';
 import 'package:mindflasher_4/services/app_haptics.dart';
-import 'package:flutter/services.dart';
 import 'flashcard_study_screen.dart';
 
 import 'package:provider/provider.dart';
@@ -39,8 +37,6 @@ class RightAnswerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final baseFontSize =
         context.read<ProviderUserControl>().userModel.base_font_size;
-    final userLanguage =
-        context.read<ProviderUserControl>().userModel.language_code ?? 'en';
     final colorScheme = Theme.of(context).colorScheme;
 
     final answerText = flashcard.answer.replaceAll('\\n', '\n');

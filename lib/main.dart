@@ -6,7 +6,6 @@ import 'package:mindflasher_4/providers/template_deck_provider.dart';
 import 'package:mindflasher_4/providers/template_flashcard_provider.dart';
 import 'package:mindflasher_4/screens/deck/deck_index_screen.dart';
 import 'package:mindflasher_4/screens/language_selection_screen.dart';
-import 'package:mindflasher_4/screens/font_size_adjustment_screen.dart';
 import 'package:provider/provider.dart';
 import 'providers/provider_user_control.dart';
 import 'providers/provider_user_login.dart';

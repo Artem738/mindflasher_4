@@ -21,8 +21,8 @@ class AudioPlayerService {
     // The backend will handle the delay of generating the file and then stream it.
     
     String fullUrl = '$_baseUrl/api/flashcards/$flashcardId/audio/direct?lang=$lang';
-    if (_bearerToken != null && _bearerToken!.isNotEmpty) {
-      final encodedToken = Uri.encodeComponent(_bearerToken!);
+    if (_bearerToken != null && _bearerToken.isNotEmpty) {
+      final encodedToken = Uri.encodeComponent(_bearerToken);
       fullUrl += '&token=$encodedToken';
     }
     if (text != null && text.isNotEmpty) {
@@ -50,7 +50,7 @@ class AudioPlayerService {
   Future<void> clearFlashcardAudioCache(int flashcardId, String lang) async {
     String fullUrl = '$_baseUrl/api/flashcards/$flashcardId/audio/cache?lang=$lang';
     final Map<String, String> headers = {};
-    if (_bearerToken != null && _bearerToken!.isNotEmpty) {
+    if (_bearerToken != null && _bearerToken.isNotEmpty) {
       headers['Authorization'] = 'Bearer $_bearerToken';
     }
 

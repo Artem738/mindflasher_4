@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mindflasher_4/providers/voice_lesson_provider.dart';
+import 'package:mindflasher_4/providers/provider_user_control.dart';
+import 'package:mindflasher_4/providers/provider_user_login.dart';
 import 'package:mindflasher_4/models/user_model.dart';
 import 'package:mindflasher_4/translates/voice_lesson_screen_translate.dart';
+import 'package:flutter/services.dart';
 
 class VoiceLessonScreen extends StatelessWidget {
   final int deckId;
@@ -62,70 +65,152 @@ class _VoiceLessonScreenBody extends StatelessWidget {
               ),
               const SizedBox(height: 32),
               if (provider.state == VoiceLessonState.initial) ...[
-                const Spacer(),
-                const Icon(Icons.record_voice_over, size: 64, color: Colors.blueGrey),
-                const SizedBox(height: 32),
-                Text(
-                  'Hands-Free Voice Lesson',
-                  style: Theme.of(context).textTheme.titleLarge,
-                  textAlign: TextAlign.center,
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 16),
+                        if (context.read<ProviderUserLogin>().isTelegramFeatureWorks)
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.orange.withOpacity(0.1),
+                              border: Border.all(color: Colors.orange),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Icon(Icons.warning_amber_rounded, color: Colors.orange),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        txt.tt('telegram_warning'),
+                                        style: const TextStyle(fontSize: 13),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                OutlinedButton.icon(
+                                  onPressed: () async {
+                                    try {
+                                      final link = await context.read<ProviderUserControl>().generateWebLink();
+                                      await Clipboard.setData(ClipboardData(text: link));
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text(txt.tt('link_copied'))),
+                                        );
+                                      }
+                                    } catch (e) {
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text(e.toString())),
+                                        );
+                                      }
+                                    }
+                                  },
+                                  icon: const Icon(Icons.copy, size: 18),
+                                  label: Text(txt.tt('copy_web_link')),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: Colors.orange,
+                                    side: const BorderSide(color: Colors.orange),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        else
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.green.withOpacity(0.1),
+                              border: Border.all(color: Colors.green),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.check_circle_outline, color: Colors.green, size: 28),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    txt.tt('browser_success'),
+                                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.green),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        const SizedBox(height: 32),
+                        const Icon(Icons.record_voice_over, size: 64, color: Colors.blueGrey),
+                        const SizedBox(height: 24),
+                        Text(
+                          txt.tt('initial_title'),
+                          style: Theme.of(context).textTheme.titleLarge,
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          txt.tt('initial_desc'),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                        const SizedBox(height: 32),
+                        Text(
+                          '${txt.tt('sensitivity_title')}: ${provider.speechAmplitudeThreshold.toStringAsFixed(1)} dB',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          txt.tt('sensitivity_desc'),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Colors.grey, fontSize: 12),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: Text(
+                                txt.tt('sensitivity_quiet'),
+                                textAlign: TextAlign.right,
+                                style: const TextStyle(color: Colors.grey, fontSize: 12),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 3,
+                              child: Slider(
+                                value: provider.speechAmplitudeThreshold.clamp(-60.0, -30.0),
+                                min: -60.0,
+                                max: -30.0,
+                                divisions: 30,
+                                activeColor: Colors.orange,
+                                label: '${provider.speechAmplitudeThreshold.toStringAsFixed(1)} dB',
+                                onChanged: (value) {
+                                  provider.updateSpeechAmplitudeThreshold(value);
+                                },
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Text(
+                                txt.tt('sensitivity_noisy'),
+                                textAlign: TextAlign.left,
+                                style: const TextStyle(color: Colors.grey, fontSize: 12),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'In this mode, you will interact with the flashcards entirely using your voice. '
-                  'The app will read the questions aloud, and you must answer them verbally.\n\n'
-                  'Say "skip" to go to the next card, "pause" to stop, or "I don\'t know" if you are stuck.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey),
-                ),
-                const SizedBox(height: 32),
-                Text(
-                  '${txt.tt('sensitivity_title')}: ${provider.speechAmplitudeThreshold.toStringAsFixed(1)} dB',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  txt.tt('sensitivity_desc'),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: Text(
-                        txt.tt('sensitivity_quiet'),
-                        textAlign: TextAlign.right,
-                        style: const TextStyle(color: Colors.grey, fontSize: 12),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Slider(
-                        value: provider.speechAmplitudeThreshold.clamp(-100.0, -30.0),
-                        min: -100.0,
-                        max: -30.0,
-                        divisions: 70,
-                        activeColor: Colors.orange,
-                        label: '${provider.speechAmplitudeThreshold.toStringAsFixed(1)} dB',
-                        onChanged: (value) {
-                          provider.updateSpeechAmplitudeThreshold(value);
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Text(
-                        txt.tt('sensitivity_noisy'),
-                        textAlign: TextAlign.left,
-                        style: const TextStyle(color: Colors.grey, fontSize: 12),
-                      ),
-                    ),
-                  ],
-                ),
-                const Spacer(),
                 ElevatedButton.icon(
                   onPressed: () {
                     provider.startLesson();

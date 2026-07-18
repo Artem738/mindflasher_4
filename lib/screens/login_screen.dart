@@ -54,6 +54,22 @@ class _LoginScreenState extends State<LoginScreen> {
                 size: 80,
                 color: Theme.of(context).colorScheme.primary,
               ),
+              if (context.watch<ProviderUserLogin>().hasError && context.watch<ProviderUserLogin>().errorMessage.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.red.withOpacity(0.5)),
+                  ),
+                  child: Text(
+                    context.watch<ProviderUserLogin>().errorMessage,
+                    style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
               const SizedBox(height: 32),
               TextField(
                 controller: _emailController,

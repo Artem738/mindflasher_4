@@ -41,9 +41,12 @@ class ProviderUserLogin extends ChangeNotifier {
 
   String get lastPass => _lastPass;
 
+  final String? initialWebKey;
+
   /// Initialise Class on First Run!
   ProviderUserLogin(
     this._userModel, {
+    this.initialWebKey,
     AuthApi? authApi,
     AuthLocalStore? authLocalStore,
     TelegramAuthBridge? telegramAuthBridge,
@@ -63,6 +66,20 @@ class ProviderUserLogin extends ChangeNotifier {
     _hasError = false;
     _errorMessage = '';
     notifyListeners();
+
+    String? webKey = initialWebKey;
+    ApiLogger.apiPrint('ProviderUserLogin init. initialWebKey = $initialWebKey');
+
+    if (kIsWeb && webKey == null) {
+      // Fallback just in case
+      webKey = Uri.base.queryParameters['key'];
+      ApiLogger.apiPrint('ProviderUserLogin fallback URI query key: $webKey');
+      if (webKey == null && Uri.base.fragment.contains('key=')) {
+        final fragmentUri = Uri.parse('http://dummy${Uri.base.fragment.startsWith('/') ? '' : '/'}${Uri.base.fragment}');
+        webKey = fragmentUri.queryParameters['key'];
+        ApiLogger.apiPrint('ProviderUserLogin fallback fragment key: $webKey');
+      }
+    }
 
     try {
       if (kIsWeb) {
@@ -85,7 +102,38 @@ class ProviderUserLogin extends ChangeNotifier {
       }
 
       await _loadLocalState();
-      await _initializeTelegram();
+      ApiLogger.apiPrint('Local state loaded. token = ${userModel.token}');
+
+      if (webKey != null && webKey.isNotEmpty) {
+        if (userModel.token == null) {
+          ApiLogger.apiPrint('Calling _loginWithWebKey($webKey)...');
+          await _loginWithWebKey(webKey);
+        } else {
+          ApiLogger.apiPrint('Skipping webKey login because user is already logged in.');
+        }
+      } else {
+        ApiLogger.apiPrint('No webKey found. Proceeding normal init.');
+      } // TODO: clear URL param if possible
+
+      if (userModel.token == null) {
+        await _initializeTelegram();
+      } else {
+        // We have a token, we might want to validate it or just let the app load
+        _logger.info('auth', 'User already authenticated via token');
+        
+        // If telegram is available, still init it to get bridge UI, but don't re-auth
+        if (_telegramAuthBridge.isSupported) {
+          try {
+            await _telegramAuthBridge.ready();
+            _telegramAuthBridge.disableVerticalSwipes();
+            _telegramUser = _telegramAuthBridge.user;
+            isTelegramFeatureWorks = true;
+            expandTelegram();
+          } catch (e) {
+            _logger.warning('telegram', 'Telegram UI init skipped: $e');
+          }
+        }
+      }
     } catch (e) {
       _hasError = true;
       _errorMessage = 'Initialization error: $e';
@@ -115,6 +163,7 @@ class ProviderUserLogin extends ChangeNotifier {
       language_code: localState.languageCode,
       isFirstEnter: localState.isFirstEnter,
       themeMode: themeMode,
+      token: localState.token,
     );
   }
 
@@ -210,6 +259,27 @@ class ProviderUserLogin extends ChangeNotifier {
       _errorMessage = 'Error TG login: $e';
       _logger.error('telegram', _errorMessage);
       ApiLogger.apiPrint(_errorMessage);
+    }
+  }
+
+  Future<void> _loginWithWebKey(String key) async {
+    try {
+      _logger.info('auth', 'Attempting web login with key');
+      ApiLogger.apiPrint('Attempting API call loginWithWebKey...');
+      final response = await _authApi.loginWithWebKey(key: key);
+      await _applyAuthenticatedUser(response.userData, response.token, fallbackEmail: null);
+      _logger.info('auth', 'Web login succeeded');
+      ApiLogger.apiPrint('Login with Web Key succeeded');
+    } on AppHttpException catch (e) {
+      _hasError = true;
+      _errorMessage = e.message;
+      _logger.error('auth', 'Web login HTTP error: $_errorMessage');
+      ApiLogger.apiPrint('Web login HTTP error: $_errorMessage');
+    } catch (e) {
+      _hasError = true;
+      _errorMessage = 'Network error: $e';
+      _logger.error('auth', 'Web login Exception: $_errorMessage');
+      ApiLogger.apiPrint('Web login Exception: $_errorMessage');
     }
   }
 
@@ -333,6 +403,10 @@ class ProviderUserLogin extends ChangeNotifier {
       await _authLocalStore.saveLastEmail(resolvedEmail);
     } else {
       await _authLocalStore.clearLastEmail();
+    }
+
+    if (token.isNotEmpty) {
+      await _authLocalStore.saveToken(token);
     }
   }
 }

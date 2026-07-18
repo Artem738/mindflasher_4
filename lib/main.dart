@@ -11,9 +11,40 @@ import 'providers/provider_user_control.dart';
 import 'providers/provider_user_login.dart';
 import 'screens/login_screen.dart';
 import 'models/user_model.dart';
+import 'package:mindflasher_4/env_config.dart';
 import 'package:mindflasher_4/services/app_http_client.dart';
+import 'package:mindflasher_4/services/api_logger.dart';
+import 'package:mindflasher_4/url_helper.dart';
+
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 void main() {
+  String? initialWebKey;
+  if (kIsWeb) {
+    try {
+      final initialUri = Uri.base;
+      final host = initialUri.host;
+      if (host == 'localhost' || host == '127.0.0.1') {
+        EnvConfig.mainApiUrl = EnvConfig.normalizeApiBaseUrl(EnvConfig.localApiUrl);
+      } else {
+        EnvConfig.mainApiUrl = EnvConfig.normalizeApiBaseUrl(EnvConfig.webApiUrl);
+      }
+      
+      ApiLogger.apiPrint('BOOTSTRAP URL: ${initialUri.toString()}');
+      
+      initialWebKey = getWebUrlKey() ?? initialUri.queryParameters['key'];
+      ApiLogger.apiPrint('BOOTSTRAP query key: $initialWebKey');
+      
+      if (initialWebKey == null && initialUri.fragment.contains('key=')) {
+        final fragmentUri = Uri.parse('http://dummy${initialUri.fragment.startsWith('/') ? '' : '/'}${initialUri.fragment}');
+        initialWebKey = fragmentUri.queryParameters['key'];
+        ApiLogger.apiPrint('BOOTSTRAP fragment key: $initialWebKey');
+      }
+    } catch (e) {
+      ApiLogger.apiPrint('BOOTSTRAP URL parse error: $e');
+    }
+  }
+
   final userModel = UserModel();
 
   AppHttpClient.onUnauthorized = () {
@@ -25,7 +56,7 @@ void main() {
       providers: [
         ChangeNotifierProvider.value(value: userModel),
         ChangeNotifierProxyProvider<UserModel, ProviderUserLogin>(
-          create: (context) => ProviderUserLogin(userModel),
+          create: (context) => ProviderUserLogin(userModel, initialWebKey: initialWebKey),
           update: (context, userModel, providerUserLogin) => providerUserLogin!,
         ),
         ChangeNotifierProxyProvider<UserModel, ProviderUserControl>(

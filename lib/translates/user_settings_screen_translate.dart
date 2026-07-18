@@ -132,6 +132,16 @@ class UserSettingsScreenTranslate {
       'ru': 'Настройки',
       'uk': 'Налаштування',
     },
+    'copy_web_link': {
+      'en': 'Copy Web Login Link',
+      'ru': 'Скопировать ссылку для браузера',
+      'uk': 'Скопіювати посилання для браузера',
+    },
+    'link_copied': {
+      'en': 'Link copied to clipboard',
+      'ru': 'Ссылка скопирована в буфер обмена',
+      'uk': 'Посилання скопійовано в буфер обміну',
+    },
   };
 
   final String languageCode;

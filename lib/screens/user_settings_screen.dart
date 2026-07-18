@@ -3,6 +3,7 @@ import 'package:mindflasher_4/screens/deck/deck_index_screen.dart';
 import 'package:mindflasher_4/screens/first_enter_screen.dart';
 import 'package:mindflasher_4/screens/font_size_adjustment_screen.dart';
 import 'package:mindflasher_4/screens/language_selection_screen.dart';
+import 'package:flutter/services.dart';
 // Добавлен новый экран
 import 'package:mindflasher_4/translates/user_settings_screen_translate.dart';
 import 'package:provider/provider.dart';
@@ -172,6 +173,31 @@ class UserSettingsScreen extends StatelessWidget {
                           MaterialPageRoute(
                               builder: (context) => const FirstEnterScreen()),
                         );
+                      },
+                    ),
+                    const Divider(height: 1),
+                    ListTile(
+                      leading: const Icon(Icons.link),
+                      title: Text(txt.tt('copy_web_link'),
+                          style: TextStyle(
+                              fontSize: baseFontSize.clamp(14.0, 20.0))),
+                      trailing: const Icon(Icons.content_copy),
+                      onTap: () async {
+                        try {
+                          final link = await context.read<ProviderUserControl>().generateWebLink();
+                          await Clipboard.setData(ClipboardData(text: link));
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(txt.tt('link_copied'))),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(e.toString())),
+                            );
+                          }
+                        }
                       },
                     ),
                   ],

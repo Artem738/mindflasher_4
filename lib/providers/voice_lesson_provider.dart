@@ -90,15 +90,17 @@ class VoiceLessonProvider extends ChangeNotifier {
 
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
-    _speechAmplitudeThreshold = prefs.getDouble('speechAmplitudeThreshold') ?? -65.0;
+    double saved = prefs.getDouble('speechAmplitudeThreshold') ?? -60.0;
+    // Ограничиваем минимум до -60 дБ, чтобы фоновый шум не активировал микрофон
+    _speechAmplitudeThreshold = saved.clamp(-60.0, -30.0);
     notifyListeners();
   }
 
   Future<void> updateSpeechAmplitudeThreshold(double value) async {
-    _speechAmplitudeThreshold = value;
+    _speechAmplitudeThreshold = value.clamp(-60.0, -30.0);
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble('speechAmplitudeThreshold', value);
+    await prefs.setDouble('speechAmplitudeThreshold', _speechAmplitudeThreshold);
   }
 
   Future<void> startLesson() async {

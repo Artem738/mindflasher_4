@@ -5,6 +5,16 @@ class VoiceLessonScreenTranslate {
       'ru': 'Голосовой урок',
       'uk': 'Голосовий урок',
     },
+    'initial_title': {
+      'en': 'Hands-Free Voice Lesson',
+      'ru': 'Голосовой урок без рук',
+      'uk': 'Голосовий урок без рук',
+    },
+    'initial_desc': {
+      'en': 'In this mode, you will interact with the flashcards entirely using your voice. The app will read the questions aloud, and you must answer them verbally.\n\nSay "skip" to go to the next card, "pause" to stop, or "I don\'t know" if you are stuck.',
+      'ru': 'В этом режиме вы будете взаимодействовать с карточками только голосом. Приложение прочитает вопросы вслух, а вы должны ответить на них устно.\n\nСкажите "дальше", чтобы перейти к следующей карточке, "пауза", чтобы остановиться, или "не знаю", если вы застряли.',
+      'uk': 'У цьому режимі ви будете взаємодіяти з картками лише голосом. Додаток прочитає питання вголос, а ви повинні відповісти на них усно.\n\nСкажіть "далі", щоб перейти до наступної картки, "пауза", щоб зупинитися, або "не знаю", якщо ви застрягли.',
+    },
     'state_loading': {
       'en': 'Loading lesson...',
       'ru': 'Загрузка урока...',
@@ -114,6 +124,26 @@ class VoiceLessonScreenTranslate {
       'en': 'Noisy env',
       'ru': 'Вокруг шумно',
       'uk': 'Навколо шумно',
+    },
+    'telegram_warning': {
+      'en': 'Voice lessons may not work correctly inside Telegram. We recommend copying the link below and opening the app in a regular browser (like Chrome or Safari).',
+      'ru': 'Голосовые уроки могут работать некорректно внутри Telegram. Рекомендуем скопировать ссылку ниже и открыть приложение в обычном браузере (например, Chrome или Safari).',
+      'uk': 'Голосові уроки можуть працювати некоректно всередині Telegram. Рекомендуємо скопіювати посилання нижче та відкрити додаток у звичайному браузері (наприклад, Chrome або Safari).',
+    },
+    'browser_success': {
+      'en': 'You are using a regular browser. Voice lessons will work smoothly!',
+      'ru': 'Вы открыли приложение в браузере. Голосовые уроки будут работать стабильно!',
+      'uk': 'Ви відкрили додаток у браузері. Голосові уроки працюватимуть стабільно!',
+    },
+    'copy_web_link': {
+      'en': 'Copy Browser Link',
+      'ru': 'Скопировать ссылку для браузера',
+      'uk': 'Скопіювати посилання для браузера',
+    },
+    'link_copied': {
+      'en': 'Link copied to clipboard',
+      'ru': 'Ссылка скопирована в буфер обмена',
+      'uk': 'Посилання скопійовано в буфер обміну',
     },
   };
 

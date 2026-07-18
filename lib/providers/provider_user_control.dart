@@ -105,4 +105,22 @@ class ProviderUserControl with ChangeNotifier {
       throw Exception('Failed to update auto-close setting on server');
     }
   }
+
+  Future<String> generateWebLink() async {
+    final url = Uri.parse('${EnvConfig.mainApiUrl}/api/user/web-link');
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${_token()}',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data['link'];
+    } else {
+      throw Exception('Failed to generate web link');
+    }
+  }
 }

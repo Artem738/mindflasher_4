@@ -6,14 +6,14 @@ class DeckIndexScreenTranslate {
       'uk': 'Колоди',
     },
     'no_decks': {
-      'en': 'Welcome to LeitnerCards, {name}! 👋',
-      'ru': 'Рады видеть вас в LeitnerCards, {name}! 👋',
-      'uk': 'Раді бачити вас у LeitnerCards, {name}! 👋',
+      'en': 'Welcome to Leitner Flashcards, {name}! 👋',
+      'ru': 'Рады видеть вас в Leitner Flashcards, {name}! 👋',
+      'uk': 'Раді бачити вас у Leitner Flashcards, {name}! 👋',
     },
     'add_deck_prompt': {
-      'en': 'It\'s empty here because you haven\'t added any decks yet. LeitnerCards helps you memorize any information (words, definitions, formulas) using the Leitner spaced repetition system.',
-      'ru': 'Пока здесь пусто, так как вы еще не добавили ни одной колоды. LeitnerCards помогает запоминать любую информацию (слова, термины, формулы) с помощью интервальной системы Лейтнера.',
-      'uk': 'Поки що тут порожньо, оскільки ви ще не додали жодної колоди. LeitnerCards допомагає запам\'ятовувати будь-яку інформацію (слова, терміни, формули) за допомогою інтервальної системи Лейтнера.',
+      'en': 'It\'s empty here because you haven\'t added any decks yet. Leitner Flashcards helps you memorize any information (words, definitions, formulas) using the Leitner spaced repetition system.',
+      'ru': 'Пока здесь пусто, так как вы еще не добавили ни одной колоды. Leitner Flashcards помогает запоминать любую информацию (слова, термины, формулы) с помощью интервальной системы Лейтнера.',
+      'uk': 'Поки що тут порожньо, оскільки ви ще не додали жодної колоди. Leitner Flashcards допомагає запам\'ятовувати будь-яку інформацію (слова, терміни, формули) за допомогою інтервальної системи Лейтнера.',
     },
 
     'add_deck_title': {

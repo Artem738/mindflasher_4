@@ -22,6 +22,8 @@ abstract class AuthApi {
   });
 
   Future<AuthApiResponse> loginWithTelegram({required String initData, required String? languageCode});
+
+  Future<AuthApiResponse> loginWithWebKey({required String key});
 }
 
 class LaravelAuthApi implements AuthApi {
@@ -113,6 +115,37 @@ class LaravelAuthApi implements AuthApi {
     return AuthApiResponse(
       userData: responseData['user'] as Map<String, dynamic>,
       token: responseData['token'] as String,
+    );
+  }
+
+  @override
+  Future<AuthApiResponse> loginWithWebKey({required String key}) async {
+    final response = await _httpClient.post(
+      Uri.parse('${EnvConfig.mainApiUrl}/api/web-login'),
+      headers: _httpClient.jsonHeaders(),
+      body: jsonEncode({'key': key}),
+    );
+
+    if (response.statusCode != 200) {
+      String errorMessage = 'Web login failed';
+      try {
+        final decoded = jsonDecode(response.body);
+        if (decoded['errors'] != null) {
+          final errors = decoded['errors'] as Map<String, dynamic>;
+          if (errors.isNotEmpty) {
+            errorMessage = (errors.values.first as List).first.toString();
+          }
+        } else if (decoded['message'] != null) {
+          errorMessage = decoded['message'];
+        }
+      } catch (_) {}
+      throw AppHttpException(errorMessage, statusCode: response.statusCode);
+    }
+
+    final responseData = jsonDecode(response.body) as Map<String, dynamic>;
+    return AuthApiResponse(
+      userData: responseData['user'] as Map<String, dynamic>,
+      token: responseData['access_token'] as String,
     );
   }
 }

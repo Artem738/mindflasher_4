@@ -50,6 +50,19 @@ class FakeAuthLocalStore implements AuthLocalStore {
   Future<void> saveThemeMode(String value) async {
     savedThemeMode = value;
   }
+
+  String? savedToken;
+  bool clearedToken = false;
+
+  @override
+  Future<void> saveToken(String value) async {
+    savedToken = value;
+  }
+
+  @override
+  Future<void> clearToken() async {
+    clearedToken = true;
+  }
 }
 
 class FakeAuthApi implements AuthApi {
@@ -76,6 +89,11 @@ class FakeAuthApi implements AuthApi {
   @override
   Future<void> registerWithEmail({required String name, required String email, required String password, required String passwordConfirmation, required String? languageCode}) async {
     registeredLanguageCode = languageCode;
+  }
+
+  @override
+  Future<AuthApiResponse> loginWithWebKey({required String key}) async {
+    throw UnimplementedError('FakeAuthApi.loginWithWebKey is not implemented');
   }
 }
 

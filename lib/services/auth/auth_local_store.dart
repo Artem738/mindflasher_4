@@ -11,6 +11,7 @@ class AuthLocalState {
     this.languageCode,
     this.lastPassword = '',
     this.themeMode,
+    this.token,
   });
 
   final bool isPreferencesAvailable;
@@ -19,6 +20,7 @@ class AuthLocalState {
   final String? languageCode;
   final String lastPassword;
   final String? themeMode;
+  final String? token;
 }
 
 abstract class AuthLocalStore {
@@ -35,6 +37,10 @@ abstract class AuthLocalStore {
   Future<void> saveLastPassword(String value);
 
   Future<void> saveThemeMode(String value);
+
+  Future<void> saveToken(String value);
+
+  Future<void> clearToken();
 }
 
 class DeviceAuthLocalStore implements AuthLocalStore {
@@ -51,6 +57,7 @@ class DeviceAuthLocalStore implements AuthLocalStore {
   static const String languageCodeKey = 'language_${EnvConfig.StorageAndSharedPreferencesKey}';
   static const String lastPasswordKey = 'lastPass_${EnvConfig.StorageAndSharedPreferencesKey}';
   static const String themeModeKey = 'themeMode_${EnvConfig.StorageAndSharedPreferencesKey}';
+  static const String tokenKey = 'authToken_${EnvConfig.StorageAndSharedPreferencesKey}';
 
   SharedPreferences? _sharedPreferences;
   FlutterSecureStorage? _secureStorage;
@@ -85,6 +92,9 @@ class DeviceAuthLocalStore implements AuthLocalStore {
       final lastPassword = secureStorage == null
           ? ''
           : await secureStorage.read(key: lastPasswordKey) ?? '';
+      final token = secureStorage == null
+          ? null
+          : await secureStorage.read(key: tokenKey);
 
       return AuthLocalState(
         isPreferencesAvailable: true,
@@ -93,17 +103,22 @@ class DeviceAuthLocalStore implements AuthLocalStore {
         languageCode: preferences.getString(languageCodeKey),
         lastPassword: lastPassword,
         themeMode: preferences.getString(themeModeKey),
+        token: token,
       );
     } catch (_) {
       final secureStorage = await _getSecureStorage();
       final lastPassword = secureStorage == null
           ? ''
           : await secureStorage.read(key: lastPasswordKey) ?? '';
+      final token = secureStorage == null
+          ? null
+          : await secureStorage.read(key: tokenKey);
 
       return AuthLocalState(
         isPreferencesAvailable: false,
         isFirstEnter: true,
         lastPassword: lastPassword,
+        token: token,
       );
     }
   }
@@ -161,5 +176,25 @@ class DeviceAuthLocalStore implements AuthLocalStore {
     }
 
     await secureStorage.write(key: lastPasswordKey, value: value);
+  }
+
+  @override
+  Future<void> saveToken(String value) async {
+    final secureStorage = await _getSecureStorage();
+    if (secureStorage == null) {
+      return;
+    }
+
+    await secureStorage.write(key: tokenKey, value: value);
+  }
+
+  @override
+  Future<void> clearToken() async {
+    final secureStorage = await _getSecureStorage();
+    if (secureStorage == null) {
+      return;
+    }
+
+    await secureStorage.delete(key: tokenKey);
   }
 }

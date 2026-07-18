@@ -1,6 +1,6 @@
 {
-    "name": "LeitnerCards",
-    "short_name": "LeitnerCards",
+    "name": "Leitner Flashcards",
+    "short_name": "Leitner Flashcards",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
